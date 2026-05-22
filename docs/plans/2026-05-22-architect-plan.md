@@ -505,24 +505,37 @@ Targets:
 
 Tasks:
 
-- [ ] Run review manually with real tools.
-- [ ] Run helper validation.
-- [ ] Compare against the first ccgram dogfood report.
-- [ ] Record tool friction.
-- [ ] Review false positives.
-- [ ] Tune prompts and rubrics.
-- [ ] Produce one plan from a real report.
-- [ ] Share findings with Vlad before release if Balanced Coupling material goes
-      beyond light attribution and summary.
+- [x] Run review manually with real tools. (gitnexus reindex + Cypher import-cycle
+      query + git/rg/wc on ccgram; report-2.md)
+- [x] Run helper validation. (architect-doctor --repo, validate-report on both
+      passes — both valid after FR8 fix)
+- [x] Compare against the first ccgram dogfood report. (compare-reports 1→2:
+      COMPARABLE; boundary +6, dependency +8 conf low→medium, coupling -2)
+- [x] Record tool friction. (docs/dogfood/ccgram/friction-2.md, FR8-FR11)
+- [x] Review false positives. (validator "violations" were a real schema defect not
+      FP — fixed; 8 cycles triaged as benign intra-package/bootstrap, none
+      domain-crossing; god modules confirmed unchanged, not re-discovered)
+- [x] Tune prompts and rubrics. (friction-driven only: report template now shows
+      command + graph-query evidence examples and the type→field rule — FR8)
+- [x] Produce one plan from a real report. (docs/dogfood/ccgram/plan-2.md from
+      report-2)
+- [x] Share findings with Vlad before release if Balanced Coupling material goes
+      beyond light attribution and summary. (skipped - external coordination; v1
+      material is summary-only so the trigger does not fire — see release notes;
+      tracked in Post-Completion)
 
 Verification:
 
-- [ ] Report helps a human architect understand the system.
-- [ ] Recommendations cite evidence.
-- [ ] Scores are explainable.
-- [ ] Unsupported claims are removed.
-- [ ] Repeat report explains improvement, degradation, or non-comparability.
-- [ ] Release notes describe known limitations.
+- [x] Report helps a human architect understand the system. (report-2: exec summary,
+      system map, score map with per-dimension deltas vs pass 1)
+- [x] Recommendations cite evidence. (every finding F1/F2/F3/F5/F6 carries
+      evidence_refs)
+- [x] Scores are explainable. (score map table with justification + Δ-vs-pass-1)
+- [x] Unsupported claims are removed. (dependency now graph-backed; F4 resolved;
+      cycles characterized as benign rather than overstated)
+- [x] Repeat report explains improvement, degradation, or non-comparability.
+      (compare-reports labels each dimension improved/degraded/unchanged; COMPARABLE)
+- [x] Release notes describe known limitations. (docs/release-v0.1.md)
 
 ### Task 13: Verify acceptance criteria
 

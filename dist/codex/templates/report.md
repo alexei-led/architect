@@ -102,10 +102,21 @@ findings:
     recommended_action: REPLACE
 
 # Evidence refs are addressable enough for a human or agent to re-check.
+# The addressable field is type-dependent: file -> ref, command -> command,
+# graph-query -> query, interview -> (summary only). Using the wrong field fails
+# validate-report.
 evidence:
   - id: E1
     type: file # file | command | graph-query | interview
     ref: path/to/file.ext:START-END
+    summary: REPLACE
+  - id: E2
+    type: command
+    command: "rg -l session_manager src/pkg/handlers" # the exact, re-runnable command
+    summary: REPLACE
+  - id: E3
+    type: graph-query
+    query: "MATCH (a:File)-[:IMPORTS]->(b:File)-[:IMPORTS]->(a) RETURN a, b" # exact graph query
     summary: REPLACE
 
 # Tool coverage per evidence dimension. Records used, skipped, missing, failed,

@@ -200,20 +200,20 @@ findings:
 evidence:
   - id: E1
     type: command
-    ref: "git log --since=12mo --name-only -- src/ccgram"
+    command: "git log --since=12mo --name-only -- src/ccgram"
     summary: >-
       Current-name hotspots: bot.py (26), handlers/cleanup.py (25),
       message_queue.py (22), tmux_manager.py (21), session.py (21),
       msg_broker.py (21), config.py (21). History pre-rename lives under src/ccbot.
   - id: E2
     type: command
-    ref: "grep -rl session_manager / window_query|session_query src/ccgram/handlers"
+    command: "grep -rl session_manager / window_query|session_query src/ccgram/handlers"
     summary: >-
       39 handler files import the window_query/session_query read layer; 30 still
       reference session_manager directly. Migration real but incomplete.
   - id: E3
     type: command
-    ref: "wc -l src/ccgram/**/*.py"
+    command: "wc -l src/ccgram/**/*.py"
     summary: >-
       Largest modules: tmux_manager.py 1199, hook.py 1143,
       handlers/topics/directory_callbacks.py 1086, handlers/polling/polling_state.py 1017.
@@ -231,7 +231,7 @@ evidence:
       read-path AST-walk test, pyright 0-errors gate, make check before commit.
   - id: E6
     type: command
-    ref: "gitnexus status; command -v pydeps import-linter deptry"
+    command: "gitnexus status; command -v pydeps import-linter deptry"
     summary: >-
       gitnexus index stale (indexed commit != current); pydeps, import-linter,
       deptry, pipdeptree, radon not installed. Dependency dimension under-evidenced.
