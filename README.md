@@ -66,3 +66,30 @@ Each target (`claude`, `codex`, `pi`) gets the same layout: `agents/architect.md
 (AGENT.md body with the target frontmatter overlay merged in), `skills/<name>/`,
 `templates/`, and a `plugin.yaml` manifest enumerating the agent and skills.
 Output is deterministic, so `--check` catches both stale builds and hand edits.
+
+## Pi package
+
+`dist/pi/` is the Pi package. Its `plugin.yaml` manifest enumerates the architect
+agent and every skill, so Pi discovers them from the manifest paths — no
+per-skill registration needed.
+
+The Pi manifest declares one dependency:
+
+```yaml
+requires:
+  - alexei-led/cc-thingz
+```
+
+`cc-thingz` provides the `ask_user_question` tool the architect's interview step
+maps to on Pi (see `src/agents/architect/pi/frontmatter.yaml`). This extension
+ships no local Pi question extension; `cc-thingz` is the single source of that
+capability. Without it, the review skill falls back to plain numbered interview
+questions.
+
+Run the Python helpers through `uv` (entry points declared in `pyproject.toml`):
+
+```sh
+uv run architect-doctor --repo /path/to/repo   # tool availability + coverage
+uv run architect-validate-report report.md     # validate a report
+uv run architect-compare-reports a.md b.md      # compare or explain non-comparability
+```

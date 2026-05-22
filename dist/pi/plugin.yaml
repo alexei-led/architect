@@ -23,3 +23,5 @@ skills:
 - skills/tools-python/SKILL.md
 - skills/tools-report-markdown/SKILL.md
 - skills/tools-typescript/SKILL.md
+requires:
+- alexei-led/cc-thingz

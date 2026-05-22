@@ -106,6 +106,9 @@ def render_manifest(target: str) -> str:
         "agents": ["agents/architect.md"],
         "skills": [f"skills/{d.name}/SKILL.md" for d in skill_dirs()],
     }
+    requires = (meta.get("requires") or {}).get(target) or []
+    if requires:
+        manifest["requires"] = list(requires)
     return yaml.safe_dump(manifest, sort_keys=False, default_flow_style=False)
 
 

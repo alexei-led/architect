@@ -79,6 +79,39 @@ def test_output_is_deterministic():
     assert compile.render_all() == compile.render_all()
 
 
+def test_pi_manifest_requires_cc_thingz():
+    """Pi declares its cc-thingz dependency so it can offer ask_user_question."""
+    rendered = compile.render_all()
+    manifest = yaml.safe_load(rendered["pi"]["plugin.yaml"])
+    assert manifest["requires"] == ["alexei-led/cc-thingz"]
+
+
+def test_only_pi_declares_requires():
+    """Claude (native AskUserQuestion) and Codex (unverified) declare no deps."""
+    rendered = compile.render_all()
+    for target in ("claude", "codex"):
+        manifest = yaml.safe_load(rendered[target]["plugin.yaml"])
+        assert "requires" not in manifest, target
+
+
+def test_pi_agent_maps_structured_questions_to_cc_thingz_tool():
+    """Regression guard: the requires entry stays linked to the mapped tool."""
+    rendered = compile.render_all()
+    fm = _agent_frontmatter(rendered["pi"]["agents/architect.md"])
+    assert fm["capabilities"]["structured_questions"] == "ask_user_question"
+
+
+def test_pi_manifest_enumerates_all_skills_for_discovery():
+    """Pi discovers skills from the manifest paths; every source skill is listed."""
+    rendered = compile.render_all()
+    manifest = yaml.safe_load(rendered["pi"]["plugin.yaml"])
+    skill_paths = {f"skills/{d.name}/SKILL.md" for d in compile.skill_dirs()}
+    assert set(manifest["skills"]) == skill_paths
+    assert manifest["agents"] == ["agents/architect.md"]
+    for path in manifest["skills"]:
+        assert path in rendered["pi"], path
+
+
 def test_committed_dist_matches_source():
     """The checked-in dist/ must be regenerated, not hand-edited."""
     rendered = compile.render_all()

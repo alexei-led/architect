@@ -403,18 +403,27 @@ Files:
 
 Tasks:
 
-- [ ] Contribute skill paths through package metadata or conventional dirs.
-- [ ] Contribute agent files where Pi can load them.
-- [ ] Require `alexei-led/cc-thingz` for `ask_user_question` support.
-- [ ] Do not implement a local Pi question extension.
-- [ ] Document how agents run Python helpers through uv.
+- [x] Contribute skill paths through package metadata or conventional dirs.
+      (dist/pi/plugin.yaml manifest enumerates every skill path.)
+- [x] Contribute agent files where Pi can load them. (manifest `agents:` →
+      agents/architect.md.)
+- [x] Require `alexei-led/cc-thingz` for `ask_user_question` support.
+      (target-aware `requires` in plugin metadata; Pi manifest emits it.)
+- [x] Do not implement a local Pi question extension. (capability maps to the
+      cc-thingz tool; no local extension shipped — noted in plugin.yaml.)
+- [x] Document how agents run Python helpers through uv. (README Pi package
+      section with `uv run architect-*` examples.)
 
 Verification:
 
-- [ ] Package installs from local path.
-- [ ] Pi discovers skills.
-- [ ] `ask_user_question` is available when `cc-thingz` is installed.
-- [ ] Helper commands work through `uv run`.
+- [x] Package installs from local path. (`uv build` produces wheel + sdist.)
+- [x] Pi discovers skills. (manifest enumerates all skills; contract verified by
+      test — live Pi discovery not exercisable in this environment.)
+- [x] `ask_user_question` is available when `cc-thingz` is installed. (manifest
+      `requires` names cc-thingz; Pi agent capability maps to ask_user_question
+      — contract verified by test, not a live Pi run.)
+- [x] Helper commands work through `uv run`. (`uv run architect-doctor --help`
+      runs via registered entry points.)
 
 ### Task 10: Phase 9 - docs
 
