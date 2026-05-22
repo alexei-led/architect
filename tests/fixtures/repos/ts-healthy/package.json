@@ -1,0 +1,9 @@
+{
+  "name": "ts-healthy",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "depcruise": "depcruise src --config .dependency-cruiser.cjs"
+  }
+}

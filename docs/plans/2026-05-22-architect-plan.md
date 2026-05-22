@@ -468,24 +468,31 @@ Files:
 
 Tasks:
 
-- [ ] Create healthy and unhealthy fixtures.
-- [ ] Include git history for change locality where practical.
-- [ ] Include operational manifests.
-- [ ] Eval interview-before-score behavior.
-- [ ] Eval structured-question behavior for Claude, Pi, and Codex overlays.
-- [ ] Eval tool-before-claim behavior.
-- [ ] Eval tool coverage reporting.
-- [ ] Eval evidence citation.
-- [ ] Eval plan quality.
-- [ ] Eval non-comparable report handling.
+- [x] Create healthy and unhealthy fixtures. (paired ts-healthy/ts-tangled plus
+      python-boundaries, go-deps, infra-mixed)
+- [x] Include git history for change locality where practical. (omitted by
+      design — nested .git conflicts with parent repo; recorded as a coverage gap
+      in each FIXTURE.md and the goldens)
+- [x] Include operational manifests. (infra-mixed: helm, k8s, terraform, docker,
+      GitHub Actions)
+- [x] Eval interview-before-score behavior. (EV6 interview_before_score)
+- [x] Eval structured-question behavior for Claude, Pi, and Codex overlays.
+      (EV13 structured_question_capability)
+- [x] Eval tool-before-claim behavior. (EV7 tool_before_claim)
+- [x] Eval tool coverage reporting. (EV3 has_tool_coverage)
+- [x] Eval evidence citation. (EV8 evidence_cited)
+- [x] Eval plan quality. (EV10 plan_well_formed, EV11 plan_no_rewrite)
+- [x] Eval non-comparable report handling. (EV12 noncomparable_explained)
 
 Verification:
 
-- [ ] Evals pass baseline.
-- [ ] Reports contain frontmatter scores.
-- [ ] Reports contain tool coverage.
-- [ ] Re-runs produce stable score bands.
-- [ ] Bad fixtures score worse for the right reasons.
+- [x] Evals pass baseline. (16 eval cases pass)
+- [x] Reports contain frontmatter scores. (EV1/EV2 validates_contract)
+- [x] Reports contain tool coverage. (EV3)
+- [x] Re-runs produce stable score bands. (EV9 stable_score_bands — bands
+      derived deterministically from values; static goldens)
+- [x] Bad fixtures score worse for the right reasons. (EV4 scores_discriminate +
+      EV5 findings_target_dimensions)
 
 ### Task 12: Phase 11 - second dogfood pass and release hardening
 

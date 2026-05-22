@@ -1,0 +1,12 @@
+name: deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Smell: deploys straight to production with no test or approval gate.
+      - name: Deploy to prod
+        run: helm upgrade --install shop ./helm

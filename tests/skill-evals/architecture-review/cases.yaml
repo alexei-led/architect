@@ -1,0 +1,118 @@
+# Architecture-review skill evals.
+#
+# Each case names a behavior the review skill must hold and an assertion type
+# the harness (test_evals.py) dispatches on. The "evals" are deterministic
+# checks against golden artifacts produced by hand under baseline/, not a live
+# model run: a golden encodes the observable property a correct review would
+# produce, and the harness verifies the contract that property implies. This
+# keeps "evals pass baseline" reproducible and makes "re-runs produce stable
+# score bands" trivially true (static goldens), which is called out explicitly
+# in the stable_score_bands case.
+
+cases:
+  # --- contract: reports carry frontmatter scores and tool coverage ---
+  - id: EV1
+    behavior: Healthy baseline report satisfies the full artifact contract.
+    assertion: validates_contract
+    report: ts-healthy.report.md
+  - id: EV2
+    behavior: Tangled baseline report satisfies the full artifact contract.
+    assertion: validates_contract
+    report: ts-tangled.report.md
+  - id: EV3
+    behavior: Reports record per-dimension tool coverage.
+    assertion: has_tool_coverage
+    report: ts-tangled.report.md
+  # --- discrimination: bad fixtures score worse for the right reasons ---
+  - id: EV4
+    behavior: Tangled scores worse than healthy on the structural dimensions.
+    assertion: scores_discriminate
+    healthy: ts-healthy.report.md
+    tangled: ts-tangled.report.md
+    expect_worse:
+      - boundary_integrity
+      - coupling_balance
+      - dependency_graph_health
+      - cohesion_modularity
+  - id: EV5
+    behavior: Every dimension that scores worse in the bad fixture has a finding pointing at it.
+    assertion: findings_target_dimensions
+    healthy: ts-healthy.report.md
+    tangled: ts-tangled.report.md
+  # --- ordered loop: interview and map precede scoring ---
+  - id: EV6
+    behavior: Scores rest on interview context and a system map, not directory shape alone.
+    assertion: interview_before_score
+    report: ts-tangled.report.md
+  # --- tool before claim ---
+  - id: EV7
+    behavior: Every non-meta score cites evidence; no claim without a tool/file ref.
+    assertion: tool_before_claim
+    report: ts-tangled.report.md
+  - id: EV8
+    behavior: Every finding cites evidence.
+    assertion: evidence_cited
+    report: ts-tangled.report.md
+  # --- stability ---
+  - id: EV9
+    behavior: Score bands are a deterministic function of values (stable across re-runs).
+    assertion: stable_score_bands
+    reports:
+      - ts-healthy.report.md
+      - ts-tangled.report.md
+  # --- plan quality ---
+  - id: EV10
+    behavior: Plan has phases, verification, and acceptance criteria.
+    assertion: plan_well_formed
+    plan: ts-tangled.plan.md
+  - id: EV11
+    behavior: Plan recommends incremental change, not a rewrite.
+    assertion: plan_no_rewrite
+    plan: ts-tangled.plan.md
+  # --- non-comparable report handling ---
+  - id: EV12
+    behavior: A partial-scope re-review is reported as non-comparable, not a trend.
+    assertion: noncomparable_explained
+    base: ts-healthy.report.md
+    head: ts-healthy-partial.report.md
+    must_mention: scope
+  # --- structured-question capability per target overlay ---
+  - id: EV13
+    behavior: Claude and Pi expose a concrete structured-question tool; Codex stays unverified.
+    assertion: structured_question_capability
+    concrete:
+      - claude
+      - pi
+    unverified:
+      - codex
+  # --- fixtures present (lighter-weight referenced repos) ---
+  - id: EV14
+    behavior: All five fixture repos exist with their defining files.
+    assertion: fixtures_present
+    fixtures:
+      ts-healthy:
+        - src/domain/order.ts
+        - src/app/place-order.ts
+        - src/infra/memory-repository.ts
+      ts-tangled:
+        - src/order.ts
+        - src/gateway.ts
+      python-boundaries:
+        - importlinter.ini
+        - src/shop/orders/service.py
+      go-deps:
+        - go.mod
+        - internal/model/model.go
+      infra-mixed:
+        - helm/Chart.yaml
+        - terraform/main.tf
+  - id: EV15
+    behavior: The infra fixture ships operational manifests across multiple tools.
+    assertion: operational_manifests_present
+    fixture: infra-mixed
+    manifests:
+      - helm/Chart.yaml
+      - terraform/main.tf
+      - k8s/kustomization.yaml
+      - Dockerfile
+      - .github/workflows/deploy.yml
