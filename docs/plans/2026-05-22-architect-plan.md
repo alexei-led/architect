@@ -331,32 +331,32 @@ Files:
 
 Tasks:
 
-- [ ] Use Python 3.12+ typing and stdlib-first design, with PyYAML allowed for
+- [x] Use Python 3.12+ typing and stdlib-first design, with PyYAML allowed for
       report frontmatter and scorecard parsing.
-- [ ] `doctor` checks tool availability and versions.
-- [ ] `doctor` reports available, applicable, covered, missing, and failed tool
+- [x] `doctor` checks tool availability and versions.
+- [x] `doctor` reports available, applicable, covered, missing, and failed tool
       states where possible.
-- [ ] `validate-report` checks frontmatter, score bands, confidence, required
+- [x] `validate-report` checks frontmatter, score bands, confidence, required
       sections, evidence refs, finding IDs, and tool coverage.
-- [ ] `compare-reports` compares scores, finding IDs, confidence, scope, rubric
+- [x] `compare-reports` compares scores, finding IDs, confidence, scope, rubric
       version, and tool coverage.
-- [ ] `compare-reports` reports non-comparability instead of inventing trends.
-- [ ] Keep helpers small.
-- [ ] Fail with an install hint when YAML support is unavailable.
-- [ ] Do not wrap ast-grep, codegraph, GitNexus, LSP, or tree-sitter.
+- [x] `compare-reports` reports non-comparability instead of inventing trends.
+- [x] Keep helpers small.
+- [x] Fail with an install hint when YAML support is unavailable.
+- [x] Do not wrap ast-grep, codegraph, GitNexus, LSP, or tree-sitter.
 
 Verification:
 
-- [ ] Helpers have pytest coverage.
-- [ ] Missing tools get install suggestions.
-- [ ] Report validator catches missing scores and confidence.
-- [ ] Report validator catches malformed evidence refs.
-- [ ] Report validator parses valid YAML frontmatter without a homemade parser.
-- [ ] Compare helper separates score deltas from confidence deltas.
-- [ ] Compare helper rejects incompatible scope or rubric versions.
-- [ ] `uv run pytest` succeeds.
-- [ ] `uv run ruff check .` succeeds.
-- [ ] `uv run ruff format --check .` succeeds.
+- [x] Helpers have pytest coverage.
+- [x] Missing tools get install suggestions.
+- [x] Report validator catches missing scores and confidence.
+- [x] Report validator catches malformed evidence refs.
+- [x] Report validator parses valid YAML frontmatter without a homemade parser.
+- [x] Compare helper separates score deltas from confidence deltas.
+- [x] Compare helper rejects incompatible scope or rubric versions.
+- [x] `uv run pytest` succeeds.
+- [x] `uv run ruff check .` succeeds.
+- [x] `uv run ruff format --check .` succeeds.
 
 ### Task 8: Phase 7 - build outputs and runtime overlays
 

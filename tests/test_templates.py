@@ -7,7 +7,16 @@ and minimal so the contract is verifiable before those CLIs exist.
 
 from pathlib import Path
 
-import yaml
+from architect_tools._contract import (
+    META_DIMENSION,
+    band_for_value,
+    comparability_reason,
+    confidence_rank,
+    split_frontmatter,
+)
+from architect_tools._contract import (
+    load_scorecard as _load_scorecard,
+)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES = REPO_ROOT / "src" / "templates"
@@ -17,38 +26,9 @@ SCORECARD = TEMPLATES / "scorecard.yaml"
 EXAMPLE_REPORT = REPO_ROOT / "tests" / "fixtures" / "reports" / "example.md"
 EXAMPLE_PLAN = REPO_ROOT / "tests" / "fixtures" / "plans" / "example.md"
 
-META_DIMENSION = "analysis_confidence"
-
-
-def split_frontmatter(text: str) -> tuple[dict, str]:
-    """Return (frontmatter dict, body) for a Markdown file with YAML frontmatter."""
-    if not text.startswith("---\n"):
-        raise AssertionError("file does not start with YAML frontmatter")
-    _, fm, body = text.split("---\n", 2)
-    return yaml.safe_load(fm), body
-
 
 def load_scorecard() -> dict:
-    return yaml.safe_load(SCORECARD.read_text())
-
-
-def band_for_value(value: int, bands: list[dict]) -> str:
-    for band in bands:
-        if band["min"] <= value <= band["max"]:
-            return band["name"]
-    raise AssertionError(f"value {value} fits no band")
-
-
-def confidence_rank(level: str) -> int:
-    return {"low": 0, "medium": 1, "high": 2}[level]
-
-
-def comparability_reason(a: dict, b: dict, keys: list[str]) -> str | None:
-    """Return an explicit reason two reports are not comparable, else None."""
-    diffs = [k for k in keys if a.get(k) != b.get(k)]
-    if not diffs:
-        return None
-    return "; ".join(f"{k} differs: {a.get(k)!r} vs {b.get(k)!r}" for k in diffs)
+    return _load_scorecard(SCORECARD)
 
 
 def test_report_template_frontmatter_parses():
