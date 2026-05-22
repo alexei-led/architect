@@ -212,28 +212,30 @@ Files:
 
 Tasks:
 
-- [ ] Decide whether Balanced Coupling content is summary-only, adapted, quoted,
-      or requires explicit permission.
-- [ ] Reuse and adapt Vlad Khononov definitions with attribution and licensing
-      caution.
-- [ ] Define integration strength levels.
-- [ ] Define implicit vs explicit coupling.
-- [ ] Define distance, lifecycle coupling, runtime coupling, and team distance.
-- [ ] Define volatility via DDD subdomains and change frequency.
-- [ ] Define balance rule: high strength + high distance + high volatility is the
+- [x] Decide whether Balanced Coupling content is summary-only, adapted, quoted,
+      or requires explicit permission. (Summary-only; source is CC BY-NC-SA, so
+      ShareAlike would taint the MIT repo — adapted/quoted reuse needs Vlad's
+      permission, parked in Post-Completion.)
+- [x] Reuse and adapt Vlad Khononov definitions with attribution and licensing
+      caution. (Summarized in our own words with attribution + links.)
+- [x] Define integration strength levels.
+- [x] Define implicit vs explicit coupling.
+- [x] Define distance, lifecycle coupling, runtime coupling, and team distance.
+- [x] Define volatility via DDD subdomains and change frequency.
+- [x] Define balance rule: high strength + high distance + high volatility is the
       highest risk.
-- [ ] Define severity mapping.
-- [ ] Warn against generic “decouple everything” advice.
-- [ ] Define architecture fitness as executable checks, not documentation.
-- [ ] Map common findings to candidate fitness checks.
+- [x] Define severity mapping.
+- [x] Warn against generic “decouple everything” advice.
+- [x] Define architecture fitness as executable checks, not documentation.
+- [x] Map common findings to candidate fitness checks.
 
 Verification:
 
-- [ ] Skill explains DDD terms on first use.
-- [ ] Skill asks only context questions that change assessment.
-- [ ] Highest priority is high strength, high distance, high volatility.
-- [ ] Fitness guidance distinguishes existing checks from recommended checks.
-- [ ] Licensing and attribution path is clear before writing reusable material.
+- [x] Skill explains DDD terms on first use.
+- [x] Skill asks only context questions that change assessment.
+- [x] Highest priority is high strength, high distance, high volatility.
+- [x] Fitness guidance distinguishes existing checks from recommended checks.
+- [x] Licensing and attribution path is clear before writing reusable material.
 
 ### Task 5: Phase 4 - first dogfood pass on ccgram
 
