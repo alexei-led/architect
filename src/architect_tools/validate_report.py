@@ -103,7 +103,7 @@ def _check_scores(
             continue
 
         value = score.get("value")
-        if not isinstance(value, int) or not 0 <= value <= 100:
+        if not isinstance(value, int) or isinstance(value, bool) or not 0 <= value <= 100:
             errors.append(f"scores.{name}: value must be an int in 0..100, got {value!r}")
             value = None
 

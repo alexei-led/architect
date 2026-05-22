@@ -32,10 +32,13 @@ The Claude output (`dist/claude/`) is a Claude plugin: `plugin.yaml` plus
 `agents/` and `skills/` trees. Claude's `AskUserQuestion` tool is native, so the
 interview step needs no extra dependency.
 
-- Install: make `dist/claude/` available to Claude as a plugin, or copy
-  `dist/claude/agents/architect.md` and `dist/claude/skills/*` into the
-  `.claude/agents/` and `.claude/skills/` directories of the repo (or your user
-  `~/.claude/`) you want to review from.
+- Install: make `dist/claude/` available to Claude as a plugin (preferred — the
+  `templates/` tree ships at the plugin root where the instructions resolve it),
+  or copy `dist/claude/agents/architect.md`, `dist/claude/skills/*`, and
+  `dist/claude/templates/` into the `.claude/agents/`, `.claude/skills/`, and
+  `.claude/templates/` directories of the repo (or your user `~/.claude/`) you
+  want to review from. The skills read templates by the relative path
+  `templates/<file>`, so the `templates/` tree must travel with the install.
 - Update: re-run the build, run `--check` to confirm a clean regeneration, then
   replace the installed copy.
 
@@ -50,8 +53,9 @@ overlay keeps `structured_questions: unverified` and the interview falls back to
 plain numbered questions; the build asserts no concrete question-tool name leaks
 into Codex output.
 
-- Install: place `dist/codex/agents/` and `dist/codex/skills/` where your Codex
-  CLI discovers agents and skills.
+- Install: place `dist/codex/agents/`, `dist/codex/skills/`, and
+  `dist/codex/templates/` where your Codex CLI discovers agents and skills; the
+  skills read templates by the relative path `templates/<file>`.
 - Update: re-run the build and replace the installed copy.
 
 ## Pi

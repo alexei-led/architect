@@ -151,8 +151,9 @@ def probe_tool(
     which: WhichFn = shutil.which,
     run: RunFn = _default_run,
 ) -> ToolStatus:
-    applicable = not tool.applies_to or bool(
-        ecosystems is None or set(tool.applies_to) & ecosystems
+    # ecosystems is None means "no repo context" — assume applicable.
+    applicable = (
+        not tool.applies_to or ecosystems is None or bool(set(tool.applies_to) & ecosystems)
     )
     if which(tool.version_cmd[0]) is None:
         return ToolStatus(tool, "missing", applicable)

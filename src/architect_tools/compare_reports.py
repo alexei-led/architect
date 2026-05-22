@@ -2,9 +2,9 @@
 
 Reports are comparable only when scope, rubric version, and tool coverage level
 match. When they differ, this emits an explicit non-comparability reason and
-refuses to invent trends. When they match, it reports score deltas and
-confidence deltas as separate sections, plus finding-set and tool-coverage
-changes.
+refuses to invent trends. When they match, it reports score deltas, confidence
+deltas, and finding-set changes (new/resolved/persisting). The tool-coverage
+level gates comparability; per-dimension coverage blocks are not diffed.
 """
 
 from __future__ import annotations

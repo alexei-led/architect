@@ -17,7 +17,7 @@ change the assessment. Confirm what you inferred rather than asking it open-ende
 
 ## Fields to capture
 
-Maps directly to `interview_context` in `src/templates/report.md`:
+Maps directly to `interview_context` in `templates/report.md`:
 
 - `system_goal` — what the system is for.
 - `quality_goals` — e.g. maintainability, change locality, deploy independence.

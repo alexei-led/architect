@@ -44,8 +44,22 @@ def split_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     """Split a `---`-delimited YAML frontmatter file into (frontmatter, body)."""
     if not text.startswith("---\n"):
         raise ValueError("file does not start with YAML frontmatter")
-    _, fm, body = text.split("---\n", 2)
+    parts = text.split("---\n", 2)
+    if len(parts) < 3:
+        raise ValueError("frontmatter is not closed by a '---' line")
+    _, fm, body = parts
     return yaml.safe_load(fm) or {}, body
+
+
+def rewrite_template_paths(text: str) -> str:
+    """Rewrite source-tree template paths to the dist-relative layout.
+
+    Source instructions reference `src/templates/<file>` so they resolve from the
+    repo root during development. In a `dist/<target>/` tree templates live at
+    `templates/<file>`, so emitted instructions must use that path to resolve
+    relative to the installed extension root.
+    """
+    return text.replace("src/templates/", "templates/")
 
 
 def _flatten_tools(tools: Any) -> list[str]:
@@ -82,7 +96,7 @@ def render_agent(target: str) -> str:
     overlay = yaml.safe_load((AGENT_DIR / target / "frontmatter.yaml").read_text())
     fm = build_agent_frontmatter(overlay)
     fm_text = yaml.safe_dump(fm, sort_keys=False, default_flow_style=False).rstrip("\n")
-    return f"---\n{fm_text}\n---\n{body}"
+    return rewrite_template_paths(f"---\n{fm_text}\n---\n{body}")
 
 
 def skill_dirs() -> list[Path]:
@@ -100,12 +114,13 @@ def render_manifest(target: str) -> str:
         "name": meta["name"],
         "version": meta["version"],
         "description": meta["description"],
-        "author": meta.get("author"),
-        "license": meta.get("license"),
-        "target": target,
-        "agents": ["agents/architect.md"],
-        "skills": [f"skills/{d.name}/SKILL.md" for d in skill_dirs()],
     }
+    for key in ("author", "license"):
+        if meta.get(key):
+            manifest[key] = meta[key]
+    manifest["target"] = target
+    manifest["agents"] = ["agents/architect.md"]
+    manifest["skills"] = [f"skills/{d.name}/SKILL.md" for d in skill_dirs()]
     requires = (meta.get("requires") or {}).get(target) or []
     if requires:
         manifest["requires"] = list(requires)
@@ -119,7 +134,7 @@ def render_target(target: str) -> dict[str, str]:
         for path in sorted(skill.rglob("*")):
             if path.is_file():
                 rel = path.relative_to(SKILLS_DIR)
-                out[f"skills/{rel.as_posix()}"] = path.read_text()
+                out[f"skills/{rel.as_posix()}"] = rewrite_template_paths(path.read_text())
     for tmpl in template_files():
         out[f"templates/{tmpl.name}"] = tmpl.read_text()
     out["plugin.yaml"] = render_manifest(target)

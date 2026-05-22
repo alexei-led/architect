@@ -52,6 +52,11 @@ COBOL have no dedicated tool skill in v1.
 - **Persistent indexes can be stale.** gitnexus/codegraph indexes must be checked for
   freshness before their output is trusted; a stale index is recorded as a coverage
   gap, not a reading.
+- **Helpers locate the default scorecard relative to the source tree.** The
+  packaged default `scorecard.yaml` resolves when the helpers run from an
+  editable/source checkout (`uv run …`, the documented path). A non-editable
+  wheel install does not bundle `templates/`, so pass `--scorecard <path>`
+  explicitly in that case.
 - **Dogfood passes are autonomous, not a substitute for human review.** The two
   ccgram passes demonstrate the loop and the helper tools end-to-end; they do not
   replace an architect's judgment on a production system.

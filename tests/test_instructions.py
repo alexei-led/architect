@@ -12,6 +12,8 @@ from pathlib import Path
 
 import yaml
 
+from architect_tools._contract import split_frontmatter
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SRC = REPO_ROOT / "src"
 AGENT_DIR = SRC / "agents" / "architect"
@@ -27,12 +29,6 @@ TASK3_SKILLS = {
 OVERLAY_TARGETS = {"claude", "codex", "pi"}
 TEMPLATE_PATH_RE = re.compile(r"src/templates/[\w./-]+")
 TODO_RE = re.compile(r"\b(TODO|FIXME|XXX)\b")
-
-
-def split_frontmatter(text: str) -> tuple[dict, str]:
-    assert text.startswith("---\n"), "file does not start with YAML frontmatter"
-    _, fm, body = text.split("---\n", 2)
-    return yaml.safe_load(fm), body
 
 
 def skill_files() -> list[Path]:

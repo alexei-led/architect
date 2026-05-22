@@ -28,7 +28,7 @@ Reuse a finding's ID across repeat reviews of the same issue so
 ## Map findings to dimensions
 
 Each finding attaches to one scorecard dimension (see
-`src/templates/scorecard.yaml`). Severity and the weight of evidence inform the
+`templates/scorecard.yaml`). Severity and the weight of evidence inform the
 band; missing coverage informs confidence, not the value. Resist scoring a
 dimension you have not actually gathered evidence for — record the gap and let
 `analysis_confidence` reflect it.

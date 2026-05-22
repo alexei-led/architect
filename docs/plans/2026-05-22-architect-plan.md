@@ -334,12 +334,15 @@ Tasks:
 - [x] Use Python 3.12+ typing and stdlib-first design, with PyYAML allowed for
       report frontmatter and scorecard parsing.
 - [x] `doctor` checks tool availability and versions.
-- [x] `doctor` reports available, applicable, covered, missing, and failed tool
-      states where possible.
+- [x] `doctor` reports available, applicable, missing, and failed tool states.
+      (No separate `covered` state: doctor checks the running environment and
+      does not cross-reference a report's tools_used. Coverage-vs-used is the
+      report's tool_coverage block, validated by `validate-report`.)
 - [x] `validate-report` checks frontmatter, score bands, confidence, required
       sections, evidence refs, finding IDs, and tool coverage.
-- [x] `compare-reports` compares scores, finding IDs, confidence, scope, rubric
-      version, and tool coverage.
+- [x] `compare-reports` compares scores, finding IDs, confidence, scope, and
+      rubric version. Tool-coverage level is a comparability gate (reports with
+      differing levels are not compared); per-dimension coverage is not diffed.
 - [x] `compare-reports` reports non-comparability instead of inventing trends.
 - [x] Keep helpers small.
 - [x] Fail with an install hint when YAML support is unavailable.

@@ -50,6 +50,13 @@ def test_catches_low_confidence_high_quality():
     assert any("requires at least medium confidence" in e for e in errors)
 
 
+def test_rejects_bool_score_value():
+    fm, body, sc = _load()
+    fm["scores"]["boundary_integrity"]["value"] = True  # bool is an int subclass
+    errors = vr.validate_report(fm, body, sc)
+    assert any("boundary_integrity" in e and "must be an int" in e for e in errors)
+
+
 def test_catches_malformed_evidence_ref():
     fm, body, sc = _load()
     fm["scores"]["boundary_integrity"]["evidence_refs"] = ["E999"]

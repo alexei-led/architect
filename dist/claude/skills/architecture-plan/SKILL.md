@@ -25,7 +25,7 @@ unless a roadmap is explicitly requested.
    IDs each phase addresses. A phase with no finding behind it does not belong in
    the plan.
 
-2. **Use the plan template.** `src/templates/plan.md` is the skeleton: Overview,
+2. **Use the plan template.** `templates/plan.md` is the skeleton: Overview,
    Success criteria, Phases (each with justification, preconditions,
    postconditions, tasks, verification), Acceptance criteria, Safety notes.
 

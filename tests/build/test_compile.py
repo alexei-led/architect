@@ -41,6 +41,19 @@ def test_every_target_has_agent_skills_templates_manifest():
         assert any(p.startswith("templates/") for p in files), target
 
 
+def test_emitted_instructions_use_dist_relative_template_paths():
+    """Compiled instructions reference templates/, not the source-tree src/templates/.
+
+    Templates ship at dist/<target>/templates/; a src/templates/ path would not
+    resolve relative to an installed extension root.
+    """
+    rendered = compile.render_all()
+    for target, files in rendered.items():
+        for rel, content in files.items():
+            if rel.startswith(("agents/", "skills/")):
+                assert "src/templates/" not in content, f"{target}/{rel}"
+
+
 def test_claude_agent_frontmatter_is_valid_and_flat_readonly():
     rendered = compile.render_all()
     fm = _agent_frontmatter(rendered["claude"]["agents/architect.md"])
