@@ -95,7 +95,7 @@ intended and observed is the core of the review.
 
 Use the architecture-scorecard skill before assigning any score. Dimensions,
 0..100 bands, anchors, confidence levels, and comparability rules live in
-`templates/scorecard.yaml` — that file is the source of truth. Do not
+`../templates/scorecard.yaml` — that file is the source of truth. Do not
 restate or invent dimension names or band edges here; read the scorecard.
 
 Two hard rules you must respect:

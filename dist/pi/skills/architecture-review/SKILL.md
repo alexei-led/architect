@@ -63,11 +63,11 @@ architecture-plan skill.
    `references/triage.md`.
 
 5. **Score with the scorecard skill.** Use the architecture-scorecard skill for
-   every score. Read `templates/scorecard.yaml` for dimensions, bands,
+   every score. Read `../../templates/scorecard.yaml` for dimensions, bands,
    anchors, and rules — it is the source of truth. Each non-meta score needs at
    least one evidence ref. Low confidence caps the quality claim.
 
-6. **Write the report from the template.** Use `templates/report.md` as the
+6. **Write the report from the template.** Use `../../templates/report.md` as the
    skeleton. Fill frontmatter (interview context, system map, scores, findings,
    evidence, tool coverage) and the prose sections. Findings carry stable IDs.
 

@@ -51,15 +51,24 @@ def split_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     return yaml.safe_load(fm) or {}, body
 
 
-def rewrite_template_paths(text: str) -> str:
-    """Rewrite source-tree template paths to the dist-relative layout.
+def rewrite_template_paths(text: str, rel: str) -> str:
+    """Rewrite source-tree template paths to a path relative to the emitting file.
 
     Source instructions reference `src/templates/<file>` so they resolve from the
     repo root during development. In a `dist/<target>/` tree templates live at
-    `templates/<file>`, so emitted instructions must use that path to resolve
-    relative to the installed extension root.
+    `templates/<file>`, but the file doing the referencing sits one or more
+    directories deep (`agents/architect.md`, `skills/<name>/SKILL.md`). An agent
+    resolves a relative ref from the directory of the file it is reading — the
+    same way `references/<file>` resolves beside a skill — so the emitted path
+    must climb back to the dist root before descending into `templates/`.
+
+    `rel` is the file's path relative to the dist target root; its directory
+    depth fixes the `../` prefix (`agents/architect.md` -> `../templates/`,
+    `skills/<name>/SKILL.md` -> `../../templates/`).
     """
-    return text.replace("src/templates/", "templates/")
+    depth = len(Path(rel).parts) - 1
+    prefix = "../" * depth
+    return text.replace("src/templates/", f"{prefix}templates/")
 
 
 def _flatten_tools(tools: Any) -> list[str]:
@@ -96,7 +105,7 @@ def render_agent(target: str) -> str:
     overlay = yaml.safe_load((AGENT_DIR / target / "frontmatter.yaml").read_text())
     fm = build_agent_frontmatter(overlay)
     fm_text = yaml.safe_dump(fm, sort_keys=False, default_flow_style=False).rstrip("\n")
-    return rewrite_template_paths(f"---\n{fm_text}\n---\n{body}")
+    return rewrite_template_paths(f"---\n{fm_text}\n---\n{body}", "agents/architect.md")
 
 
 def skill_dirs() -> list[Path]:
@@ -133,8 +142,8 @@ def render_target(target: str) -> dict[str, str]:
     for skill in skill_dirs():
         for path in sorted(skill.rglob("*")):
             if path.is_file():
-                rel = path.relative_to(SKILLS_DIR)
-                out[f"skills/{rel.as_posix()}"] = rewrite_template_paths(path.read_text())
+                rel = f"skills/{path.relative_to(SKILLS_DIR).as_posix()}"
+                out[rel] = rewrite_template_paths(path.read_text(), rel)
     for tmpl in template_files():
         out[f"templates/{tmpl.name}"] = tmpl.read_text()
     out["plugin.yaml"] = render_manifest(target)

@@ -12,6 +12,7 @@ tools:
   deny:
     - Edit
     - Write
+    - NotebookEdit
 capabilities:
   # Codex structured-question support is not yet verified against the concrete
   # runtime. Until Task 8 confirms a real tool name, the review skill must fall

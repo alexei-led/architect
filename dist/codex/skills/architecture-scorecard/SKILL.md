@@ -11,7 +11,7 @@ description: >-
 # Architecture scorecard
 
 How to score, honestly and reproducibly. The rubric itself lives in
-`templates/scorecard.yaml` — read it; do not restate or invent values here.
+`../../templates/scorecard.yaml` — read it; do not restate or invent values here.
 
 ## When to use
 
@@ -21,7 +21,7 @@ report.
 
 ## Procedure
 
-1. **Read the rubric.** `templates/scorecard.yaml` is the source of truth for
+1. **Read the rubric.** `../../templates/scorecard.yaml` is the source of truth for
    dimension names, 0..100 bands and their anchors, confidence levels, and the
    enforced rules. If you find yourself typing a dimension name or band edge from
    memory, stop and read the file — drift from the scorecard is a bug.

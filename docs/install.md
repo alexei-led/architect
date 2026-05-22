@@ -37,8 +37,10 @@ interview step needs no extra dependency.
   or copy `dist/claude/agents/architect.md`, `dist/claude/skills/*`, and
   `dist/claude/templates/` into the `.claude/agents/`, `.claude/skills/`, and
   `.claude/templates/` directories of the repo (or your user `~/.claude/`) you
-  want to review from. The skills read templates by the relative path
-  `templates/<file>`, so the `templates/` tree must travel with the install.
+  want to review from. Instructions reference templates by a path relative to
+  the referencing file (`../../templates/<file>` from a skill,
+  `../templates/<file>` from the agent), so the whole `dist/<target>/` layout
+  must travel with the install intact.
 - Update: re-run the build, run `--check` to confirm a clean regeneration, then
   replace the installed copy.
 
@@ -54,8 +56,9 @@ plain numbered questions; the build asserts no concrete question-tool name leaks
 into Codex output.
 
 - Install: place `dist/codex/agents/`, `dist/codex/skills/`, and
-  `dist/codex/templates/` where your Codex CLI discovers agents and skills; the
-  skills read templates by the relative path `templates/<file>`.
+  `dist/codex/templates/` where your Codex CLI discovers agents and skills,
+  preserving the relative layout; instructions reference templates by a path
+  relative to the referencing file (`../../templates/<file>` from a skill).
 - Update: re-run the build and replace the installed copy.
 
 ## Pi

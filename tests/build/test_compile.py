@@ -1,6 +1,8 @@
 """Tests for the source-to-dist build compiler (Task 8 verification)."""
 
 import importlib.util
+import posixpath
+import re
 from pathlib import Path
 
 import yaml
@@ -41,6 +43,9 @@ def test_every_target_has_agent_skills_templates_manifest():
         assert any(p.startswith("templates/") for p in files), target
 
 
+TEMPLATE_REF_RE = re.compile(r"(?:\.\./)*templates/[\w./-]+")
+
+
 def test_emitted_instructions_use_dist_relative_template_paths():
     """Compiled instructions reference templates/, not the source-tree src/templates/.
 
@@ -52,6 +57,23 @@ def test_emitted_instructions_use_dist_relative_template_paths():
         for rel, content in files.items():
             if rel.startswith(("agents/", "skills/")):
                 assert "src/templates/" not in content, f"{target}/{rel}"
+
+
+def test_emitted_template_refs_resolve_from_each_files_directory():
+    """Every emitted templates/ ref must resolve to a real file from the directory
+    of the file that references it — the base an agent uses for a relative ref."""
+    rendered = compile.render_all()
+    for target, files in rendered.items():
+        for rel, content in files.items():
+            if not rel.startswith(("agents/", "skills/")):
+                continue
+            file_dir = posixpath.dirname(rel)
+            for ref in TEMPLATE_REF_RE.findall(content):
+                resolved = posixpath.normpath(posixpath.join(file_dir, ref))
+                assert resolved in files, (
+                    f"{target}/{rel}: ref {ref!r} resolves to {resolved!r}, "
+                    "which is not an emitted file"
+                )
 
 
 def test_claude_agent_frontmatter_is_valid_and_flat_readonly():
