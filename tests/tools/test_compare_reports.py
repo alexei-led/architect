@@ -85,6 +85,17 @@ def test_rejects_incompatible_scope():
     assert out.reason is not None and "scope" in out.reason
 
 
+def test_rejects_reports_missing_comparability_block():
+    base, sc = _base()
+    head = copy.deepcopy(base)
+    del base["comparability"]
+    del head["comparability"]
+    out = cr.compare_reports(base, head, sc)
+    assert not out.comparable
+    assert out.reason is not None and "missing" in out.reason
+    assert not out.score_deltas  # no invented trend
+
+
 def test_main_comparable_exit_zero(capsys):
     rc = cr.main([str(EXAMPLE_REPORT), str(EXAMPLE_REPORT), "--scorecard", str(SCORECARD)])
     assert rc == 0

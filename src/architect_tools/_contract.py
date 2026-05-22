@@ -103,8 +103,19 @@ def confidence_rank(level: str) -> int:
 
 
 def comparability_reason(a: dict[str, Any], b: dict[str, Any], keys: list[str]) -> str | None:
-    """Return an explicit reason two reports are not comparable, else None."""
-    diffs = [k for k in keys if a.get(k) != b.get(k)]
-    if not diffs:
+    """Return an explicit reason two reports are not comparable, else None.
+
+    A must-match key absent (None) from either report is itself a
+    non-comparability reason: comparability cannot be established without it,
+    so two reports that both omit the comparability block are not comparable.
+    """
+    reasons = []
+    for k in keys:
+        av, bv = a.get(k), b.get(k)
+        if av is None or bv is None:
+            reasons.append(f"{k} missing: {av!r} vs {bv!r}")
+        elif av != bv:
+            reasons.append(f"{k} differs: {av!r} vs {bv!r}")
+    if not reasons:
         return None
-    return "; ".join(f"{k} differs: {a.get(k)!r} vs {b.get(k)!r}" for k in diffs)
+    return "; ".join(reasons)
