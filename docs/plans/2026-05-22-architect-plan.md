@@ -245,23 +245,25 @@ Target:
 
 Tasks:
 
-- [ ] Run the current review loop manually against ccgram.
-- [ ] Cover applicable evidence dimensions with tools that already work in the
+- [x] Run the current review loop manually against ccgram.
+- [x] Cover applicable evidence dimensions with tools that already work in the
       environment.
-- [ ] Record tool friction.
-- [ ] Record missing evidence.
-- [ ] Record unclear interview questions.
-- [ ] Produce one report draft.
-- [ ] Produce one plan draft from that report.
-- [ ] Tune templates, prompts, rubrics, and tool routing based on real pain.
+- [x] Record tool friction. (docs/dogfood/ccgram/friction.md, FR1-FR7)
+- [x] Record missing evidence. (report system_map.missing_evidence + FR5)
+- [x] Record unclear interview questions. (FR1 non-interactive interview gap)
+- [x] Produce one report draft. (docs/dogfood/ccgram/report.md)
+- [x] Produce one plan draft from that report. (docs/dogfood/ccgram/plan.md)
+- [x] Tune templates, prompts, rubrics, and tool routing based on real pain.
+      (review SKILL.md + interview.md edits for FR1, FR3-FR6)
 
 Verification:
 
-- [ ] Report helps a human understand ccgram’s architecture.
-- [ ] Recommendations cite evidence.
-- [ ] Scores are explainable.
-- [ ] Unsupported claims are removed.
-- [ ] Plan avoids unsupported rewrites.
+- [x] Report helps a human understand ccgram’s architecture.
+- [x] Recommendations cite evidence. (F1-F4 each carry evidence refs)
+- [x] Scores are explainable. (score map table with per-dimension justification)
+- [x] Unsupported claims are removed. (dependency_graph_health capped at low
+      confidence; no scoring from imports alone)
+- [x] Plan avoids unsupported rewrites. (incremental phases; "No rewrites")
 
 ### Task 6: Phase 5 - evidence tool skill suite
 

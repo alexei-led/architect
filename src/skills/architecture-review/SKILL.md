@@ -26,6 +26,9 @@ architecture-plan skill.
    lack the intended architecture, quality goals, volatile areas, or scope, run
    the interview first. See `references/interview.md`. Inspect docs, ADRs, and
    manifests before asking — never ask a question the repo already answers.
+   **Non-interactive runs (CI, autonomous):** when no user is reachable,
+   reconstruct intent from docs/ADRs/CLAUDE.md/changelog, label the context
+   reconstructed, and cap `analysis_confidence` accordingly. Never invent intent.
 
 2. **Build the system map before judging quality.** Establish what exists:
    languages, package managers, units, deploy units, public interfaces, declared
@@ -40,6 +43,20 @@ architecture-plan skill.
    change, and operational evidence. Cite tools and files you used. Record
    coverage — used, skipped, missing, failed — per dimension, even where you find
    nothing wrong. Summarize output; do not paste raw dumps.
+   - **Check persistent indexes for staleness first.** Before trusting codegraph
+     or GitNexus, confirm the index matches the current commit (e.g.
+     `gitnexus status`). A stale index is a coverage gap, not evidence — record
+     it as `tools_failed`, do not score from it.
+   - **No working tool for an applicable dimension** is recorded as
+     `tools_missing` with explicit `confidence_impact`. Do not silently score a
+     dimension (e.g. dependency health) from imports alone without flagging the
+     gap and capping confidence.
+   - **Redirect tool caches** to a writable temp dir when a tool writes a cache
+     into the target repo (e.g. `RUFF_CACHE_DIR=$TMPDIR/...`); a sandboxed or
+     read-only target will otherwise fail the tool.
+   - **Churn across renames:** a directory/package rename splits each file's
+     git history across the old and new path, halving apparent churn. Scope churn
+     to current paths or use `git log --follow` per file.
 
 4. **Triage before scoring.** Sort signal from noise: which observations are
    facts, which are hypotheses, which actually bear on a score. See

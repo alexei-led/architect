@@ -39,3 +39,12 @@ Branch on the runtime's `structured_questions` capability:
 Ask one focused batch, not a long interrogation. If the user defers, record the
 gap in `missing_evidence` and let it lower `analysis_confidence` rather than
 guessing intent.
+
+## Non-interactive mode
+
+When no user is reachable (CI, autonomous loop), do not skip the interview —
+reconstruct it. Read CLAUDE.md, `.claude/rules/`, ADRs, design docs, modularity
+or architecture reviews, and the changelog, and fill `interview_context` from
+them. State in the report that the context is reconstructed, not interview-sourced,
+and cap `analysis_confidence` at `medium`. Never invent goals or ownership the
+sources do not support; leave unknowns in `missing_evidence`.
