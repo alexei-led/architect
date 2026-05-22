@@ -13,7 +13,9 @@ usable and verifiable. The broad tool suite stays in scope for v1, but tool use
 is routed through coverage, applicability, and evidence summaries so reports do
 not become tool-output landfill. Civilization is fragile enough.
 
-## First usable slice
+## Context
+
+### First usable slice
 
 Before expanding the tool suite, ship one thin path:
 
@@ -26,34 +28,67 @@ Before expanding the tool suite, ship one thin path:
 
 Phase 5 breadth starts only after this slice exposes real tool friction.
 
-## Success criteria
+### Acceptance Criteria
 
-- [ ] Architect agent exists for Claude, Codex, and Pi.
-- [ ] Review flow produces four artifacts: interview context, system map,
-      architecture report, and refactoring plan.
-- [ ] Review skill runs interview before scoring when context is missing.
-- [ ] Interview uses structured question tools when the runtime supports them.
-- [ ] Review skill builds a system map before judging quality.
-- [ ] Architect covers all applicable evidence dimensions with available tools
-      before making claims.
-- [ ] Architect records tool coverage, missing tools, failed tools, and confidence
-      impact.
-- [ ] Scorecard skill defines dimensions, score bands, anchors, and confidence
-      rules.
-- [ ] Evidence references have a stable schema.
-- [ ] Balanced Coupling skill reuses Vlad Khononov material with attribution and
-      within licensing limits.
-- [ ] Tool skills cover ast-grep, codegraph, GitNexus, LSP, and tree-sitter.
-- [ ] Tool skills cover TypeScript, Python, Go, and operational dependencies.
-- [ ] Helper tools and build scripts use Python 3.12+ with uv.
-- [ ] Report template writes Markdown with YAML frontmatter scores.
-- [ ] Plan template writes phases, tasks, verification, and acceptance criteria.
-- [ ] Helper tools validate reports, compare reports, and check tools.
-- [ ] Comparisons explain improvement, degradation, or non-comparability.
-- [ ] Claude, Codex, and Pi outputs build from one source tree.
-- [ ] Dogfood runs on `/Users/alexei/Workspace/ccgram`, not this planning repo.
+- Architect agent exists for Claude, Codex, and Pi.
+- Review flow produces four artifacts: interview context, system map,
+  architecture report, and refactoring plan.
+- Review skill runs interview before scoring when context is missing.
+- Interview uses structured question tools when the runtime supports them.
+- Review skill builds a system map before judging quality.
+- Architect covers all applicable evidence dimensions with available tools
+  before making claims.
+- Architect records tool coverage, missing tools, failed tools, and confidence
+  impact.
+- Scorecard skill defines dimensions, score bands, anchors, and confidence
+  rules.
+- Evidence references have a stable schema.
+- Balanced Coupling skill reuses Vlad Khononov material with attribution and
+  within licensing limits.
+- Tool skills cover ast-grep, codegraph, GitNexus, LSP, and tree-sitter.
+- Tool skills cover TypeScript, Python, Go, and operational dependencies.
+- Helper tools and build scripts use Python 3.12+ with uv.
+- Report template writes Markdown with YAML frontmatter scores.
+- Plan template writes phases, tasks, verification, and acceptance criteria.
+- Helper tools validate reports, compare reports, and check tools.
+- Comparisons explain improvement, degradation, or non-comparability.
+- Claude, Codex, and Pi outputs build from one source tree.
+- Dogfood runs on `/Users/alexei/Workspace/ccgram`, not this planning repo.
 
-## Phase 0: scaffold
+## Validation Commands
+
+Run after the scaffold task creates the Python project files:
+
+- `uv sync`
+- `uv run pytest`
+- `uv run ruff check .`
+- `uv run ruff format --check .`
+
+## Development Approach
+
+- Testing approach: regular. Define contracts and fixtures before implementation when practical.
+- Complete one Task section fully before moving to the next.
+- Keep changes vertical and independently verifiable.
+- Update this plan when scope changes during implementation.
+- Keep runtime dependencies minimal; prefer local OSS CLI tools over wrapped package logic.
+
+## Testing Strategy
+
+- Add or update tests for every code-changing task.
+- Validate generated examples, templates, report schemas, and helper tools with fixtures.
+- Run the validation commands after each task once the project scaffold exists.
+- Treat manual dogfood findings as evidence for prompt, rubric, and template changes.
+
+## Progress Tracking
+
+- Mark completed task items immediately after they are done.
+- Add newly discovered in-scope work to the current or next Task section.
+- Move non-automatable follow-up work to Post-Completion without checkboxes.
+- Do not leave task checkboxes outside Task sections; ralphex only executes Task or Iteration sections.
+
+## Implementation Steps
+
+### Task 1: Phase 0 - scaffold
 
 Files:
 
@@ -71,22 +106,22 @@ Files:
 
 Tasks:
 
-- [ ] Initialize package metadata.
-- [ ] Add `pi-package` keyword.
-- [ ] Add uv-backed build, check, and test scripts.
-- [ ] Keep runtime dependencies minimal.
-- [ ] Add source-to-dist layout.
-- [ ] Add docs for instruction-first design.
+- [x] Initialize package metadata.
+- [x] Add `pi-package` keyword.
+- [x] Add uv-backed build, check, and test scripts.
+- [x] Keep runtime dependencies minimal.
+- [x] Add source-to-dist layout.
+- [x] Add docs for instruction-first design.
 
 Verification:
 
-- [ ] `uv sync` succeeds.
-- [ ] `uv run pytest` succeeds.
-- [ ] `uv run ruff check .` succeeds.
-- [ ] `uv run ruff format --check .` succeeds.
-- [ ] Expected source directories exist.
+- [x] `uv sync` succeeds.
+- [x] `uv run pytest` succeeds.
+- [x] `uv run ruff check .` succeeds.
+- [x] `uv run ruff format --check .` succeeds.
+- [x] Expected source directories exist.
 
-## Phase 1: artifact contract and templates
+### Task 2: Phase 1 - artifact contract and templates
 
 Files:
 
@@ -123,7 +158,7 @@ Verification:
 - [ ] Low confidence cannot be presented as high quality.
 - [ ] Non-comparable reports have an explicit reason.
 
-## Phase 2: architect agent and review loop
+### Task 3: Phase 2 - architect agent and review loop
 
 Files:
 
@@ -167,7 +202,7 @@ Verification:
 - [ ] Skill cites tools and files used.
 - [ ] Instruction lint passes.
 
-## Phase 3: Balanced Coupling and architecture fitness
+### Task 4: Phase 3 - Balanced Coupling and architecture fitness
 
 Files:
 
@@ -200,7 +235,7 @@ Verification:
 - [ ] Fitness guidance distinguishes existing checks from recommended checks.
 - [ ] Licensing and attribution path is clear before writing reusable material.
 
-## Phase 4: first dogfood pass on ccgram
+### Task 5: Phase 4 - first dogfood pass on ccgram
 
 Target:
 
@@ -226,7 +261,7 @@ Verification:
 - [ ] Unsupported claims are removed.
 - [ ] Plan avoids unsupported rewrites.
 
-## Phase 5: evidence tool skill suite
+### Task 6: Phase 5 - evidence tool skill suite
 
 Files:
 
@@ -281,7 +316,7 @@ Verification:
 - [ ] Each skill says when to stop and record a coverage gap instead of running
       another redundant tool.
 
-## Phase 6: Python helper tools
+### Task 7: Phase 6 - Python helper tools
 
 Files:
 
@@ -319,7 +354,7 @@ Verification:
 - [ ] `uv run ruff check .` succeeds.
 - [ ] `uv run ruff format --check .` succeeds.
 
-## Phase 7: build outputs and runtime overlays
+### Task 8: Phase 7 - build outputs and runtime overlays
 
 Files:
 
@@ -351,7 +386,7 @@ Verification:
 - [ ] Claude output has valid frontmatter.
 - [ ] Codex output avoids unverified structured-input tool names.
 
-## Phase 8: Pi package
+### Task 9: Phase 8 - Pi package
 
 Files:
 
@@ -372,7 +407,7 @@ Verification:
 - [ ] `ask_user_question` is available when `cc-thingz` is installed.
 - [ ] Helper commands work through `uv run`.
 
-## Phase 9: docs
+### Task 10: Phase 9 - docs
 
 Files:
 
@@ -402,7 +437,7 @@ Verification:
 - [ ] Scoring docs match scorecard skill.
 - [ ] Methodology docs match Balanced Coupling skill.
 
-## Phase 10: evals and fixtures
+### Task 11: Phase 10 - evals and fixtures
 
 Files:
 
@@ -434,7 +469,7 @@ Verification:
 - [ ] Re-runs produce stable score bands.
 - [ ] Bad fixtures score worse for the right reasons.
 
-## Phase 11: second dogfood pass and release hardening
+### Task 12: Phase 11 - second dogfood pass and release hardening
 
 Targets:
 
@@ -463,3 +498,22 @@ Verification:
 - [ ] Unsupported claims are removed.
 - [ ] Repeat report explains improvement, degradation, or non-comparability.
 - [ ] Release notes describe known limitations.
+
+### Task 13: Verify acceptance criteria
+
+- [ ] Verify the architect agent exists for Claude, Codex, and Pi.
+- [ ] Verify the review flow produces interview context, system map, architecture report, and refactoring plan artifacts.
+- [ ] Verify review skills enforce interview, system mapping, scorecard use, evidence citation, and tool coverage reporting.
+- [ ] Verify methodology, tool, helper, build, package, documentation, eval, and dogfood deliverables match the Acceptance Criteria section.
+- [ ] Run `uv sync`.
+- [ ] Run `uv run pytest`.
+- [ ] Run `uv run ruff check .`.
+- [ ] Run `uv run ruff format --check .`.
+
+## Post-Completion
+
+Items requiring external coordination or manual approval:
+
+- Share findings with Vlad before release if Balanced Coupling material goes beyond light attribution and summary.
+- Run final dogfood on target repositories outside this planning repo.
+- Publish release notes with known limitations after validation passes.

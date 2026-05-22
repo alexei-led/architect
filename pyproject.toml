@@ -1,0 +1,39 @@
+[project]
+name = "architect"
+version = "0.1.0"
+description = "Instruction-first architecture review extension for Claude Code, Codex CLI, and Pi."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [{ name = "Alexei Ledenev" }]
+keywords = ["pi-package", "claude-code", "codex", "architecture", "code-review"]
+dependencies = []
+
+[project.scripts]
+architect-doctor = "architect_tools.doctor:main"
+architect-validate-report = "architect_tools.validate_report:main"
+architect-compare-reports = "architect_tools.compare_reports:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/architect_tools"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
