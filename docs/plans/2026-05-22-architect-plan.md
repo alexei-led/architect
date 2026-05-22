@@ -282,42 +282,42 @@ Files:
 
 Tasks:
 
-- [ ] Define tool applicability rules.
-- [ ] Define tool coverage levels: discovery, structural, semantic, dependency,
+- [x] Define tool applicability rules.
+- [x] Define tool coverage levels: discovery, structural, semantic, dependency,
       change, operational, security/supply-chain, and report quality.
-- [ ] Define context-budget rules for summarizing noisy output.
-- [ ] Define tool-budget and stop rules for redundant or expensive scans.
-- [ ] Document ast-grep commands for imports, exports, direct DB access, routes,
+- [x] Define context-budget rules for summarizing noisy output.
+- [x] Define tool-budget and stop rules for redundant or expensive scans.
+- [x] Document ast-grep commands for imports, exports, direct DB access, routes,
       and framework leaks.
-- [ ] Document codegraph init, index, sync, status, query, context, affected, and
+- [x] Document codegraph init, index, sync, status, query, context, affected, and
       files commands.
-- [ ] Document GitNexus analyze, status, list, query, context, impact,
+- [x] Document GitNexus analyze, status, list, query, context, impact,
       detect-changes, and cypher commands.
-- [ ] Document stale-index handling for codegraph and GitNexus.
-- [ ] Document LSP definitions, references, implementations, diagnostics,
+- [x] Document stale-index handling for codegraph and GitNexus.
+- [x] Document LSP definitions, references, implementations, diagnostics,
       document symbols, workspace symbols, and tree-sitter syntax queries.
-- [ ] Add TypeScript commands for dependency-cruiser, madge, knip, tsc, ESLint,
+- [x] Add TypeScript commands for dependency-cruiser, madge, knip, tsc, ESLint,
       and package managers.
-- [ ] Add Python commands for import-linter, pydeps, pyright or basedpyright,
+- [x] Add Python commands for import-linter, pydeps, pyright or basedpyright,
       ruff, deptry, pipdeptree, uv tree, radon or lizard, and vulture.
-- [ ] Add Go commands for go list, go mod graph, goda, gopls, staticcheck,
+- [x] Add Go commands for go list, go mod graph, goda, gopls, staticcheck,
       govulncheck, and go-callvis.
-- [ ] Add operational commands for Helm, Kustomize, Kubernetes, Terraform,
+- [x] Add operational commands for Helm, Kustomize, Kubernetes, Terraform,
       OpenTofu, Docker, GitHub Actions, policy tools, SBOM, and vulnerability
       scanners.
-- [ ] Add report commands for Markdown, Mermaid, jq, yq, Graphviz, D2, links,
+- [x] Add report commands for Markdown, Mermaid, jq, yq, Graphviz, D2, links,
       spelling, and formatting.
-- [ ] Skip dedicated PHP, Ruby, COBOL, Java, and JVM-only skills.
+- [x] Skip dedicated PHP, Ruby, COBOL, Java, and JVM-only skills.
 
 Verification:
 
-- [ ] Each skill includes exact commands.
-- [ ] Each skill explains when the tool is applicable.
-- [ ] Each skill explains how tool evidence affects confidence.
-- [ ] Each skill explains failure and missing-tool handling.
-- [ ] Each skill avoids duplicating tool behavior in package code.
-- [ ] Tool output examples are summarized, not pasted wholesale.
-- [ ] Each skill says when to stop and record a coverage gap instead of running
+- [x] Each skill includes exact commands.
+- [x] Each skill explains when the tool is applicable.
+- [x] Each skill explains how tool evidence affects confidence.
+- [x] Each skill explains failure and missing-tool handling.
+- [x] Each skill avoids duplicating tool behavior in package code.
+- [x] Tool output examples are summarized, not pasted wholesale.
+- [x] Each skill says when to stop and record a coverage gap instead of running
       another redundant tool.
 
 ### Task 7: Phase 6 - Python helper tools
