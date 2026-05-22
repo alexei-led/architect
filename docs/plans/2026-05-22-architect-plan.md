@@ -1,0 +1,465 @@
+# Architect extension plan
+
+## Overview
+
+Build an instruction-first architecture review extension for Claude Code, Codex
+CLI, and Pi.
+
+The extension contains an architect agent, focused skills, report templates,
+plan templates, and small helper tools. Agents use local OSS CLIs directly.
+
+The plan is organized as vertical slices. Each slice should produce something
+usable and verifiable. The broad tool suite stays in scope for v1, but tool use
+is routed through coverage, applicability, and evidence summaries so reports do
+not become tool-output landfill. Civilization is fragile enough.
+
+## First usable slice
+
+Before expanding the tool suite, ship one thin path:
+
+1. One runtime overlay works end-to-end.
+2. One dogfood repo produces interview context, system map, scored report, and
+   refactoring plan.
+3. Report validation and comparison work on the produced report.
+4. Tool coverage records used, skipped, missing, and failed tools with confidence
+   impact.
+
+Phase 5 breadth starts only after this slice exposes real tool friction.
+
+## Success criteria
+
+- [ ] Architect agent exists for Claude, Codex, and Pi.
+- [ ] Review flow produces four artifacts: interview context, system map,
+      architecture report, and refactoring plan.
+- [ ] Review skill runs interview before scoring when context is missing.
+- [ ] Interview uses structured question tools when the runtime supports them.
+- [ ] Review skill builds a system map before judging quality.
+- [ ] Architect covers all applicable evidence dimensions with available tools
+      before making claims.
+- [ ] Architect records tool coverage, missing tools, failed tools, and confidence
+      impact.
+- [ ] Scorecard skill defines dimensions, score bands, anchors, and confidence
+      rules.
+- [ ] Evidence references have a stable schema.
+- [ ] Balanced Coupling skill reuses Vlad Khononov material with attribution and
+      within licensing limits.
+- [ ] Tool skills cover ast-grep, codegraph, GitNexus, LSP, and tree-sitter.
+- [ ] Tool skills cover TypeScript, Python, Go, and operational dependencies.
+- [ ] Helper tools and build scripts use Python 3.12+ with uv.
+- [ ] Report template writes Markdown with YAML frontmatter scores.
+- [ ] Plan template writes phases, tasks, verification, and acceptance criteria.
+- [ ] Helper tools validate reports, compare reports, and check tools.
+- [ ] Comparisons explain improvement, degradation, or non-comparability.
+- [ ] Claude, Codex, and Pi outputs build from one source tree.
+- [ ] Dogfood runs on `/Users/alexei/Workspace/ccgram`, not this planning repo.
+
+## Phase 0: scaffold
+
+Files:
+
+- `README.md`
+- `LICENSE`
+- `pyproject.toml`
+- `uv.lock`
+- `src/agents/`
+- `src/skills/`
+- `src/templates/`
+- `src/architect_tools/`
+- `src/plugins/`
+- `scripts/build/`
+- `tests/`
+
+Tasks:
+
+- [ ] Initialize package metadata.
+- [ ] Add `pi-package` keyword.
+- [ ] Add uv-backed build, check, and test scripts.
+- [ ] Keep runtime dependencies minimal.
+- [ ] Add source-to-dist layout.
+- [ ] Add docs for instruction-first design.
+
+Verification:
+
+- [ ] `uv sync` succeeds.
+- [ ] `uv run pytest` succeeds.
+- [ ] `uv run ruff check .` succeeds.
+- [ ] `uv run ruff format --check .` succeeds.
+- [ ] Expected source directories exist.
+
+## Phase 1: artifact contract and templates
+
+Files:
+
+- `src/templates/report.md`
+- `src/templates/scorecard.yaml`
+- `src/templates/plan.md`
+- `tests/fixtures/reports/example.md`
+- `tests/fixtures/plans/example.md`
+
+Tasks:
+
+- [ ] Define interview context fields.
+- [ ] Define system map fields.
+- [ ] Define report frontmatter.
+- [ ] Choose YAML handling: PyYAML dependency or a deliberately constrained
+      subset. Prefer PyYAML unless packaging proves it too costly.
+- [ ] Define score dimensions.
+- [ ] Define `0..100` score bands and anchors.
+- [ ] Define confidence levels.
+- [ ] Define evidence reference schema.
+- [ ] Define finding schema with stable IDs.
+- [ ] Define tool coverage and gap schema.
+- [ ] Define report sections.
+- [ ] Define plan structure.
+- [ ] Define report comparability rules: scope, rubric version, and tool coverage.
+
+Verification:
+
+- [ ] Example report frontmatter parses.
+- [ ] Example report includes score values, bands, confidence, evidence refs, and
+      tool coverage.
+- [ ] Example plan includes phases, tasks, verification, acceptance criteria, and
+      safety notes.
+- [ ] Low confidence cannot be presented as high quality.
+- [ ] Non-comparable reports have an explicit reason.
+
+## Phase 2: architect agent and review loop
+
+Files:
+
+- `src/agents/architect/AGENT.md`
+- `src/agents/architect/claude/frontmatter.yaml`
+- `src/agents/architect/codex/frontmatter.yaml`
+- `src/agents/architect/pi/frontmatter.yaml`
+- `src/skills/architecture-review/SKILL.md`
+- `src/skills/architecture-review/references/interview.md`
+- `src/skills/architecture-review/references/triage.md`
+- `src/skills/architecture-scorecard/SKILL.md`
+- `src/skills/architecture-plan/SKILL.md`
+
+Tasks:
+
+- [ ] Make architect read-only for source code by default.
+- [ ] Allow report/plan writes only with explicit user approval.
+- [ ] Require interview before full scoring when context is missing.
+- [ ] Require docs and code inspection before asking answerable questions.
+- [ ] Require system map before scoring.
+- [ ] Define intended architecture source order.
+- [ ] Define observed architecture evidence sources.
+- [ ] Separate facts, hypotheses, scores, and recommendations.
+- [ ] Cite evidence for every finding.
+- [ ] Use the scorecard skill before assigning scores.
+- [ ] Use the report template for reports.
+- [ ] Use the plan template for plans.
+- [ ] Recommend incremental refactoring only.
+- [ ] Define user-facing flows: architecture review, compare reports, and make
+      refactoring plan.
+- [ ] Route code changes to an engineer or mutator agent.
+
+Verification:
+
+- [ ] Agent has no edit/write behavior for production source code.
+- [ ] Agent output contract is clear.
+- [ ] Skill interviews first when context is missing.
+- [ ] Skill uses structured question tools on Claude and Pi.
+- [ ] Skill defines Codex structured-question behavior through target overlay.
+- [ ] Skill does not score from directory shape alone.
+- [ ] Skill cites tools and files used.
+- [ ] Instruction lint passes.
+
+## Phase 3: Balanced Coupling and architecture fitness
+
+Files:
+
+- `src/skills/methodology-balanced-coupling/SKILL.md`
+- `src/skills/methodology-balanced-coupling/references/details.md`
+- `src/skills/methodology-architecture-fitness/SKILL.md`
+
+Tasks:
+
+- [ ] Decide whether Balanced Coupling content is summary-only, adapted, quoted,
+      or requires explicit permission.
+- [ ] Reuse and adapt Vlad Khononov definitions with attribution and licensing
+      caution.
+- [ ] Define integration strength levels.
+- [ ] Define implicit vs explicit coupling.
+- [ ] Define distance, lifecycle coupling, runtime coupling, and team distance.
+- [ ] Define volatility via DDD subdomains and change frequency.
+- [ ] Define balance rule: high strength + high distance + high volatility is the
+      highest risk.
+- [ ] Define severity mapping.
+- [ ] Warn against generic “decouple everything” advice.
+- [ ] Define architecture fitness as executable checks, not documentation.
+- [ ] Map common findings to candidate fitness checks.
+
+Verification:
+
+- [ ] Skill explains DDD terms on first use.
+- [ ] Skill asks only context questions that change assessment.
+- [ ] Highest priority is high strength, high distance, high volatility.
+- [ ] Fitness guidance distinguishes existing checks from recommended checks.
+- [ ] Licensing and attribution path is clear before writing reusable material.
+
+## Phase 4: first dogfood pass on ccgram
+
+Target:
+
+- `/Users/alexei/Workspace/ccgram`
+
+Tasks:
+
+- [ ] Run the current review loop manually against ccgram.
+- [ ] Cover applicable evidence dimensions with tools that already work in the
+      environment.
+- [ ] Record tool friction.
+- [ ] Record missing evidence.
+- [ ] Record unclear interview questions.
+- [ ] Produce one report draft.
+- [ ] Produce one plan draft from that report.
+- [ ] Tune templates, prompts, rubrics, and tool routing based on real pain.
+
+Verification:
+
+- [ ] Report helps a human understand ccgram’s architecture.
+- [ ] Recommendations cite evidence.
+- [ ] Scores are explainable.
+- [ ] Unsupported claims are removed.
+- [ ] Plan avoids unsupported rewrites.
+
+## Phase 5: evidence tool skill suite
+
+Files:
+
+- `src/skills/tools-ast-grep/SKILL.md`
+- `src/skills/tools-ast-grep/references/rules.md`
+- `src/skills/tools-codegraph/SKILL.md`
+- `src/skills/tools-gitnexus/SKILL.md`
+- `src/skills/tools-lsp-tree-sitter/SKILL.md`
+- `src/skills/tools-typescript/SKILL.md`
+- `src/skills/tools-python/SKILL.md`
+- `src/skills/tools-go/SKILL.md`
+- `src/skills/tools-infra-operational/SKILL.md`
+- `src/skills/tools-report-markdown/SKILL.md`
+
+Tasks:
+
+- [ ] Define tool applicability rules.
+- [ ] Define tool coverage levels: discovery, structural, semantic, dependency,
+      change, operational, security/supply-chain, and report quality.
+- [ ] Define context-budget rules for summarizing noisy output.
+- [ ] Define tool-budget and stop rules for redundant or expensive scans.
+- [ ] Document ast-grep commands for imports, exports, direct DB access, routes,
+      and framework leaks.
+- [ ] Document codegraph init, index, sync, status, query, context, affected, and
+      files commands.
+- [ ] Document GitNexus analyze, status, list, query, context, impact,
+      detect-changes, and cypher commands.
+- [ ] Document stale-index handling for codegraph and GitNexus.
+- [ ] Document LSP definitions, references, implementations, diagnostics,
+      document symbols, workspace symbols, and tree-sitter syntax queries.
+- [ ] Add TypeScript commands for dependency-cruiser, madge, knip, tsc, ESLint,
+      and package managers.
+- [ ] Add Python commands for import-linter, pydeps, pyright or basedpyright,
+      ruff, deptry, pipdeptree, uv tree, radon or lizard, and vulture.
+- [ ] Add Go commands for go list, go mod graph, goda, gopls, staticcheck,
+      govulncheck, and go-callvis.
+- [ ] Add operational commands for Helm, Kustomize, Kubernetes, Terraform,
+      OpenTofu, Docker, GitHub Actions, policy tools, SBOM, and vulnerability
+      scanners.
+- [ ] Add report commands for Markdown, Mermaid, jq, yq, Graphviz, D2, links,
+      spelling, and formatting.
+- [ ] Skip dedicated PHP, Ruby, COBOL, Java, and JVM-only skills.
+
+Verification:
+
+- [ ] Each skill includes exact commands.
+- [ ] Each skill explains when the tool is applicable.
+- [ ] Each skill explains how tool evidence affects confidence.
+- [ ] Each skill explains failure and missing-tool handling.
+- [ ] Each skill avoids duplicating tool behavior in package code.
+- [ ] Tool output examples are summarized, not pasted wholesale.
+- [ ] Each skill says when to stop and record a coverage gap instead of running
+      another redundant tool.
+
+## Phase 6: Python helper tools
+
+Files:
+
+- `src/architect_tools/doctor.py`
+- `src/architect_tools/validate_report.py`
+- `src/architect_tools/compare_reports.py`
+- `tests/tools/*.py`
+
+Tasks:
+
+- [ ] Use Python 3.12+ typing and stdlib-first design, with PyYAML allowed for
+      report frontmatter and scorecard parsing.
+- [ ] `doctor` checks tool availability and versions.
+- [ ] `doctor` reports available, applicable, covered, missing, and failed tool
+      states where possible.
+- [ ] `validate-report` checks frontmatter, score bands, confidence, required
+      sections, evidence refs, finding IDs, and tool coverage.
+- [ ] `compare-reports` compares scores, finding IDs, confidence, scope, rubric
+      version, and tool coverage.
+- [ ] `compare-reports` reports non-comparability instead of inventing trends.
+- [ ] Keep helpers small.
+- [ ] Fail with an install hint when YAML support is unavailable.
+- [ ] Do not wrap ast-grep, codegraph, GitNexus, LSP, or tree-sitter.
+
+Verification:
+
+- [ ] Helpers have pytest coverage.
+- [ ] Missing tools get install suggestions.
+- [ ] Report validator catches missing scores and confidence.
+- [ ] Report validator catches malformed evidence refs.
+- [ ] Report validator parses valid YAML frontmatter without a homemade parser.
+- [ ] Compare helper separates score deltas from confidence deltas.
+- [ ] Compare helper rejects incompatible scope or rubric versions.
+- [ ] `uv run pytest` succeeds.
+- [ ] `uv run ruff check .` succeeds.
+- [ ] `uv run ruff format --check .` succeeds.
+
+## Phase 7: build outputs and runtime overlays
+
+Files:
+
+- `scripts/build/compile.py`
+- `src/plugins/architecture/plugin.yaml`
+- target frontmatter overlays
+- `dist/claude/`
+- `dist/codex/`
+- `dist/pi/`
+
+Tasks:
+
+- [ ] Reuse the `cc-thingz` source-to-dist pattern.
+- [ ] Compile agents and skills from one source tree.
+- [ ] Support target overlays.
+- [ ] Generate Pi output.
+- [ ] Generate Claude output.
+- [ ] Generate Codex output.
+- [ ] Keep generated files reproducible.
+- [ ] Add Codex structured-question overlay only after verifying the concrete
+      runtime behavior.
+
+Verification:
+
+- [ ] Build regenerates `dist/` from `src/`.
+- [ ] Drift check catches hand-edited generated files.
+- [ ] Manifests reference architect agent and skills.
+- [ ] Pi discovers skills.
+- [ ] Claude output has valid frontmatter.
+- [ ] Codex output avoids unverified structured-input tool names.
+
+## Phase 8: Pi package
+
+Files:
+
+- Pi package manifest or conventional package directories
+
+Tasks:
+
+- [ ] Contribute skill paths through package metadata or conventional dirs.
+- [ ] Contribute agent files where Pi can load them.
+- [ ] Require `alexei-led/cc-thingz` for `ask_user_question` support.
+- [ ] Do not implement a local Pi question extension.
+- [ ] Document how agents run Python helpers through uv.
+
+Verification:
+
+- [ ] Package installs from local path.
+- [ ] Pi discovers skills.
+- [ ] `ask_user_question` is available when `cc-thingz` is installed.
+- [ ] Helper commands work through `uv run`.
+
+## Phase 9: docs
+
+Files:
+
+- `README.md`
+- `docs/install.md`
+- `docs/tools.md`
+- `docs/report-format.md`
+- `docs/scoring.md`
+- `docs/methodology.md`
+
+Tasks:
+
+- [ ] Document Claude install/update.
+- [ ] Document Codex install/update.
+- [ ] Document Pi install/update.
+- [ ] Document required and recommended OSS CLI tools.
+- [ ] Document tool coverage states and confidence impact.
+- [ ] Document score dimensions.
+- [ ] Document report format.
+- [ ] Document plan format.
+- [ ] Attribute Vlad and Balanced Coupling.
+
+Verification:
+
+- [ ] Install docs match package layout.
+- [ ] Tool docs match doctor output.
+- [ ] Scoring docs match scorecard skill.
+- [ ] Methodology docs match Balanced Coupling skill.
+
+## Phase 10: evals and fixtures
+
+Files:
+
+- `tests/fixtures/repos/ts-healthy/`
+- `tests/fixtures/repos/ts-tangled/`
+- `tests/fixtures/repos/python-boundaries/`
+- `tests/fixtures/repos/go-deps/`
+- `tests/fixtures/repos/infra-mixed/`
+- `tests/skill-evals/architecture-review/`
+
+Tasks:
+
+- [ ] Create healthy and unhealthy fixtures.
+- [ ] Include git history for change locality where practical.
+- [ ] Include operational manifests.
+- [ ] Eval interview-before-score behavior.
+- [ ] Eval structured-question behavior for Claude, Pi, and Codex overlays.
+- [ ] Eval tool-before-claim behavior.
+- [ ] Eval tool coverage reporting.
+- [ ] Eval evidence citation.
+- [ ] Eval plan quality.
+- [ ] Eval non-comparable report handling.
+
+Verification:
+
+- [ ] Evals pass baseline.
+- [ ] Reports contain frontmatter scores.
+- [ ] Reports contain tool coverage.
+- [ ] Re-runs produce stable score bands.
+- [ ] Bad fixtures score worse for the right reasons.
+
+## Phase 11: second dogfood pass and release hardening
+
+Targets:
+
+- `/Users/alexei/Workspace/ccgram`
+- `cc-thingz`
+- `modularity`
+- one large mixed repo
+
+Tasks:
+
+- [ ] Run review manually with real tools.
+- [ ] Run helper validation.
+- [ ] Compare against the first ccgram dogfood report.
+- [ ] Record tool friction.
+- [ ] Review false positives.
+- [ ] Tune prompts and rubrics.
+- [ ] Produce one plan from a real report.
+- [ ] Share findings with Vlad before release if Balanced Coupling material goes
+      beyond light attribution and summary.
+
+Verification:
+
+- [ ] Report helps a human architect understand the system.
+- [ ] Recommendations cite evidence.
+- [ ] Scores are explainable.
+- [ ] Unsupported claims are removed.
+- [ ] Repeat report explains improvement, degradation, or non-comparability.
+- [ ] Release notes describe known limitations.
