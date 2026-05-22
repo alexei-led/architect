@@ -18,6 +18,7 @@ from typing import Any
 from architect_tools._contract import (
     comparability_reason,
     confidence_rank,
+    is_int_score,
     load_report,
     load_scorecard,
 )
@@ -55,8 +56,9 @@ def compare_reports(
     confidence_deltas: dict[str, int] = {}
     for name in sorted(set(base_scores) & set(head_scores)):
         b, h = base_scores[name], head_scores[name]
-        if isinstance(b.get("value"), int) and isinstance(h.get("value"), int):
-            score_deltas[name] = h["value"] - b["value"]
+        bv, hv = b.get("value"), h.get("value")
+        if is_int_score(bv) and is_int_score(hv):
+            score_deltas[name] = hv - bv
         if b.get("confidence") in {"low", "medium", "high"} and h.get("confidence") in {
             "low",
             "medium",

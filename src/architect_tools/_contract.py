@@ -68,7 +68,10 @@ def split_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     """Return (frontmatter dict, body) for a Markdown file with YAML frontmatter."""
     if not text.startswith("---\n"):
         raise ValueError("file does not start with YAML frontmatter")
-    _, fm, body = text.split("---\n", 2)
+    parts = text.split("---\n", 2)
+    if len(parts) < 3:
+        raise ValueError("frontmatter is not closed by a '---' line")
+    _, fm, body = parts
     parsed = yaml.safe_load(fm)
     if not isinstance(parsed, dict):
         raise ValueError("frontmatter is not a YAML mapping")
@@ -81,6 +84,11 @@ def load_report(path: Path) -> tuple[dict[str, Any], str]:
 
 def load_scorecard(path: Path | None = None) -> dict[str, Any]:
     return yaml.safe_load(Path(path or DEFAULT_SCORECARD).read_text())
+
+
+def is_int_score(value: Any) -> bool:
+    """True for genuine integer scores, excluding bool (a subclass of int)."""
+    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def band_for_value(value: int, bands: list[dict[str, Any]]) -> str | None:

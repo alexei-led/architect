@@ -43,6 +43,16 @@ def test_separates_score_and_confidence_deltas():
     assert out.confidence_deltas["coupling_balance"] == 1
 
 
+def test_bool_score_value_excluded_from_deltas():
+    base, sc = _base()
+    head = copy.deepcopy(base)
+    # bool is an int subclass; True must not be treated as a numeric score 1.
+    base["scores"]["boundary_integrity"]["value"] = True
+    head["scores"]["boundary_integrity"]["value"] = 60
+    out = cr.compare_reports(base, head, sc)
+    assert "boundary_integrity" not in out.score_deltas
+
+
 def test_finding_set_changes():
     base, sc = _base()
     head = copy.deepcopy(base)
