@@ -438,22 +438,22 @@ Files:
 
 Tasks:
 
-- [ ] Document Claude install/update.
-- [ ] Document Codex install/update.
-- [ ] Document Pi install/update.
-- [ ] Document required and recommended OSS CLI tools.
-- [ ] Document tool coverage states and confidence impact.
-- [ ] Document score dimensions.
-- [ ] Document report format.
-- [ ] Document plan format.
-- [ ] Attribute Vlad and Balanced Coupling.
+- [x] Document Claude install/update.
+- [x] Document Codex install/update.
+- [x] Document Pi install/update.
+- [x] Document required and recommended OSS CLI tools.
+- [x] Document tool coverage states and confidence impact.
+- [x] Document score dimensions.
+- [x] Document report format.
+- [x] Document plan format.
+- [x] Attribute Vlad and Balanced Coupling.
 
 Verification:
 
-- [ ] Install docs match package layout.
-- [ ] Tool docs match doctor output.
-- [ ] Scoring docs match scorecard skill.
-- [ ] Methodology docs match Balanced Coupling skill.
+- [x] Install docs match package layout.
+- [x] Tool docs match doctor output.
+- [x] Scoring docs match scorecard skill.
+- [x] Methodology docs match Balanced Coupling skill.
 
 ### Task 11: Phase 10 - evals and fixtures
 

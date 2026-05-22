@@ -93,3 +93,11 @@ uv run architect-doctor --repo /path/to/repo   # tool availability + coverage
 uv run architect-validate-report report.md     # validate a report
 uv run architect-compare-reports a.md b.md      # compare or explain non-comparability
 ```
+
+## Documentation
+
+- [docs/install.md](docs/install.md) — install and update for Claude, Codex, and Pi.
+- [docs/tools.md](docs/tools.md) — OSS CLI tools, coverage states, confidence impact.
+- [docs/report-format.md](docs/report-format.md) — report and plan format.
+- [docs/scoring.md](docs/scoring.md) — score dimensions, bands, confidence, comparability.
+- [docs/methodology.md](docs/methodology.md) — Balanced Coupling and architecture fitness.
