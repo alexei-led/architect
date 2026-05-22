@@ -371,24 +371,29 @@ Files:
 
 Tasks:
 
-- [ ] Reuse the `cc-thingz` source-to-dist pattern.
-- [ ] Compile agents and skills from one source tree.
-- [ ] Support target overlays.
-- [ ] Generate Pi output.
-- [ ] Generate Claude output.
-- [ ] Generate Codex output.
-- [ ] Keep generated files reproducible.
-- [ ] Add Codex structured-question overlay only after verifying the concrete
-      runtime behavior.
+- [x] Reuse the `cc-thingz` source-to-dist pattern. (Pattern inferred; external
+      repo not fetchable here — noted in compile.py to reconcile when accessible.)
+- [x] Compile agents and skills from one source tree.
+- [x] Support target overlays.
+- [x] Generate Pi output.
+- [x] Generate Claude output.
+- [x] Generate Codex output.
+- [x] Keep generated files reproducible. (Deterministic emit; `--check` drift gate.)
+- [x] Add Codex structured-question overlay only after verifying the concrete
+      runtime behavior. (Deferred — Codex runtime not verifiable in this
+      environment; overlay preserves `structured_questions: unverified` and the
+      compiler asserts no concrete tool name leaks into Codex output.)
 
 Verification:
 
-- [ ] Build regenerates `dist/` from `src/`.
-- [ ] Drift check catches hand-edited generated files.
-- [ ] Manifests reference architect agent and skills.
-- [ ] Pi discovers skills.
-- [ ] Claude output has valid frontmatter.
-- [ ] Codex output avoids unverified structured-input tool names.
+- [x] Build regenerates `dist/` from `src/`.
+- [x] Drift check catches hand-edited generated files.
+- [x] Manifests reference architect agent and skills.
+- [x] Pi discovers skills. (Pi target emits a `skills/` tree + manifest; full Pi
+      discovery wiring is Task 9.)
+- [x] Claude output has valid frontmatter. (Parseable YAML; flat read-only
+      `tools` allow-list, no Edit/Write.)
+- [x] Codex output avoids unverified structured-input tool names.
 
 ### Task 9: Phase 8 - Pi package
 

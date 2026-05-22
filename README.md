@@ -54,5 +54,15 @@ uv run ruff check .         # lint
 uv run ruff format --check .  # format check
 ```
 
-`scripts/build/` regenerates `dist/` from `src/` (added in a later phase). Do
-not hand-edit generated files under `dist/`.
+`scripts/build/compile.py` regenerates `dist/` from `src/`. Do not hand-edit
+generated files under `dist/`.
+
+```sh
+uv run python scripts/build/compile.py          # regenerate dist/
+uv run python scripts/build/compile.py --check  # fail on drift / hand-edits
+```
+
+Each target (`claude`, `codex`, `pi`) gets the same layout: `agents/architect.md`
+(AGENT.md body with the target frontmatter overlay merged in), `skills/<name>/`,
+`templates/`, and a `plugin.yaml` manifest enumerating the agent and skills.
+Output is deterministic, so `--check` catches both stale builds and hand edits.
