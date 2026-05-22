@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 license = { file = "LICENSE" }
 authors = [{ name = "Alexei Ledenev" }]
 keywords = ["pi-package", "claude-code", "codex", "architecture", "code-review"]
-dependencies = []
+dependencies = ["pyyaml>=6.0"]
 
 [project.scripts]
 architect-doctor = "architect_tools.doctor:main"

@@ -133,30 +133,30 @@ Files:
 
 Tasks:
 
-- [ ] Define interview context fields.
-- [ ] Define system map fields.
-- [ ] Define report frontmatter.
-- [ ] Choose YAML handling: PyYAML dependency or a deliberately constrained
-      subset. Prefer PyYAML unless packaging proves it too costly.
-- [ ] Define score dimensions.
-- [ ] Define `0..100` score bands and anchors.
-- [ ] Define confidence levels.
-- [ ] Define evidence reference schema.
-- [ ] Define finding schema with stable IDs.
-- [ ] Define tool coverage and gap schema.
-- [ ] Define report sections.
-- [ ] Define plan structure.
-- [ ] Define report comparability rules: scope, rubric version, and tool coverage.
+- [x] Define interview context fields.
+- [x] Define system map fields.
+- [x] Define report frontmatter.
+- [x] Choose YAML handling: PyYAML dependency or a deliberately constrained
+      subset. Prefer PyYAML unless packaging proves it too costly. (PyYAML added.)
+- [x] Define score dimensions.
+- [x] Define `0..100` score bands and anchors.
+- [x] Define confidence levels.
+- [x] Define evidence reference schema.
+- [x] Define finding schema with stable IDs.
+- [x] Define tool coverage and gap schema.
+- [x] Define report sections.
+- [x] Define plan structure.
+- [x] Define report comparability rules: scope, rubric version, and tool coverage.
 
 Verification:
 
-- [ ] Example report frontmatter parses.
-- [ ] Example report includes score values, bands, confidence, evidence refs, and
+- [x] Example report frontmatter parses.
+- [x] Example report includes score values, bands, confidence, evidence refs, and
       tool coverage.
-- [ ] Example plan includes phases, tasks, verification, acceptance criteria, and
+- [x] Example plan includes phases, tasks, verification, acceptance criteria, and
       safety notes.
-- [ ] Low confidence cannot be presented as high quality.
-- [ ] Non-comparable reports have an explicit reason.
+- [x] Low confidence cannot be presented as high quality.
+- [x] Non-comparable reports have an explicit reason.
 
 ### Task 3: Phase 2 - architect agent and review loop
 
