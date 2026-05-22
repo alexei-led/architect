@@ -539,14 +539,14 @@ Verification:
 
 ### Task 13: Verify acceptance criteria
 
-- [ ] Verify the architect agent exists for Claude, Codex, and Pi.
-- [ ] Verify the review flow produces interview context, system map, architecture report, and refactoring plan artifacts.
-- [ ] Verify review skills enforce interview, system mapping, scorecard use, evidence citation, and tool coverage reporting.
-- [ ] Verify methodology, tool, helper, build, package, documentation, eval, and dogfood deliverables match the Acceptance Criteria section.
-- [ ] Run `uv sync`.
-- [ ] Run `uv run pytest`.
-- [ ] Run `uv run ruff check .`.
-- [ ] Run `uv run ruff format --check .`.
+- [x] Verify the architect agent exists for Claude, Codex, and Pi. (AGENT.md + claude/codex/pi frontmatter overlays; dist/{claude,codex,pi}/agents)
+- [x] Verify the review flow produces interview context, system map, architecture report, and refactoring plan artifacts. (templates + dogfood report.md/plan.md; report frontmatter carries interview context + system map)
+- [x] Verify review skills enforce interview, system mapping, scorecard use, evidence citation, and tool coverage reporting. (architecture-review SKILL.md: build system map before judging, triage before scoring, "No scoring before a system map", structured_questions routing)
+- [x] Verify methodology, tool, helper, build, package, documentation, eval, and dogfood deliverables match the Acceptance Criteria section. (14 skills incl. methodology-balanced-coupling/fitness + 10 tool skills; 3 helpers; reproducible build --check; Pi plugin manifest; 6 docs; 62 passing tests incl. evals; dogfood passes 1+2)
+- [x] Run `uv sync`. (Resolved 9 packages)
+- [x] Run `uv run pytest`. (62 passed)
+- [x] Run `uv run ruff check .`. (All checks passed)
+- [x] Run `uv run ruff format --check .`. (22 files already formatted)
 
 ## Post-Completion
 
