@@ -1,0 +1,20 @@
+# Codex CLI overlay for the architect agent.
+# The build compiler (Task 8) merges this over AGENT.md's body.
+name: architect
+description: Read-only architecture reviewer. Interviews for intent, maps the system, scores against a fixed rubric with cited evidence, and drafts incremental refactoring plans. Use when reviewing or auditing a codebase's architecture, comparing architecture reports, or planning a refactor. Does not edit code.
+model: opus
+tools:
+  allow:
+    - Read
+    - Grep
+    - Glob
+    - Bash
+  deny:
+    - Edit
+    - Write
+capabilities:
+  # Codex structured-question support is not yet verified against the concrete
+  # runtime. Until Task 8 confirms a real tool name, the review skill must fall
+  # back to plain numbered interview questions for this target. Do not invent a
+  # tool name here.
+  structured_questions: unverified

@@ -174,33 +174,33 @@ Files:
 
 Tasks:
 
-- [ ] Make architect read-only for source code by default.
-- [ ] Allow report/plan writes only with explicit user approval.
-- [ ] Require interview before full scoring when context is missing.
-- [ ] Require docs and code inspection before asking answerable questions.
-- [ ] Require system map before scoring.
-- [ ] Define intended architecture source order.
-- [ ] Define observed architecture evidence sources.
-- [ ] Separate facts, hypotheses, scores, and recommendations.
-- [ ] Cite evidence for every finding.
-- [ ] Use the scorecard skill before assigning scores.
-- [ ] Use the report template for reports.
-- [ ] Use the plan template for plans.
-- [ ] Recommend incremental refactoring only.
-- [ ] Define user-facing flows: architecture review, compare reports, and make
+- [x] Make architect read-only for source code by default.
+- [x] Allow report/plan writes only with explicit user approval.
+- [x] Require interview before full scoring when context is missing.
+- [x] Require docs and code inspection before asking answerable questions.
+- [x] Require system map before scoring.
+- [x] Define intended architecture source order.
+- [x] Define observed architecture evidence sources.
+- [x] Separate facts, hypotheses, scores, and recommendations.
+- [x] Cite evidence for every finding.
+- [x] Use the scorecard skill before assigning scores.
+- [x] Use the report template for reports.
+- [x] Use the plan template for plans.
+- [x] Recommend incremental refactoring only.
+- [x] Define user-facing flows: architecture review, compare reports, and make
       refactoring plan.
-- [ ] Route code changes to an engineer or mutator agent.
+- [x] Route code changes to an engineer or mutator agent.
 
 Verification:
 
-- [ ] Agent has no edit/write behavior for production source code.
-- [ ] Agent output contract is clear.
-- [ ] Skill interviews first when context is missing.
-- [ ] Skill uses structured question tools on Claude and Pi.
-- [ ] Skill defines Codex structured-question behavior through target overlay.
-- [ ] Skill does not score from directory shape alone.
-- [ ] Skill cites tools and files used.
-- [ ] Instruction lint passes.
+- [x] Agent has no edit/write behavior for production source code.
+- [x] Agent output contract is clear.
+- [x] Skill interviews first when context is missing.
+- [x] Skill uses structured question tools on Claude and Pi.
+- [x] Skill defines Codex structured-question behavior through target overlay.
+- [x] Skill does not score from directory shape alone.
+- [x] Skill cites tools and files used.
+- [x] Instruction lint passes.
 
 ### Task 4: Phase 3 - Balanced Coupling and architecture fitness
 
