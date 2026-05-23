@@ -1,0 +1,42 @@
+title = "architect gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+paths = [
+    '''\.gitignore$''',
+    '''\.gitleaks\.toml$''',
+]
+
+# Belt-and-suspenders: these files should already be ignored. If one is staged,
+# fail even when its contents have low entropy or only contain variable names.
+[[rules]]
+id = "local-env-file"
+description = "Local environment files must never be committed"
+path = '''(^|/)\.env(\..*)?$'''
+entropy = 0
+
+[[rules]]
+id = "credential-file"
+description = "Credential or token-named files must never be committed"
+path = '''(^|/).*(credentials|secret|token|password).*$'''
+entropy = 0
+
+[[rules]]
+id = "private-key-material"
+description = "Private key material files must never be committed"
+path = '''\.(pem|key|p12)$'''
+entropy = 0
+
+[[rules]]
+id = "local-agent-state"
+description = "Local agent state may contain transcripts or credentials"
+path = '''(^|/)\.pi/'''
+entropy = 0
+
+[[rules]]
+id = "gitleaks-report"
+description = "Gitleaks reports may contain redacted findings and local paths"
+path = '''(^|/)\.gitleaks-report\.'''
+entropy = 0

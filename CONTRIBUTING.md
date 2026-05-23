@@ -7,6 +7,7 @@ Development notes for `architect`. User install instructions live in [README.md]
 - Python 3.12+
 - `uv`
 - `make`
+- `gitleaks` for secret scanning before commit/push
 - Optional: `markdownlint-cli2` for Markdown linting
 
 ## Setup
@@ -24,6 +25,7 @@ make lint               # instruction lint + ruff check + ruff format --check
 make lint-instructions  # agent and skill instruction checks only
 make test               # pytest
 make check              # lint + tests
+make secrets-history    # full Gitleaks scan before public push
 ```
 
 Run `make check` before sending changes. For README or docs-only edits, also run:
@@ -33,6 +35,19 @@ markdownlint-cli2 README.md CONTRIBUTING.md docs/*.md
 ```
 
 If `markdownlint-cli2` is not installed, state that in the change notes.
+
+## Secret scanning
+
+The local git hooks run Gitleaks before commits and pushes:
+
+```sh
+make secrets-staged   # staged diff only; used by pre-commit
+make secrets-history  # full git history; used by pre-push and release validation
+```
+
+`.env` and other local secret material are ignored. Do not commit real keys,
+credential files, tokens, or generated Gitleaks reports. Before making the repo
+public, run `make check secrets-history` from a clean tree.
 
 ## Skill evals
 
@@ -45,6 +60,20 @@ make skill-evals          # run evals with baseline and HTML report
 make skill-evals-fast     # no baseline, no HTML report, advisory exit
 make skill-evals-summary  # summarize latest workspace
 ```
+
+## Release
+
+Release tags require curated changelog notes and a clean tree:
+
+```sh
+make release V=0.2.0
+```
+
+The release script updates `pyproject.toml`, `uv.lock`, and
+`src/plugins/architecture/plugin.yaml`, promotes the `CHANGELOG.md` Unreleased
+section when needed, runs `make check secrets-history`, commits the version bump,
+and creates an annotated `vX.Y.Z` tag. Push the branch and tag to publish through
+GitHub Actions.
 
 ## Helper CLIs
 

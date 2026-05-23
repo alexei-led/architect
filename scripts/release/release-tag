@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# Create a release tag with version bump and changelog promotion.
+#
+# Usage: scripts/release/release-tag v0.2.0
+set -euo pipefail
+
+if [ $# -ne 1 ]; then
+	echo "Usage: scripts/release/release-tag <version>"
+	echo "Example: scripts/release/release-tag v0.2.0"
+	exit 1
+fi
+
+TAG="$1"
+VERSION="${TAG#v}"
+
+if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+	echo "ERROR: '$TAG' is not a valid semver tag (expected vX.Y.Z)"
+	exit 1
+fi
+
+if [ -n "$(git status --porcelain)" ]; then
+	echo "ERROR: working tree is not clean — commit or stash changes first"
+	exit 1
+fi
+
+if git rev-parse "$TAG" >/dev/null 2>&1; then
+	echo "ERROR: tag '$TAG' already exists"
+	exit 1
+fi
+
+python3 - "$VERSION" <<'PY'
+from __future__ import annotations
+
+import re
+import sys
+from datetime import date
+from pathlib import Path
+
+version = sys.argv[1]
+files = [
+    Path("pyproject.toml"),
+    Path("uv.lock"),
+    Path("src/plugins/architecture/plugin.yaml"),
+]
+
+for path in files:
+    text = path.read_text(encoding="utf-8")
+    if path.suffix == ".toml" or path.name == "uv.lock":
+        if path.name == "pyproject.toml":
+            text = re.sub(r'(?m)^version = "[^"]+"', f'version = "{version}"', text, count=1)
+        else:
+            text = re.sub(
+                r'(?m)^(name = "architect"\nversion = ")[^"]+("\n)',
+                rf"\g<1>{version}\2",
+                text,
+                count=1,
+            )
+    else:
+        text = re.sub(r"(?m)^version: .+", f"version: {version}", text, count=1)
+    path.write_text(text, encoding="utf-8")
+
+changelog = Path("CHANGELOG.md")
+text = changelog.read_text(encoding="utf-8")
+if f"## [{version}]" not in text:
+    marker = "## [Unreleased]\n"
+    if marker not in text:
+        raise SystemExit("CHANGELOG.md missing ## [Unreleased] marker")
+    after = text.split(marker, 1)[1]
+    next_header = re.search(r"(?m)^## \[", after)
+    if next_header is None:
+        raise SystemExit("CHANGELOG.md missing release history after Unreleased")
+    unreleased = after[: next_header.start()].strip()
+    if not unreleased:
+        raise SystemExit(
+            "CHANGELOG.md Unreleased section is empty — add release notes before tagging"
+        )
+    dated = f"## [{version}] - {date.today().isoformat()}\n\n{unreleased}\n\n"
+    text = text.replace(marker + after[: next_header.start()], marker + "\n" + dated, 1)
+    changelog.write_text(text, encoding="utf-8")
+PY
+
+uv lock
+make check secrets-history
+
+git add pyproject.toml uv.lock src/plugins/architecture/plugin.yaml CHANGELOG.md
+if ! git diff --cached --quiet; then
+	git commit -m "chore: bump version to $VERSION"
+fi
+
+git tag -a "$TAG" -m "Release $VERSION"
+
+echo "Created tag $TAG"
+echo "Push with: git push origin master $TAG"

@@ -1,0 +1,43 @@
+name: Release
+on:
+  push:
+    tags:
+      - v*.*.*
+permissions:
+  contents: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: make check
+  release:
+    name: Create release
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Generate release notes
+        run: |
+          python3 scripts/release/generate-release-notes.py \
+            --tag "$GITHUB_REF_NAME" \
+            --changelog CHANGELOG.md \
+            --plugin src/plugins/architecture/plugin.yaml \
+            --output "$RUNNER_TEMP/release-notes.md" \
+            --repository "$GITHUB_REPOSITORY"
+      - uses: softprops/action-gh-release@v3
+        with:
+          body_path: ${{ runner.temp }}/release-notes.md
+          generate_release_notes: false

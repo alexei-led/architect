@@ -1,8 +1,27 @@
-.env
-.pi
+# Local agent state
+.pi/
+
+# Python
 .venv/
 __pycache__/
-*.pyc
+*.py[cod]
 .pytest_cache/
 .ruff_cache/
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*credentials*
+*secret*
+*token*
+
+# Build artifacts
+build/
 dist/
+*.egg-info/
+
+# Tool caches
+.gitleaks-report.*
