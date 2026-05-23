@@ -111,11 +111,13 @@ for greenfield work it is design → plan; for pure audit it is review only.
 
 ## Plan format
 
-The architecture plan is plain Markdown for humans and coding agents. Generated
-plan files default to `docs/plans/<kebab-case-target>.md` unless the user gives a
-different path. One hotspot, boundary, module, or flow per plan unless a roadmap
-is requested; keep the next execution horizon to five tasks or fewer before
-re-review.
+The architecture plan is plain Markdown for humans, coding agents, and task
+runners. Generated plan files default to `docs/plans/<kebab-case-target>.md`
+unless the user gives a different path. If a plan is written outside the
+configured plans directory, the handoff must name the exact execution path or say
+to copy/symlink it into that directory. One hotspot, boundary, module, or flow
+per plan unless a roadmap is requested; keep the next execution horizon to five
+tasks or fewer before re-review.
 
 - **Overview** — the problem the plan addresses.
 - **Source artifact** — approved design ID plus design decisions, contract IDs,
@@ -123,12 +125,15 @@ re-review.
   evidence refs when the design came from a review.
 - **Success criteria** — observable outcomes, each tied to a finding, score
   dimension, design decision, contract, module responsibility, or risk.
-- **Validation Commands** — project-wide and focused commands the executor can
-  run after task completion.
-- **Phases** — executable work uses `### Task N:` headings. Each task carries a
-  justification (finding ID + evidence ref), preconditions, postconditions,
-  small independently-verifiable checkbox items, and a verification check (test,
-  fitness check, command). Checkboxes belong only inside task sections.
+- **Validation Commands** — project-wide commands the executor can run after
+  task completion.
+- **Implementation Steps** — executable work uses `### Task N:` or
+  `### Iteration N:` headings. Each task carries a justification (finding ID +
+  evidence ref), file list, preconditions, postconditions, concrete GitNexus
+  `impact` / `detect-changes` commands or an explicit missing-tool fallback,
+  concrete per-task verification commands, manual checks as plain bullets, and
+  small independently-verifiable checkbox items. Checkboxes belong only inside
+  task or iteration sections.
 - **Acceptance criteria** — conditions for accepting the whole plan; prefer
   characterization tests, seam creation, boundary repair, and fitness checks
   before cosmetic cleanup.
@@ -138,5 +143,7 @@ re-review.
 
 Plans recommend incremental implementation/refactoring only — no big-bang
 rewrites — and each boundary repair pairs with a fitness check so it cannot
-silently re-rot. A plan ends by recommending a scoped `architecture-review` pass
-once implementation lands.
+silently re-rot. The final executable task handles whole-plan verification,
+documentation confirmation, GitNexus `detect-changes`, and scoped re-review
+handoff. A plan ends by recommending a scoped `architecture-review` pass once
+implementation lands.

@@ -4,17 +4,18 @@ description: >-
   Turn approved architecture-design artifacts, with supporting review findings
   when present, into an incremental implementation/refactoring plan. Use when
   asked to plan a refactor, sequence remediation, or implement an approved target
-  architecture. Produces a phased, verifiable plan that cites source findings,
-  evidence, design decisions, contracts, or risks. NOT for applying changes
-  (hand off to a mutator agent), designing target architecture (use
-  architecture-design), or scoring (use architecture-scorecard).
+  architecture. Produces a task-runner-compatible, verifiable plan that cites
+  source findings, evidence, design decisions, contracts, or risks. NOT for
+  applying changes (hand off to a mutator agent), designing target architecture
+  (use architecture-design), or scoring (use architecture-scorecard).
 ---
 
 # Architecture plan
 
 Derive an actionable, incremental implementation/refactoring plan from an
 approved design, with review findings as supporting context when present. The
-architect drafts the plan; it never executes it.
+artifact is executable by an engineer, mutator agent, or task runner; the
+architect writes the plan and stops.
 
 ## When to use
 
@@ -53,15 +54,17 @@ Maintain a visible task list for the planning flow. Track at least:
 5. Verification and acceptance criteria attached.
 6. Handoff and re-review step recorded.
 
-Keep task names outcome-based. Do not expose runtime-specific mechanics in the
-plan.
+Keep task names outcome-based. Do not expose prompt or tool internals in task
+names.
 
 ## Destination
 
 When the user asks to write or generate a plan and gives no destination, write it
 under `docs/plans/` using a kebab-case slug from the target, for example
 `docs/plans/extract-auth-boundary.md`. Create `docs/plans/` if it is missing.
-Use a user-specified path only when provided.
+Use a user-specified path only when provided. If the user-specified path is
+outside `docs/plans/`, state that the executor must be invoked with that exact
+path or the plan must be copied/symlinked into the configured plans directory.
 
 ## Procedure
 
@@ -71,30 +74,49 @@ Use a user-specified path only when provided.
    source rationale does not belong in the plan.
 
 2. **Use the plan template.** `../../templates/plan.md` is the skeleton: Overview,
-   Source artifact, Success criteria, Validation Commands, Phases with
-   executable `### Task N:` sections, Acceptance criteria, Safety notes,
+   Source artifact, Success criteria, Validation Commands, Implementation Steps
+   with executable `### Task N:` sections, Acceptance criteria, Safety notes,
    Re-review. Put checkboxes only inside `### Task N:` or `### Iteration N:`
    sections; context sections must use plain bullets or prose.
 
 3. **Resolve the destination.** For written artifacts, default to
-   `docs/plans/<kebab-case-target>.md` unless the user gives another path.
+   `docs/plans/<kebab-case-target>.md` unless the user gives another path. When
+   the path is outside `docs/plans/`, include the exact execution path or the
+   copy/symlink instruction in the handoff.
 
 4. **Order for safety.** Prefer characterization tests, seam creation, boundary
    repair, and fitness checks before cosmetic cleanup. Establish a safety net
    before changing behavior-bearing code.
 
-5. **Keep it incremental.** No big-bang rewrites. Each executable task is small
-   and independently verifiable. Keep the next execution horizon to five tasks or
-   fewer before a re-review.
+5. **Keep it incremental.** No big-bang rewrites. Each executable task is small,
+   independently committable, and independently verifiable. Keep the next
+   execution horizon to five tasks or fewer before a re-review.
 
-6. **Make every task verifiable.** Each `### Task N:` section includes a
-   concrete check — a test, a fitness check, or a command — that proves it is
-   done. Success and acceptance criteria tie back to findings, score dimensions,
-   design decisions, integration contracts, or module responsibilities.
+6. **Make every task concrete.** Each `### Task N:` section includes:
+   - Justification: source finding, evidence ref, design decision, contract,
+     risk, or module responsibility.
+   - Files: planned file paths and what changes in each.
+   - Preconditions and postconditions.
+   - Impact commands: concrete `gitnexus impact <path-or-symbol>` and
+     `gitnexus detect-changes` commands when GitNexus is available; otherwise an
+     explicit fallback such as `git diff --name-only` and the missing-tool note.
+   - Verification commands: concrete test, lint, type, or fitness commands for
+     this task, not only whole-plan commands.
+   - Manual checks: plain bullets only, or `None`.
+   - Checkbox work items for executable implementation steps only.
 
-7. **Write safety notes.** Flag irreversible steps, data migrations, and
-   wide-blast-radius changes. State plainly that the architect does not apply the
-   plan; an engineer or mutator agent executes it after approval.
+7. **Separate manual checks.** Do not turn human review or judgment into
+   checkboxes. Put those under `Manual checks:` using plain bullets so task
+   runners do not treat them as extra loop iterations.
+
+8. **End with final verification and docs.** The last executable task is a final
+   verification/documentation task. It runs whole-plan validation, updates or
+   explicitly rules out docs changes, records GitNexus `detect-changes`, and
+   records the scoped `architecture-review` follow-up.
+
+9. **Write safety notes.** Flag irreversible steps, data migrations, and
+   wide-blast-radius changes. State plainly that an engineer, mutator agent, or
+   task runner executes the approved plan after approval.
 
 ## Failure handling
 
@@ -104,7 +126,9 @@ Use a user-specified path only when provided.
 - Missing `../../templates/plan.md`: report the missing template and ask before
   using an inline fallback.
 - Requested rewrite with no cited finding, design decision, or risk behind it:
-  decline that phase and name the missing rationale.
+  decline that task and name the missing rationale.
+- No concrete file list or verification command can be named for a task: split,
+  narrow, or discard the task before writing the plan.
 
 ## Output
 
@@ -118,23 +142,34 @@ Include:
 - `## Success criteria`: measurable outcomes tied to findings, score dimensions,
   design decisions, contracts, or module responsibilities. Use plain bullets, no
   checkboxes.
-- `## Validation Commands`: commands to run after task completion.
-- `## Phases`: at most five executable `### Task N:` sections. Each task has
-  justification, preconditions, checkbox work items, postconditions, and
-  verification.
+- `## Validation Commands`: concrete project-wide commands to run for the whole
+  plan.
+- `## Implementation Steps`: at most five executable `### Task N:` or
+  `### Iteration N:` sections. Each task has justification, files,
+  preconditions, postconditions, impact commands, verification commands, manual
+  checks, and checkbox work items.
+- A final `### Task N: Final verification and documentation` section.
 - `## Acceptance criteria`: checks that prove the plan is complete. Use plain
   bullets, no checkboxes.
 - `## Safety notes`: blast radius, irreversible steps, rollback notes, and the
-  mutator/engineer handoff.
+  engineer/mutator/task-runner handoff.
 
 ## Hard rules
 
 - Every executable task cites a source finding, evidence ref, design decision,
   contract, risk, or module responsibility.
-- Task headers must be `### Task N:` or `### Iteration N:`.
+- Task headers must be `### Task N:` or `### Iteration N:`; `N` may be an
+  integer or a small variant such as `2.5` or `2a`.
 - Checkboxes must appear only under executable task/iteration headings.
 - Generated plan files default to `docs/plans/<kebab-case-target>.md` unless the
   user provides a different path.
+- If a generated plan is outside `docs/plans/`, the handoff must say how to run
+  it by exact path or copy/symlink it into the configured plans directory.
+- Every task has a file list and concrete per-task verification command.
+- Manual checks use plain bullets only.
+- Every plan includes concrete GitNexus impact/detect-changes commands or an
+  explicit missing-tool fallback.
 - Incremental only — no rewrites the source artifact does not justify.
+- The final executable task is verification/documentation/handoff.
 - The plan must end with a re-review recommendation.
 - The architect produces the plan and stops. Execution is someone else's job.

@@ -9,6 +9,12 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Architecture workflow
+
+- Added conditional next-skill routing for architecture review, design, and plan flows.
+- Made architecture plans task-runner executable with implementation steps, per-task file lists, GitNexus impact checks, concrete verification commands, manual checks, and final verification/documentation handoff.
+- Added regression tests for the executable plan-template contract.
+
 ## [0.2.1] - 2026-05-23
 
 ### Architecture design

@@ -1,5 +1,3 @@
-"""Minimal template contract tests."""
-
 from pathlib import Path
 
 from architect_tools._contract import load_scorecard as _load_scorecard
@@ -7,6 +5,31 @@ from architect_tools._contract import split_frontmatter
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES = REPO_ROOT / "src" / "templates"
+
+
+def task_sections(body: str) -> list[str]:
+    sections: list[str] = []
+    current: list[str] = []
+
+    for line in body.splitlines():
+        if line.startswith(("### Task ", "### Iteration ")):
+            if current:
+                sections.append("\n".join(current))
+            current = [line]
+            continue
+
+        if current and line.startswith("## "):
+            sections.append("\n".join(current))
+            current = []
+            continue
+
+        if current:
+            current.append(line)
+
+    if current:
+        sections.append("\n".join(current))
+
+    return sections
 
 
 def test_report_template_parses():
@@ -30,17 +53,20 @@ def test_plan_template_has_core_sections():
         "## Overview",
         "## Source artifact",
         "## Validation Commands",
-        "## Phases",
+        "## Implementation Steps",
         "## Acceptance criteria",
+        "## Safety notes",
+        "## Re-review",
     ):
         assert section in body
+    assert "## Phases" not in body
 
 
 def test_plan_template_uses_executable_task_sections():
     body = (TEMPLATES / "plan.md").read_text()
     assert "### Task 1:" in body
+    assert "### Task 3: Final verification and documentation" in body
     assert "### Phase" not in body
-    assert "ralphex" not in body.lower()
 
     in_executable_task = False
     for line in body.splitlines():
@@ -51,6 +77,30 @@ def test_plan_template_uses_executable_task_sections():
 
         if line.lstrip().startswith(("- [ ]", "- [x]")):
             assert in_executable_task, f"checkbox outside executable task section: {line}"
+
+
+def test_plan_template_tasks_have_execution_metadata():
+    body = (TEMPLATES / "plan.md").read_text()
+    sections = task_sections(body)
+    assert len(sections) >= 3
+    assert "gitnexus impact" in body
+    assert "gitnexus detect-changes" in body
+    assert "copy/symlink" in body
+
+    for section in sections:
+        for label in (
+            "Justification:",
+            "Files:",
+            "Preconditions:",
+            "Postconditions:",
+            "Impact commands:",
+            "Verification commands:",
+            "Manual checks:",
+        ):
+            assert label in section
+
+        assert "- [ ]" in section
+        assert section.index("Manual checks:") < section.index("- [ ]")
 
 
 def test_design_template_has_core_sections():

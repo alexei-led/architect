@@ -1,5 +1,3 @@
-"""Instruction lint for the architect role and skills."""
-
 import re
 from pathlib import Path
 
@@ -92,6 +90,17 @@ def test_architecture_plan_defaults_to_docs_plans_destination():
     text = (SKILLS_DIR / "architecture-plan" / "SKILL.md").read_text()
     assert "docs/plans/<kebab-case-target>.md" in text
     assert "Create `docs/plans/` if it is missing" in text
+    assert "copy/symlink" in text
+
+
+def test_architecture_plan_requires_task_runner_contract():
+    text = (SKILLS_DIR / "architecture-plan" / "SKILL.md").read_text()
+    assert "## Implementation Steps" in text
+    assert "Final verification and documentation" in text
+    assert "gitnexus impact <path-or-symbol>" in text
+    assert "gitnexus detect-changes" in text
+    assert "Manual checks" in text
+    assert "Every task has a file list" in text
 
 
 def test_architecture_next_skill_routing_is_conditional():
