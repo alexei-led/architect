@@ -28,10 +28,12 @@ beats a pasted edge list.
 ## Commands
 
 ```sh
-# Validate report frontmatter parses as YAML (cheap gate before the helper)
-yq '.scores' report.md          # yq reads frontmatter-style YAML
-# extract + check a field with jq from a JSON intermediate
-yq -o=json '.' report.md | jq '.tool_coverage'
+# Validate report frontmatter with the authoritative helper
+architect-validate-report report.md
+
+# Extract frontmatter for quick local jq/yq checks
+python -c 'from pathlib import Path; print(Path("report.md").read_text().split("---", 2)[1])' > /tmp/report-frontmatter.yaml
+yq -o=json '.' /tmp/report-frontmatter.yaml | jq '.tool_coverage'
 
 # Render a Mermaid diagram to SVG (system map / dependency graph)
 mmdc -i map.mmd -o map.svg
@@ -50,9 +52,9 @@ codespell report.md
 npx prettier --check "**/*.md"
 ```
 
-The authoritative frontmatter/section validation is the
-`validate-report` helper (Task 7) — these CLIs are for quick local checks and
-diagram rendering, not a replacement for it.
+The authoritative frontmatter/section validation is
+`architect-validate-report` — these CLIs are for quick local checks and diagram
+rendering, not a replacement for it.
 
 ## Evidence output
 
@@ -91,4 +93,4 @@ mile, not a place to spend the evidence budget.
 - Frontmatter must parse; everything else here is optional polish.
 - Diagrams summarize evidence — they never substitute for cited refs.
 - Report quality never raises an architecture score or its confidence.
-- Use the CLIs; the authoritative schema check is the validate-report helper.
+- Use the CLIs; the authoritative schema check is `architect-validate-report`.

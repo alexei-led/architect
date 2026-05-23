@@ -16,7 +16,7 @@ Dependency, complexity, and quality evidence for Python targets. These cover the
 import graph, layering contracts, type state, dead code, and dependency hygiene.
 
 Evidence dimensions: **dependency**, **structural**, **semantic** (type
-checkers), **change** proxy (complexity hotspots).
+checkers), and **complexity** hotspots.
 
 ## When to use
 
@@ -34,7 +34,7 @@ Redirect caches to `$TMPDIR` (`RUFF_CACHE_DIR=$TMPDIR/ruff`). Prefer
 
 ```sh
 # Layering / boundary contracts (config in .importlinter or pyproject)
-uvx import-linter
+uvx --from import-linter lint-imports
 
 # Import/module dependency graph (DOT for the system map)
 uvx pydeps src/pkg --max-bacon 2 --noshow -T dot

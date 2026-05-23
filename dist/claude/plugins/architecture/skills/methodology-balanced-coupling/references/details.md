@@ -1,8 +1,7 @@
 # Balanced Coupling — details
 
 Supplementary notes for the methodology-balanced-coupling skill. Summary in our
-own words; attribution and licensing as stated in the skill (Vlad Khononov,
-coupling.dev, CC BY-NC-SA source — summary-only here).
+own words; see `attribution.md` for source attribution and licensing.
 
 ## Implicit vs explicit coupling
 

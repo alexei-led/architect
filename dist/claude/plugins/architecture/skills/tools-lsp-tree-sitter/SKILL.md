@@ -31,7 +31,8 @@ functions, all type declarations) and a server would be overkill.
 
 ## Commands
 
-LSP access depends on the runtime's LSP integration; the operations to request:
+LSP access depends on the runtime's LSP integration; use only exposed runtime
+operations, and do not invent tool names. Operations to request:
 
 ```text
 definition <file>:<line>:<col>     # where a symbol is defined

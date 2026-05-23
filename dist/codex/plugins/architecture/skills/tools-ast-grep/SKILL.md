@@ -61,7 +61,8 @@ For reusable, named rules (relational metavariable constraints, `inside`,
 Record:
 
 - `dimension`: structural.
-- `source`: ast-grep command, language, pattern/rule file, and searched scope.
+- `source`: ast-grep command, language, pattern/rule file, searched scope, and
+  version when parser behavior is in doubt.
 - `facts`: matched file:line refs or confirmed zero-match scope.
 - `limits`: parse errors, unsupported language, regex fallback, or lack of semantic reachability.
 
@@ -79,7 +80,7 @@ Record:
 
 - Not installed → record the structural dimension `tools_missing`, note the
   install hint (`brew install ast-grep` / `cargo install ast-grep`), and fall
-  back to `tools-lsp-tree-sitter` syntax queries or a regex `grep` with an
+  back to `tools-lsp-tree-sitter` syntax queries or `rg`/regex search with an
   explicit confidence caveat. Do not silently downgrade to regex without saying
   so.
 - A pattern that errors (unsupported language, bad metavariable) is a tool

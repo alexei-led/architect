@@ -16,9 +16,9 @@ CI is enforced. A **fitness function** is an automated check that fails the buil
 when the system drifts from an intended architectural property — a layering
 rule, an allowed-dependency rule, a cycle ban, a bundle-size budget.
 
-This is Neal Ford / _Building Evolutionary Architectures_ territory. The point
-for a review: a documented rule and an enforced rule are not the same, and the
-score must reflect which one you actually found.
+This follows the evolutionary architecture idea of fitness functions. For a
+review: a documented rule and an enforced rule are not the same, and the score
+must reflect which one you actually found.
 
 ## When to use
 
@@ -35,11 +35,11 @@ Keep these strictly separate — conflating them inflates the score.
   architectural property. Cite it. Only existing, enforced checks raise the
   `architecture_fitness` score.
 - **Recommended check** — a check you propose because intent is currently
-  unenforced. It is a _recommendation_, not evidence of fitness. It belongs in
+  unenforced. It is a recommendation, not evidence of fitness. It belongs in
   the report's recommendations and the refactoring plan, and does **not** raise
   the score.
 
-A repo with thorough architecture docs and zero enforcement scores _low_ on
+A repo with thorough architecture docs and zero enforcement scores low on
 fitness, not high. Documentation is intent; fitness is enforcement.
 
 ## Verifying a check is real
@@ -59,17 +59,18 @@ recommended, not existing.
 ## Mapping findings to candidate checks
 
 When intent is unenforced, recommend the cheapest check that would catch the
-finding's class. Common findings → candidate checks:
+finding's class:
 
-| Finding                                            | Candidate fitness check                                                                     |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Layer/boundary bypassed                            | dependency-rule lint (dependency-cruiser, import-linter, ESLint boundaries, `go list` rule) |
-| Import cycles                                      | cycle check (madge `--circular`, import-linter contract, `go list` / staticcheck)           |
-| Forbidden direct DB / framework access from domain | ast-grep rule asserting the pattern is absent                                               |
-| God module / unbounded fan-in                      | dependency-count or graph-metric threshold in CI                                            |
-| Public API surface creeping                        | knip / exported-symbol diff gate                                                            |
-| Bundle / binary size budget                        | size-limit / artifact-size assertion                                                        |
-| Required boundary contract drift                   | contract/schema test (consumer-driven, snapshot)                                            |
+- Layer or boundary bypassed: dependency-rule lint, e.g. dependency-cruiser,
+  import-linter, ESLint boundaries, or a `go list` rule.
+- Import cycles: cycle check, e.g. madge `--circular`, import-linter contract,
+  `go list`, or staticcheck.
+- Direct DB or framework access from domain code: ast-grep absence rule.
+- God module or unbounded fan-in: dependency-count or graph-metric threshold in
+  CI.
+- Public API surface creeping: knip or exported-symbol diff gate.
+- Bundle or binary size budget: size-limit or artifact-size assertion.
+- Boundary contract drift: contract/schema test.
 
 Recommend checks the team's existing tools can express — don't propose a new
 framework when a lint rule does it. Tie each recommendation to the finding ID it
@@ -79,9 +80,20 @@ guards so the plan can sequence it.
 
 - High `architecture_fitness` requires enforced checks, cited as evidence. No
   enforcement → low band regardless of doc quality.
-- In a refactoring plan, add the fitness check _with_ the boundary repair, so the
+- In a refactoring plan, add the fitness check with the boundary repair, so the
   repaired boundary can't silently re-rot. Order it as a postcondition of the
   phase that fixes the boundary.
+
+## Output
+
+When applying this methodology, report:
+
+- `finding_id`: finding the check protects.
+- `existing_check`: current automated check, or `none`.
+- `evidence_ref`: CI/config/test evidence for an existing check.
+- `enforced`: whether it runs automatically and can fail the build.
+- `score_impact`: how it affects `architecture_fitness`.
+- `recommended_check`: cheapest missing check, if intent is unenforced.
 
 ## Hard rules
 

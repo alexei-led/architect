@@ -40,8 +40,8 @@ go mod graph
 goda graph "./...:all"
 goda cycle ./...
 
-# Semantic references via the language server (see tools-lsp-tree-sitter)
-gopls references <file>:<line>:<col>
+# Semantic references via the language server
+# Use exposed LSP operations from tools-lsp-tree-sitter; do not invent gopls CLI syntax.
 
 # Static analysis: bugs, unused code, suspicious constructs
 staticcheck ./...
@@ -91,7 +91,8 @@ Record:
 `go list` plus goda answers the dependency/boundary question for a module; add
 staticcheck for bugs and govulncheck for supply chain. Stop once those are
 recorded — don't generate a full go-callvis render unless a specific call-path
-question needs it (the images are large and noisy; summarize, never paste).
+question needs it or the user asks for it (the images are large and noisy;
+summarize, never paste).
 
 ## Hard rules
 

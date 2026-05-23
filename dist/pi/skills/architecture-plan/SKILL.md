@@ -45,6 +45,27 @@ unless a roadmap is explicitly requested.
    wide-blast-radius changes. State plainly that the architect does not apply the
    plan; an engineer or mutator agent executes it after approval.
 
+## Failure handling
+
+- Missing source report, unreadable report, or absent finding/evidence IDs: stop
+  and ask for the report or IDs. Do not invent refs.
+- Missing `../../templates/plan.md`: report the missing template and ask before
+  using an inline fallback.
+- Requested rewrite with no cited finding behind it: decline that phase and name
+  the missing evidence.
+
+## Output
+
+Return a plan shaped like `../../templates/plan.md` with:
+
+- `source_report`: path or ID plus finding/evidence IDs used.
+- `success_criteria`: measurable outcomes tied to findings or score dimensions.
+- `phases`: at most five next phases, each with justification, preconditions,
+  tasks, postconditions, and verification.
+- `acceptance_criteria`: checks that prove the plan is complete.
+- `safety_notes`: blast radius, irreversible steps, rollback notes, and the
+  mutator/engineer handoff.
+
 ## Hard rules
 
 - Every phase cites a finding or evidence ref.

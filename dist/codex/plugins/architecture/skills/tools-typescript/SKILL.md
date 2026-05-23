@@ -28,27 +28,29 @@ direction, coupling, and architecture fitness.
 
 ## Commands
 
-Prefer `npx`/`pnpm dlx` so you don't mutate the target's deps. Redirect any
-cache to `$TMPDIR`.
+Detect the package manager first, then prefer that runner (`pnpm exec`, `npm
+exec`, `bunx`, configured scripts) so you don't mutate the target's deps. The
+examples use `npm exec`; substitute the repo's runner. Redirect any cache to
+`$TMPDIR`.
 
 ```sh
+# Which package manager / lockfile (discovery)
+ls package-lock.json yarn.lock pnpm-lock.yaml bun.lockb 2>/dev/null
+
 # Module graph + boundary rules (config-driven; reports violations + cycles)
-npx depcruise src --include-only "^src" --config .dependency-cruiser.cjs
+npm exec -- depcruise src --include-only "^src" --config .dependency-cruiser.cjs
 
 # Circular dependencies, fast
-npx madge --circular --extensions ts,tsx src
+npm exec -- madge --circular --extensions ts,tsx src
 
 # Dead files, unused exports, unused dependencies
-npx knip
+npm exec -- knip
 
 # Type errors without emitting (semantic correctness)
-npx tsc --noEmit
+npm exec -- tsc --noEmit
 
 # Lint, including boundary plugins if configured
-npx eslint . --max-warnings 0
-
-# Which package manager / lockfile (discovery)
-ls package-lock.json yarn.lock pnpm-lock.yaml 2>/dev/null
+ESLINT_CACHE_LOCATION=$TMPDIR/eslint-cache npm exec -- eslint . --max-warnings 0
 ```
 
 ## Evidence output

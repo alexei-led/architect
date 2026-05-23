@@ -47,6 +47,27 @@ report.
    how much of the applicable evidence you actually covered. It is where missing
    tools and unanswered interview questions land.
 
+## Failure handling
+
+- Missing or unreadable `../../templates/scorecard.yaml`: stop; do not recreate the
+  rubric from memory.
+- Missing evidence for a non-meta dimension: do not score it. Record a coverage
+  gap and lower `analysis_confidence`.
+- Band/value mismatch, missing evidence refs, or low-confidence high-quality
+  claim: fix the score before reporting.
+
+## Output
+
+For each scored dimension, return:
+
+- `dimension`: exact scorecard key.
+- `value`: 0..100.
+- `band`: band containing the value.
+- `confidence`: independent coverage/confidence level.
+- `evidence_refs`: refs supporting the score, empty only for meta dimensions.
+- `rationale`: one or two sentences tied to evidence and band anchors.
+- `rules_checked`: band/value match, evidence refs, confidence cap.
+
 ## Rules you must not break
 
 - Band matches value.

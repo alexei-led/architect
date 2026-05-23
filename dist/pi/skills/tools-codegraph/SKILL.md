@@ -29,7 +29,7 @@ it during evidence gathering.
 ## Commands
 
 ```sh
-codegraph init                 # set up the graph store in the repo
+codegraph init                 # set up graph store; prefer an external cache/store if supported
 codegraph index                # full parse → build the graph
 codegraph sync                 # incremental update after changes
 codegraph status               # index health + commit it was built at
@@ -44,13 +44,14 @@ Typical flow: `init` once, `index`, then `status` to confirm freshness, then
 
 ## Stale-index handling
 
-Always run `codegraph status` before trusting a query. If the index commit does
+Run `codegraph status` before each scoring query batch. If the index commit does
 not match the working tree, the graph describes an old repo:
 
 - Run `codegraph sync` (incremental) or `codegraph index` (full) to refresh.
-- If you cannot refresh (read-only target, time budget), the stale graph is
-  not evidence — record the dependency dimension `tools_failed` with reason
-  "stale index," and do not score dependency health from it.
+- If you cannot refresh (read-only target, time budget, or no approved writable
+  cache), the stale graph is not evidence — record the dependency dimension
+  `tools_failed` with reason "stale index," and do not score dependency health
+  from it.
 
 ## Evidence output
 
@@ -77,6 +78,9 @@ Record:
   dependency tools (tools-python / tools-typescript / tools-go) for cycles and
   graphs, and record the reduced coverage. Do not infer the dependency graph
   from raw imports alone without flagging the gap.
+- `init` / `index` would write into a read-only source tree → use an external
+  writable cache/store if the tool supports it; otherwise ask before mutating the
+  target or record `tools_failed`.
 - `index` errors on an unsupported language → record which languages the graph
   covers; treat uncovered languages as a coverage gap, not as "no dependencies."
 
@@ -89,6 +93,6 @@ is tools-gitnexus territory, not another codegraph query.
 
 ## Hard rules
 
-- Verify index freshness with `status` before every scoring use.
+- Verify index freshness with `status` before each scoring query batch.
 - A stale index is `tools_failed`, never evidence.
 - Do not wrap codegraph in package code — agents call the CLI directly.

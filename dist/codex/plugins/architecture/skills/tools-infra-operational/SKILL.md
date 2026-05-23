@@ -23,7 +23,8 @@ Evidence dimensions: operational and security/supply-chain.
 Use when the system map finds Helm charts, Kustomize bases, raw k8s manifests,
 Terraform/OpenTofu, Dockerfiles, CI workflows, policy files, or SBOM/vulnerability
 scan inputs. Render and validate before judging — a chart's values determine the
-real topology, not the template text.
+real topology, not the template text. Never apply, deploy, delete, or destroy
+infrastructure unless the user explicitly approves that separate action.
 
 ## Commands
 
@@ -40,7 +41,8 @@ kubeconform -strict -summary manifests/
 kube-linter lint manifests/
 
 # Terraform / OpenTofu: structure + static security
-terraform validate          # or: tofu validate
+terraform init -backend=false  # if validation needs initialization; avoid backend side effects
+terraform validate             # or: tofu validate
 tflint --recursive
 tfsec .                     # or: trivy config .
 
@@ -83,8 +85,8 @@ Record:
 ## Failure and missing-tool handling
 
 - Tool missing → record the operational (or security) dimension `tools_missing`
-  - install hint; fall back to reading the manifests directly and label the
-    topology claims as un-validated hypotheses.
+  with an install hint; fall back to reading the manifests directly and label
+  the topology claims as un-validated hypotheses.
 - `helm template` / `terraform validate` failing on missing values or
   uninitialized backend → `tools_failed` (config state), not "valid." Note what
   was missing.
@@ -103,6 +105,8 @@ gap, not something to infer.
 
 - Render Helm/Kustomize before judging topology; template text is not the
   deployed shape.
+- Do not run `kubectl apply`, `helm upgrade`, `terraform apply`, `tofu apply`,
+  delete, or destroy commands without explicit user approval.
 - Distinguish an enforced CI validation step (raises fitness) from a recommended
   one.
 - Summarize scanner output; cite component + severity, never dump the table.

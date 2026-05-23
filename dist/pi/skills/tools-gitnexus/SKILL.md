@@ -29,6 +29,9 @@ step.
 
 ## Commands
 
+Prefer exposed GitNexus runtime tools when available; use the CLI otherwise.
+Build or refresh indexes only in an approved writable cache/store.
+
 ```sh
 gitnexus analyze                 # mine history → build the change graph
 gitnexus status                  # index health + commit it covers
@@ -48,7 +51,8 @@ co-change evidence.
 Run `gitnexus status` (and `detect-changes`) before trusting output. If the
 index lags the working tree, co-change data is incomplete:
 
-- Re-run `gitnexus analyze` to refresh.
+- Re-run `gitnexus analyze` to refresh, only if it can write to an approved
+  cache/store.
 - If you cannot refresh, the change dimension is `tools_failed` ("stale
   index") — do not score change locality from it.
 
@@ -64,8 +68,9 @@ Record:
 ## Confidence impact
 
 - Fresh co-change/impact data is direct change evidence: `tools_used`, raises
-  confidence for `change_locality` and the volatility input to
-  `coupling_balance`.
+  confidence for `change_locality`. For `coupling_balance`, it supports churn
+  and change-locality claims; domain volatility still comes from the business
+  context.
 - Renames split history. A directory/package rename divides a file's churn
   across old and new paths, halving apparent change. Scope queries to current
   paths or follow renames; otherwise note the undercount and cap confidence.
@@ -78,6 +83,9 @@ Record:
   `git log --follow`, `git log --pretty --name-only`, and per-file commit counts,
   recording the coarser coverage. Do not assert change locality with no history
   evidence at all.
+- Index creation would mutate the source tree or write to an unapproved location
+  → use exposed runtime tools or an approved cache/store; otherwise ask before
+  mutating or record `tools_failed`.
 - `analyze` errors on a shallow/empty repo → record the limit; "no co-change
   found" from a one-commit clone is not evidence of good locality.
 

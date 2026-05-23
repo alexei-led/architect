@@ -113,35 +113,14 @@ criteria for the mutator or engineer.
 
 ## Structured questions by runtime
 
-The interview asks the user questions. Every interview response must state the
-runtime boundary before the fallback: tool availability comes only from the
-active runtime's exposed tool list. Never infer availability from source
-AGENT/SKILL frontmatter, source agent metadata, per-target overlays, generated
-plugin config, or repository files.
+Use `references/interview.md` for the full interview and fallback rules. In the
+main review flow:
 
-When a structured-question tool is exposed, use that tool. Name concrete tools
-only when that tool is actually exposed in the current runtime. Examples:
-`AskUserQuestion`, `ask_user_question`. Otherwise do not name them; refer
-generically to a structured-question tool.
-
-If no structured-question tool is available, say that no concrete runtime tool is
-available and ask exactly one plain prose question in the current turn. The
-fallback response must include an actual question mark. Choose the highest-impact
-missing context, include concise options inside that one question when useful,
-and wait. Do not print an interview script, field checklist, priority list, or
-multiple example questions. Never list all interview fields in the no-tool
-fallback. If the answer is ambiguous or deferred, record it as missing evidence
-and lower confidence rather than guessing.
-
-When asked to describe fallback behavior, use this answer shape:
-
-- Tool availability comes only from the active runtime's exposed tool list, never
-  from AGENT/SKILL frontmatter, source agent metadata, per-target overlays,
-  generated plugin config, or repository files.
-- Use concrete names such as `AskUserQuestion` or `ask_user_question` only when
-  that exact tool is exposed; otherwise say no concrete structured-question tool
-  is available.
-- Ask exactly one plain prose question now, with options if useful.
+- Determine availability only from the active runtime's exposed tool list,
+  never from source agent metadata, per-target overlays, repo metadata, or
+  generated config.
+- Use concrete tool names only when that tool is actually exposed.
+- If no structured-question tool is available, ask exactly one plain prose question and wait.
 - Ambiguous or deferred answers become `missing_evidence` and lower
   `analysis_confidence`.
 
