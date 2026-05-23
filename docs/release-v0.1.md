@@ -7,8 +7,9 @@ CLIs directly; the package wraps none of them.
 
 ## What it does
 
-- Architect agent for Claude, Codex, and Pi, compiled from one source tree
-  (`scripts/build/compile.py` → `dist/{claude,codex,pi}/`).
+- One plain architect role prompt in `src/agents/architect/AGENT.md`, composed
+  with runtime tool envelopes and the architecture skills. Runtime wrappers for
+  Claude, Codex, or Pi are install-time adapter config, not generated source.
 - Review flow produces four artifacts: interview context, system map, scored
   architecture report (Markdown + YAML frontmatter), and an incremental refactoring
   plan.
@@ -20,11 +21,11 @@ CLIs directly; the package wraps none of them.
 
 ## Supported review targets
 
-Validated against the bundled fixtures (`tests/fixtures/repos/`: ts-healthy,
-ts-tangled, python-boundaries, go-deps, infra-mixed) and dogfooded twice against
-`ccgram` (see `docs/dogfood/ccgram/`). Languages with first-class tool skills:
-TypeScript, Python, Go, plus operational/infra manifests. PHP, Ruby, Java/JVM, and
-COBOL have no dedicated tool skill in v1.
+Validated with instruction lint, prompt-level skill eval definitions, helper
+smoke tests, and two dogfood passes against `ccgram` (see
+`docs/dogfood/ccgram/`). Languages with first-class tool skills: TypeScript,
+Python, Go, plus operational/infra manifests. PHP, Ruby, Java/JVM, and COBOL
+have no dedicated tool skill in v1.
 
 ## Known limitations
 
@@ -41,11 +42,10 @@ COBOL have no dedicated tool skill in v1.
 - **No live interview in autonomous/CI runs.** With no interactive user the architect
   reconstructs intent from docs (CLAUDE.md, ADRs, design notes) and labels it
   reconstructed, capping confidence. A live interview yields higher confidence.
-- **Codex structured-question behavior is unverified.** The Codex overlay carries
-  `structured_questions: unverified` and the compiler asserts no concrete
-  structured-input tool name leaks into Codex output. On Pi, structured questions
-  require `alexei-led/cc-thingz` (`ask_user_question`); the extension ships no local
-  Pi question extension.
+- **Structured-question tools are runtime-dependent.** Use `AskUserQuestion`,
+  `ask_user_question`, or any similar tool when the active runtime exposes it.
+  Without one, the review skill asks one plain question and records lower
+  confidence when parsing is ambiguous.
 - **Report contract is strict.** Evidence entries require a type-dependent field
   (`file→ref`, `command→command`, `graph-query→query`); `architect-validate-report`
   fails on the wrong field. The report template shows all shapes.

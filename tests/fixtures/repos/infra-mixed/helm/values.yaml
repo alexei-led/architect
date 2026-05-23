@@ -1,8 +1,0 @@
-image:
-  repository: example.com/shop
-  tag: latest
-# Smell: hardcoded DB endpoint that Terraform also provisions. No single source
-# of truth couples the deploy unit to the infra unit.
-database:
-  host: shop-db.prod.internal
-  port: 5432

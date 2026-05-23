@@ -12,7 +12,6 @@ EXPECTED_SOURCE_DIRS = [
     "src/templates",
     "src/architect_tools",
     "src/plugins",
-    "scripts/build",
     "tests",
 ]
 

@@ -73,14 +73,14 @@ architecture-plan skill.
 
 ## Structured questions by runtime
 
-The interview asks the user questions. Branch on the agent's
-`structured_questions` capability flag (set in the per-target overlay), not on a
-hardcoded tool name:
+The interview asks the user questions. Use whatever structured-question tool the
+active runtime exposes. Examples include `AskUserQuestion`, `ask_user_question`,
+or a similar extension tool. Do not infer availability from source agent
+metadata.
 
-- A concrete tool name (e.g. `AskUserQuestion` on Claude, `ask_user_question` on
-  Pi with cc-thingz): use the structured-question tool.
-- `unverified` or unset (e.g. Codex until its runtime is confirmed): fall back to
-  plain numbered questions in prose. Do not call an unverified tool.
+If no structured-question tool is available, ask one plain question in prose,
+include concise options when useful, understand the answer from text, and record
+lower confidence when the answer is ambiguous.
 
 ## Hard rules
 

@@ -1,7 +1,7 @@
 [project]
 name = "architect"
 version = "0.1.0"
-description = "Instruction-first architecture review extension for Claude Code, Codex CLI, and Pi."
+description = "Instruction-first architecture review role, skills, templates, and helper tools."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
@@ -29,7 +29,7 @@ packages = ["src/architect_tools"]
 
 [tool.ruff]
 line-length = 100
-src = ["src", "tests", "scripts"]
+src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

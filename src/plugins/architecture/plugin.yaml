@@ -1,24 +1,22 @@
-# Static metadata for the architecture extension manifest.
-#
-# The build compiler (scripts/build/compile.py) reads this metadata and injects
-# the `agents` and `skills` lists by enumerating the source tree, so the emitted
-# per-target manifest never drifts from what actually ships. Do not hand-maintain
-# agent/skill lists here.
 name: architecture
 version: 0.1.0
-description: 'Instruction-first architecture review extension: a read-only architect agent, evidence-based review/scorecard/plan skills, methodology and tool skills, and report/plan templates.'
+description: 'Instruction-first architecture review: one read-only architect role, evidence-based review/scorecard/plan skills, methodology and tool skills, and report/plan templates.'
 author: Alexei Ledenev
 license: MIT
-# Target-aware package dependencies. The compiler emits `requires:` into a
-# target's manifest only when its list here is non-empty.
-#
-# Pi requires alexei-led/cc-thingz to gain the `ask_user_question` tool the
-# architect's interview step maps to (see
-# src/agents/architect/pi/frontmatter.yaml, `structured_questions:
-# ask_user_question`). We do NOT ship a local Pi question extension; cc-thingz is
-# the single source of that capability. Claude has a native AskUserQuestion tool,
-# so it needs no dependency; Codex's structured-question support is unverified,
-# so it declares none either.
-requires:
-  pi:
-    - alexei-led/cc-thingz
+agents:
+  - architect
+skills:
+  - architecture-plan
+  - architecture-review
+  - architecture-scorecard
+  - methodology-architecture-fitness
+  - methodology-balanced-coupling
+  - tools-ast-grep
+  - tools-codegraph
+  - tools-gitnexus
+  - tools-go
+  - tools-infra-operational
+  - tools-lsp-tree-sitter
+  - tools-python
+  - tools-report-markdown
+  - tools-typescript

@@ -1,0 +1,42 @@
+{
+  "skill_name": "architecture-review",
+  "evals": [
+    {
+      "id": "cold-architecture-review",
+      "name": "cold architecture review",
+      "prompt": "A user says: review this repo's architecture. They give no intended architecture, quality goals, or scope. Describe the workflow.",
+      "expected_output": "The response inspects docs/manifests before asking, interviews only for missing context, builds a system map before scoring, gathers cited evidence with tool coverage, uses the scorecard, and writes a report without editing source.",
+      "assertions": [
+        "The output says to inspect repository docs, ADRs, manifests, and structure before asking questions.",
+        "The output asks only for missing context that changes the architecture assessment.",
+        "The output builds a system map before scoring and explicitly forbids scoring from directory shape alone.",
+        "The output requires cited evidence and per-dimension tool coverage before findings or scores.",
+        "The output keeps the role read-only for source code and routes implementation to a mutator or engineer."
+      ]
+    },
+    {
+      "id": "structured-question-fallback",
+      "name": "structured question fallback",
+      "prompt": "A runtime has no concrete structured-question tool available. Describe how the architecture-review skill should interview the user.",
+      "expected_output": "The response uses a structured-question tool only when the active runtime exposes one; otherwise it asks one concise plain question with useful options and records lower confidence if the answer is ambiguous.",
+      "assertions": [
+        "The output does not depend on source agent frontmatter or per-target overlays to decide tool availability.",
+        "The output uses concrete runtime tools such as AskUserQuestion or ask_user_question only when actually available.",
+        "The output falls back to one plain prose question when no structured-question tool exists.",
+        "The output records ambiguity or deferred answers as missing evidence that lowers analysis confidence."
+      ]
+    },
+    {
+      "id": "refactor-request-boundary",
+      "name": "refactor request boundary",
+      "prompt": "A user asks the architect to review structural risk and then immediately refactor the code. Describe the response and handoff.",
+      "expected_output": "The response reviews and plans only: it produces findings and an incremental refactoring plan, refuses to edit production source itself, and hands implementation to a mutator or engineer after approval.",
+      "assertions": [
+        "The output separates review, scoring, and recommendations from implementation.",
+        "The output uses architecture-plan for an incremental plan when changes are warranted.",
+        "The output refuses source edits by the architect role.",
+        "The output includes verification steps and acceptance criteria for the mutator handoff."
+      ]
+    }
+  ]
+}

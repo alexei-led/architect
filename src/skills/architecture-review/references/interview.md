@@ -30,15 +30,15 @@ Maps directly to `interview_context` in `src/templates/report.md`:
 
 ## Asking questions
 
-Branch on the runtime's `structured_questions` capability:
+Use whatever structured-question tool the active runtime exposes
+(`AskUserQuestion`, `ask_user_question`, or equivalent). Offer discrete options
+where the choice is bounded.
 
-- Concrete tool available (Claude `AskUserQuestion`, Pi `ask_user_question`):
-  use it; offer discrete options where the choice is bounded.
-- `unverified` or unset (Codex, for now): ask plain numbered questions in prose.
-
-Ask one focused batch, not a long interrogation. If the user defers, record the
-gap in `missing_evidence` and let it lower `analysis_confidence` rather than
-guessing intent.
+If no structured-question tool is available, ask one plain question in prose.
+Include concise labeled options when useful, understand the answer from text, and
+continue. If the answer is ambiguous or the user defers, record the gap in
+`missing_evidence` and let it lower `analysis_confidence` rather than guessing
+intent.
 
 ## Non-interactive mode
 
