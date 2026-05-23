@@ -80,6 +80,8 @@ def test_template_references_resolve():
 
 def test_structured_questions_do_not_depend_on_agent_overlays():
     text = (SKILLS_DIR / "architecture-review" / "SKILL.md").read_text()
-    assert "whatever structured-question tool" in text
-    assert "source agent" in text and "metadata" in text
-    assert "per-target overlay" not in text
+    assert "active runtime's exposed tool list" in text
+    assert "source agent metadata" in text
+    assert "per-target overlays" in text
+    assert "only when that tool is actually exposed" in text
+    assert "ask exactly one plain prose question" in text

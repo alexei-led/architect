@@ -12,8 +12,8 @@ Never ask a question the repository already answers. Read first:
 - Directory structure — candidate units and layers.
 
 Then ask only what inspection cannot settle, and only questions whose answers
-change the assessment. Confirm what you inferred rather than asking it open-ended
-("I see three deploy units — A, B, C. Correct?") .
+change the architecture assessment. Confirm what you inferred rather than asking
+it open-ended ("I see three deploy units — A, B, C. Correct?") .
 
 ## Fields to capture
 
@@ -30,13 +30,21 @@ Maps directly to `interview_context` in `src/templates/report.md`:
 
 ## Asking questions
 
-Use whatever structured-question tool the active runtime exposes
-(`AskUserQuestion`, `ask_user_question`, or equivalent). Offer discrete options
-where the choice is bounded.
+Every interview response must state the runtime boundary before choosing a
+fallback: decide structured-question tool availability only from the active
+runtime's exposed tool list, never from source AGENT/SKILL frontmatter, source
+agent metadata, per-target overlays, generated plugin config, or repository
+files. Use concrete tool names such as `AskUserQuestion` or `ask_user_question`
+only when that exact tool is actually exposed. Offer discrete options where the
+choice is bounded.
 
-If no structured-question tool is available, ask one plain question in prose.
-Include concise labeled options when useful, understand the answer from text, and
-continue. If the answer is ambiguous or the user defers, record the gap in
+If no structured-question tool is available, say that no concrete runtime tool is
+available and ask exactly one plain prose question in the current turn. The
+fallback response must include an actual question mark. Choose the highest-impact
+missing field, include concise labeled options inside that one question when
+useful, and wait. Do not output a multi-question script, field checklist,
+priority list, multiple examples, or the full field inventory as the fallback.
+If the answer is ambiguous or the user defers, record the gap in
 `missing_evidence` and let it lower `analysis_confidence` rather than guessing
 intent.
 
