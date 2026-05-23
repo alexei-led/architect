@@ -1,3 +1,4 @@
+.env
 .pi
 .venv/
 __pycache__/

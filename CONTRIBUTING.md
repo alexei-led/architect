@@ -20,9 +20,10 @@ This installs development dependencies with `uv` and points Git hooks at `script
 ## Local checks
 
 ```sh
-make lint      # ruff check + ruff format --check
-make test      # pytest
-make check     # lint + tests
+make lint               # instruction lint + ruff check + ruff format --check
+make lint-instructions  # agent and skill instruction checks only
+make test               # pytest
+make check              # lint + tests
 ```
 
 Run `make check` before sending changes. For README or docs-only edits, also run:
@@ -32,6 +33,18 @@ markdownlint-cli2 README.md CONTRIBUTING.md docs/*.md
 ```
 
 If `markdownlint-cli2` is not installed, state that in the change notes.
+
+## Skill evals
+
+Paid Agent Skills evals read `OPENAI_API_KEY` from the environment or local `.env`.
+The `.env` file is ignored and must not be committed.
+
+```sh
+make skill-evals-prepare  # build /tmp/architect-skill-eval-root from src/skills + fixtures
+make skill-evals          # run evals with baseline and HTML report
+make skill-evals-fast     # no baseline, no HTML report, advisory exit
+make skill-evals-summary  # summarize latest workspace
+```
 
 ## Helper CLIs
 
