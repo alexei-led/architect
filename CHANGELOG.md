@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-23
+
 ### Architecture design
 
 - Added `architecture-design` for requirements-to-architecture work, including module maps, integration contracts, module test specifications, fitness checks, self-review, and skill-flow handoff.
