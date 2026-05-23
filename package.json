@@ -1,6 +1,6 @@
 {
   "name": "architect",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Instruction-first architecture review: one read-only architect role, evidence-based review/scorecard/plan skills, methodology and tool skills, and report/plan templates.",
   "keywords": [
     "pi-package",

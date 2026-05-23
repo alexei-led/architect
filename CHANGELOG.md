@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-23
+
 ### Architecture-review routing
 
 - Added `tools-code-search` for local `fd`/`rg`/`git grep` discovery and targeted read evidence.
