@@ -4,7 +4,7 @@
     {
       "name": "architecture",
       "source": "./dist/claude/plugins/architecture",
-      "description": "Instruction-first architecture review: one read-only architect role, evidence-based review/scorecard/plan skills, methodology and tool skills, and report/plan templates.",
+      "description": "Instruction-first architecture design and review: one read-only architect role, evidence-based design/review/scorecard/plan skills, methodology and tool skills, and report/design/plan templates.",
       "version": "0.2.0"
     }
   ],

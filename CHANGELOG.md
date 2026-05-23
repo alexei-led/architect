@@ -9,6 +9,19 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Architecture design
+
+- Added `architecture-design` for requirements-to-architecture work, including module maps, integration contracts, module test specifications, fitness checks, self-review, and skill-flow handoff.
+- Added `src/templates/design.md` for target architecture artifacts.
+
+### Review and reporting
+
+- Added Mermaid guidance for human-facing reports while keeping AI-targeted reports plain text.
+- Added skill navigation and outcome-based task-list discipline to design/review/plan flows.
+- Strengthened architecture-review with working-model validation, stale-doc suspicion, and human-facing finding narratives.
+- Expanded Balanced Coupling guidance with the balance-rule mnemonic, examples, generic-provider volatility, and connascence tie-breakers.
+- Extended architecture-plan to sequence work from approved design artifacts as well as review findings.
+
 ## [0.2.0] - 2026-05-23
 
 ### Architecture-review routing

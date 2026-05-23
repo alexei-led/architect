@@ -19,6 +19,16 @@ Use whenever you are about to assign or revise a score on any architecture
 dimension. The architecture-review skill calls this before writing scores into a
 report.
 
+## Skill navigation
+
+- Missing evidence or system map: return to `architecture-review`; scores are
+  not a substitute for evidence.
+- Current skill: use `architecture-scorecard` only to assign defensible values,
+  bands, confidence, and score rationales.
+- Next skill: write the `architecture-review` report, then use
+  `architecture-plan` for warranted changes or `architecture-design` if the
+  intended target architecture is missing.
+
 ## Procedure
 
 1. **Read the rubric.** `src/templates/scorecard.yaml` is the source of truth for

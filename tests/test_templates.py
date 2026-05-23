@@ -12,6 +12,7 @@ TEMPLATES = REPO_ROOT / "src" / "templates"
 def test_report_template_parses():
     fm, body = split_frontmatter((TEMPLATES / "report.md").read_text())
     assert fm["artifact"] == "architecture-report"
+    assert fm["schema_version"] == 2
     assert "scores" in fm
     assert "## Executive summary" in body
 
@@ -25,5 +26,11 @@ def test_scorecard_parses():
 
 def test_plan_template_has_core_sections():
     body = (TEMPLATES / "plan.md").read_text()
-    for section in ("## Overview", "## Phases", "## Acceptance criteria"):
+    for section in ("## Overview", "## Source artifact", "## Phases", "## Acceptance criteria"):
+        assert section in body
+
+
+def test_design_template_has_core_sections():
+    body = (TEMPLATES / "design.md").read_text()
+    for section in ("## Domain and volatility map", "## Module map", "## Handoff"):
         assert section in body

@@ -19,8 +19,11 @@ For each thing a tool surfaced, classify it:
 ## Promote facts to findings
 
 A finding needs: a stable ID, a dimension, a severity, at least one evidence
-ref, and a recommended (incremental) action. If you cannot cite evidence, it is
-not a finding yet — it is a hypothesis or a coverage gap.
+ref, a human-facing narrative, and a recommended (incremental) action. The
+narrative covers the problem, knowledge or boundary leakage/drift, complexity
+impact, cascading-change scenarios, recommended improvement, and trade-offs. If
+you cannot cite evidence, it is not a finding yet — it is a hypothesis or a
+coverage gap.
 
 Reuse a finding's ID across repeat reviews of the same issue so
 `architect-compare-reports` can track it.

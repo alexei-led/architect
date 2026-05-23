@@ -7,13 +7,23 @@ judgment. Its output populates `interview_context` in the report frontmatter.
 
 Never ask a question the repository already answers. Read first:
 
-- READMEs, `docs/`, ADRs, design notes — stated intent and goals.
+- READMEs, `docs/`, ADRs, design notes — stated intent and goals, not proof of
+  current implementation.
 - Manifests and config — declared modules, packages, ownership, deploy units.
 - Directory structure — candidate units and layers.
 
 Then ask only what inspection cannot settle, and only questions whose answers
 change the architecture assessment. Confirm what you inferred rather than asking
-it open-ended ("I see three deploy units — A, B, C. Correct?") .
+it open-ended ("I see three deploy units — A, B, C. Correct?"). Include drift
+risk in the confirmation when docs and code may disagree.
+
+## Working model checkpoint
+
+Before scoring, present the reconstructed model for correction: system purpose,
+functional areas, candidate modules/deploy units, major integrations, domain
+classification, ownership/deployment assumptions, known pain, and doc-vs-code
+drift risks. If the user cannot confirm it, record the uncertainty in
+`missing_evidence` and lower `analysis_confidence`.
 
 ## Fields to capture
 

@@ -25,8 +25,9 @@ TEMPLATE_REF_SOURCE = "src/templates/"
 
 AGENT_DESCRIPTIONS = {
     "architect": (
-        "Read-only architecture reviewer: maps intended vs observed structure, gathers "
-        "evidence, scores architecture, and writes plans without editing source."
+        "Read-only architecture designer/reviewer: creates target designs, maps intended "
+        "vs observed structure, gathers evidence, scores architecture, and writes plans "
+        "without editing source."
     ),
 }
 

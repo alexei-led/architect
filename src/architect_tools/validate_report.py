@@ -20,6 +20,7 @@ from architect_tools._contract import (
     COVERAGE_STATE_FIELDS,
     EVIDENCE_REQUIRED_FIELD,
     EVIDENCE_TYPES,
+    FINDING_NARRATIVE_FIELDS,
     META_DIMENSION,
     REQUIRED_SECTIONS,
     SEVERITIES,
@@ -51,7 +52,14 @@ def validate_report(frontmatter: dict[str, Any], body: str, scorecard: dict[str,
     evidence_ids = _check_evidence(frontmatter.get("evidence"), errors)
 
     _check_scores(scores, dimensions, bands, rules, evidence_ids, errors)
-    _check_findings(frontmatter.get("findings"), dimensions, evidence_ids, errors)
+    schema_version = frontmatter.get("schema_version")
+    _check_findings(
+        frontmatter.get("findings"),
+        dimensions,
+        evidence_ids,
+        errors,
+        require_narrative=isinstance(schema_version, int) and schema_version >= 2,
+    )
     _check_tool_coverage(frontmatter.get("tool_coverage"), errors)
     _check_sections(body, errors)
 
@@ -175,6 +183,8 @@ def _check_findings(
     dimensions: list[str],
     evidence_ids: set[str],
     errors: list[str],
+    *,
+    require_narrative: bool,
 ) -> None:
     if findings is None:
         findings = []
@@ -197,9 +207,28 @@ def _check_findings(
             errors.append(f"findings[{fid or i}]: invalid severity {finding.get('severity')!r}")
         if finding.get("dimension") not in dimensions:
             errors.append(f"findings[{fid or i}]: unknown dimension {finding.get('dimension')!r}")
+        if not finding.get("recommended_action"):
+            errors.append(f"findings[{fid or i}]: missing recommended_action")
+        if require_narrative:
+            _check_finding_narrative(finding, fid or i, errors)
         for ref in finding.get("evidence_refs") or []:
             if ref not in evidence_ids:
                 errors.append(f"findings[{fid or i}]: evidence ref {ref!r} not found in evidence")
+
+
+def _check_finding_narrative(finding: dict[str, Any], label: str | int, errors: list[str]) -> None:
+    narrative = finding.get("narrative")
+    if not isinstance(narrative, dict):
+        errors.append(f"findings[{label}]: missing narrative")
+        return
+    for field in FINDING_NARRATIVE_FIELDS:
+        value = narrative.get(field)
+        if field == "cascading_change_scenarios":
+            if not isinstance(value, list) or not value or not all(value):
+                errors.append(f"findings[{label}].narrative.{field}: missing non-empty list")
+            continue
+        if not value:
+            errors.append(f"findings[{label}].narrative.{field}: missing or empty")
 
 
 def _check_tool_coverage(coverage: Any, errors: list[str]) -> None:

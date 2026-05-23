@@ -3,7 +3,7 @@
 # Markdown body below carries prose; this frontmatter carries machine-checkable
 # structure validated by validate-report and compared by compare-reports.
 artifact: architecture-report
-schema_version: 1
+schema_version: 2
 rubric_version: 1
 report_id: REPLACE-with-stable-slug
 date: YYYY-MM-DD
@@ -99,7 +99,15 @@ findings:
     severity: high # critical | high | medium | low
     dimension: boundary_integrity
     evidence_refs: [E1]
-    recommended_action: REPLACE
+    narrative:
+      problem: REPLACE concise user-facing problem statement
+      knowledge_or_boundary_leakage: REPLACE what leaks, drifts, or crosses a boundary
+      complexity_impact: REPLACE why changes become harder or less predictable
+      cascading_change_scenarios:
+        - REPLACE concrete change that would ripple
+      recommended_improvement: REPLACE concrete balancing or boundary repair
+      tradeoffs: REPLACE cost, risk, or why not to over-decouple
+    recommended_action: REPLACE one-line action used by comparison/planning tools
 
 # Evidence refs are addressable enough for a human or agent to re-check.
 # The addressable field is type-dependent: file -> ref, command -> command,
@@ -132,6 +140,11 @@ tool_coverage:
 
 # Architecture report: REPLACE-repo-name
 
+Audience note: for human-facing reports, use Mermaid diagrams sparingly when they
+clarify module maps or boundary drift. For AI/agent-targeted reports, prefer
+plain text adjacency lists and cited bullets; skip decorative diagrams, broad
+tables, and formatting polish.
+
 ## Executive summary
 
 REPLACE: top-level verdict, dominant risks, and overall confidence.
@@ -142,7 +155,9 @@ REPLACE: render the intended architecture and constraints captured above.
 
 ## System map
 
-REPLACE: what exists. Established before judging quality.
+REPLACE: what exists. Established before judging quality. For human-facing
+reports, a small Mermaid diagram may summarize this map; include the same facts
+in text. For AI/agent-targeted reports, use plain text only.
 
 ## Intended architecture
 
@@ -159,11 +174,21 @@ REPLACE: per-dimension value, band, confidence, and one-line justification.
 
 ## Key findings
 
-REPLACE: prioritized findings, each tied to a finding ID and evidence.
+REPLACE: prioritized findings, each tied to a finding ID and evidence. For each
+finding include:
+
+- Problem.
+- Knowledge or boundary leakage / drift.
+- Complexity impact.
+- Cascading-change scenarios.
+- Recommended improvement.
+- Trade-offs.
 
 ## Coupling review
 
-REPLACE: important integrations by strength, distance, volatility.
+REPLACE: important integrations by strength, distance, volatility. State the
+abstraction level assessed and the balancing move: lower strength, lower
+distance, or accept due to low volatility.
 
 ## Boundary violations
 
@@ -179,7 +204,7 @@ REPLACE: incremental, evidence-backed. No big-bang rewrites.
 
 ## Plan summary
 
-REPLACE when a refactoring plan accompanies this report; otherwise omit.
+REPLACE when an architecture plan accompanies this report; otherwise omit.
 
 ## Evidence appendix
 

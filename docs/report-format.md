@@ -1,16 +1,17 @@
-# Report and plan format
+# Report, design, and plan format
 
 The architecture report is one Markdown file: YAML frontmatter carries
 machine-checkable structure, the body carries prose. `architect-validate-report`
 checks the frontmatter; `architect-compare-reports` diffs two reports or explains
 why they are not comparable. The canonical template is
-`src/templates/report.md`; the plan template is `src/templates/plan.md`.
+`src/templates/report.md`; the design template is `src/templates/design.md`; the
+plan template is `src/templates/plan.md`.
 
 ## Report frontmatter
 
 ```yaml
 artifact: architecture-report
-schema_version: 1
+schema_version: 2
 rubric_version: 1 # must match the scorecard the scores were assigned under
 report_id: stable-slug
 date: YYYY-MM-DD
@@ -28,7 +29,7 @@ comparability: # two reports compare only when all three match
 interview_context: { ... } # intended architecture and constraints from the interview
 system_map: { ... } # what exists, established before judging quality
 scores: { ... } # one entry per dimension (see scoring.md)
-findings: [...] # stable IDs, severity, dimension, evidence refs, action
+findings: [...] # stable IDs, severity, dimension, evidence refs, narrative, action
 evidence: [...] # addressable refs a human/agent can re-check
 tool_coverage: [...] # used/skipped/missing/failed + confidence impact per dimension
 ```
@@ -53,7 +54,13 @@ where intent and reality diverge.
 
 Each finding has a stable `id` (`F1`, `F2`, …) reused across repeat reports for
 the same issue, a `severity` (`critical` | `high` | `medium` | `low`), the
-`dimension` it bears on, `evidence_refs`, and a `recommended_action`.
+`dimension` it bears on, `evidence_refs`, a human-facing `narrative`, and a
+`recommended_action`.
+
+The narrative explains the issue in terms a maintainer can act on:
+`problem`, `knowledge_or_boundary_leakage`, `complexity_impact`,
+`cascading_change_scenarios`, `recommended_improvement`, and `tradeoffs`. The
+validator requires this narrative for schema version 2 reports.
 
 ### evidence
 
@@ -76,20 +83,40 @@ In order: Executive summary, Interview context, System map, Intended
 architecture, Observed architecture, Score map, Key findings, Coupling review,
 Boundary violations, Change locality and hotspots, Recommendations, Plan summary
 (when a plan accompanies the report), Evidence appendix, Tool coverage and gaps.
+Key findings render the narrative fields above, not just severity labels.
+
+For human-facing reports, a small Mermaid diagram may clarify the system map,
+dependency clusters, or boundary drift. Keep the same facts in text. For
+AI/agent-targeted reports, skip decorative diagrams, broad tables, and formatting
+polish; use plain text evidence and adjacency lists.
 
 Intended architecture is rendered by source order (interview → docs → manifests →
 directories → inferred clusters), and disagreements between sources are reported
 rather than silently resolved.
 
+## Design format
+
+The design artifact is plain Markdown for target architecture. It separates
+requirements and intended architecture from observed implementation so stale docs
+do not masquerade as code truth. It covers source inputs, drift notes,
+domain/volatility map, module map, integration contracts, key flows, module test
+specifications, architecture-fitness checks, trade-offs, self-review, risks, and
+handoff.
+
+Use design for requirements-to-architecture work. Use review when judging current
+implementation health. Use plan when sequencing implementation.
+
 ## Plan format
 
-The refactoring plan is plain Markdown for humans and coding agents. One hotspot,
-boundary, or flow per plan unless a roadmap is requested; keep the next execution
-horizon to five phases or fewer before re-review.
+The architecture plan is plain Markdown for humans and coding agents. One
+hotspot, boundary, module, or flow per plan unless a roadmap is requested; keep
+the next execution horizon to five phases or fewer before re-review.
 
-- **Overview** — the problem and the source report ID + finding IDs it derives from.
-- **Success criteria** — observable, checkbox outcomes, each tied to a finding or
-  score dimension.
+- **Overview** — the problem the plan addresses.
+- **Source artifact** — source report/design ID plus finding IDs, evidence refs,
+  design decisions, contract IDs, risks, or module names it derives from.
+- **Success criteria** — observable, checkbox outcomes, each tied to a finding,
+  score dimension, design decision, contract, module responsibility, or risk.
 - **Phases** — each with a justification (finding ID + evidence ref),
   preconditions, postconditions, small independently-verifiable tasks, and a
   verification check (test, fitness check, command).
@@ -100,5 +127,7 @@ horizon to five phases or fewer before re-review.
   changes, or "No elevated risk." The architect never applies changes; an
   engineer or mutator agent executes the approved plan.
 
-Plans recommend incremental refactoring only — no big-bang rewrites — and each
-boundary repair pairs with a fitness check so it cannot silently re-rot.
+Plans recommend incremental implementation/refactoring only — no big-bang
+rewrites — and each boundary repair pairs with a fitness check so it cannot
+silently re-rot. A plan ends by recommending a scoped `architecture-review` pass
+once implementation lands.

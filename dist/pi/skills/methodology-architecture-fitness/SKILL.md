@@ -22,9 +22,19 @@ must reflect which one you actually found.
 
 ## When to use
 
-Use while scoring the `architecture_fitness` dimension, or when a finding's fix
-is "and keep it from coming back." A boundary repair without a check to hold it
-will rot again; the plan should add the check.
+Use while scoring the `architecture_fitness` dimension, when designing checks for
+a new architecture, or when a finding's fix is "and keep it from coming back." A
+boundary repair without a check to hold it will rot again; the plan should add
+the check.
+
+## Skill navigation
+
+- Missing architecture intent: use `architecture-design` to define it or
+  `architecture-review` to reconstruct it from docs and code.
+- Current skill: use `methodology-architecture-fitness` to distinguish existing
+  enforced checks from recommended checks.
+- Next skill: use `architecture-scorecard` when scoring a review, include checks
+  in `architecture-design`, or sequence missing checks in `architecture-plan`.
 
 ## Existing checks vs recommended checks
 

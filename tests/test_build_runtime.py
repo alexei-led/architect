@@ -34,6 +34,8 @@ def test_compiled_runtime_artifacts_exist_and_use_compiled_template_paths():
         assert (root / "templates/scorecard.yaml").is_file()
         skill = root / "skills/architecture-review/SKILL.md"
         assert skill.is_file()
+        assert (root / "skills/architecture-design/SKILL.md").is_file()
+        assert (root / "templates/design.md").is_file()
         text = skill.read_text(encoding="utf-8")
         assert "src/templates/" not in text
         assert "../../templates/report.md" in text
@@ -46,5 +48,5 @@ def test_codex_custom_agent_is_standalone_toml():
     agent = tomllib.loads((REPO_ROOT / "dist/codex/agents/architect.toml").read_text())
     assert agent["name"] == "architect"
     assert agent["sandbox_mode"] == "read-only"
-    assert "You review software architecture" in agent["developer_instructions"]
+    assert "You design and review software architecture" in agent["developer_instructions"]
     assert "../templates/scorecard.yaml" in agent["developer_instructions"]

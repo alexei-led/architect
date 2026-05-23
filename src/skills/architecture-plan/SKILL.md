@@ -1,33 +1,65 @@
 ---
 name: architecture-plan
 description: >-
-  Turn architecture-report findings into an incremental refactoring plan. Use
-  when asked to plan a refactor, sequence remediation, or act on a report's
-  findings. Produces a phased, verifiable plan that cites finding and evidence
-  IDs. NOT for applying changes (hand off to a mutator agent) or for scoring
-  (use architecture-scorecard).
+  Turn architecture-report findings or approved architecture-design artifacts
+  into an incremental implementation/refactoring plan. Use when asked to plan a
+  refactor, sequence remediation, implement a target architecture, or act on a
+  report's findings. Produces a phased, verifiable plan that cites source
+  findings, evidence, design decisions, contracts, or risks. NOT for applying
+  changes (hand off to a mutator agent) or for scoring (use
+  architecture-scorecard).
 ---
 
 # Architecture plan
 
-Derive an actionable, incremental refactoring plan from a report. The architect
-drafts the plan; it never executes it.
+Derive an actionable, incremental implementation/refactoring plan from a report
+or approved design. The architect drafts the plan; it never executes it.
 
 ## When to use
 
 Use after an architecture review, when the user wants the report's findings
-turned into a sequence of changes. Plan one hotspot, boundary, or flow per plan
-unless a roadmap is explicitly requested.
+turned into a sequence of changes. Use after an architecture design, when the
+user wants approved target architecture implemented. Plan one hotspot, boundary,
+module, or flow per plan unless a roadmap is explicitly requested.
+
+If there is no review report and no approved design artifact, run
+`architecture-review` for existing-code remediation or `architecture-design` for
+requirements-to-design work first.
+
+## Skill navigation
+
+- Missing findings for an existing system: run `architecture-review` first.
+- Missing target architecture for new work: run `architecture-design` first.
+- Current skill: use `architecture-plan` to sequence small, verifiable changes
+  from a report or approved design.
+- Next skill after implementation: run `architecture-review` to verify the code
+  now matches intended architecture and the plan's acceptance criteria.
+
+## Task list discipline
+
+Maintain a visible task list for the planning flow. Track at least:
+
+1. Source report or design artifact confirmed.
+2. Scope and first execution horizon selected.
+3. Safety net ordered before behavior-bearing changes.
+4. Phases drafted.
+5. Verification and acceptance criteria attached.
+6. Handoff and re-review step recorded.
+
+Keep task names outcome-based. Do not expose runtime-specific mechanics in the
+plan.
 
 ## Procedure
 
-1. **Anchor to the report.** Cite the source report ID and the finding/evidence
-   IDs each phase addresses. A phase with no finding behind it does not belong in
-   the plan.
+1. **Anchor to the source artifact.** Cite the source report ID plus
+   finding/evidence IDs, or the approved design artifact plus decision, contract,
+   risk, or module IDs each phase addresses. A phase with no source rationale
+   does not belong in the plan.
 
 2. **Use the plan template.** `src/templates/plan.md` is the skeleton: Overview,
-   Success criteria, Phases (each with justification, preconditions,
-   postconditions, tasks, verification), Acceptance criteria, Safety notes.
+   Source artifact, Success criteria, Phases (each with justification,
+   preconditions, postconditions, tasks, verification), Acceptance criteria,
+   Safety notes, Re-review.
 
 3. **Order for safety.** Prefer characterization tests, seam creation, boundary
    repair, and fitness checks before cosmetic cleanup. Establish a safety net
@@ -39,7 +71,8 @@ unless a roadmap is explicitly requested.
 
 5. **Make every task verifiable.** Each phase ends with a concrete check — a
    test, a fitness check, or a command — that proves it is done. Success and
-   acceptance criteria tie back to findings or score dimensions.
+   acceptance criteria tie back to findings, score dimensions, design decisions,
+   integration contracts, or module responsibilities.
 
 6. **Write safety notes.** Flag irreversible steps, data migrations, and
    wide-blast-radius changes. State plainly that the architect does not apply the
@@ -47,19 +80,22 @@ unless a roadmap is explicitly requested.
 
 ## Failure handling
 
-- Missing source report, unreadable report, or absent finding/evidence IDs: stop
-  and ask for the report or IDs. Do not invent refs.
+- Missing source report/design, unreadable artifact, or absent finding/evidence/
+  decision/contract refs: stop and ask for the missing source. Do not invent
+  refs.
 - Missing `src/templates/plan.md`: report the missing template and ask before
   using an inline fallback.
-- Requested rewrite with no cited finding behind it: decline that phase and name
-  the missing evidence.
+- Requested rewrite with no cited finding, design decision, or risk behind it:
+  decline that phase and name the missing rationale.
 
 ## Output
 
 Return a plan shaped like `src/templates/plan.md` with:
 
-- `source_report`: path or ID plus finding/evidence IDs used.
-- `success_criteria`: measurable outcomes tied to findings or score dimensions.
+- `source_artifact`: report/design path or ID plus finding, evidence, decision,
+  contract, risk, or module IDs used.
+- `success_criteria`: measurable outcomes tied to findings, score dimensions,
+  design decisions, contracts, or module responsibilities.
 - `phases`: at most five next phases, each with justification, preconditions,
   tasks, postconditions, and verification.
 - `acceptance_criteria`: checks that prove the plan is complete.
@@ -68,6 +104,8 @@ Return a plan shaped like `src/templates/plan.md` with:
 
 ## Hard rules
 
-- Every phase cites a finding or evidence ref.
-- Incremental only — no rewrites the evidence does not justify.
+- Every phase cites a source finding, evidence ref, design decision, contract,
+  risk, or module responsibility.
+- Incremental only — no rewrites the source artifact does not justify.
+- The plan must end with a re-review recommendation.
 - The architect produces the plan and stops. Execution is someone else's job.

@@ -1,8 +1,8 @@
 # architect
 
-> Instruction-first architecture review package for AI coding runtimes. It ships a read-only Architect role, review/scorecard/plan skills, methodology guidance, report/plan templates, and helper CLIs for evidence-based architecture reports.
+> Instruction-first architecture design and review package for AI coding runtimes. It ships a read-only Architect role, design/review/scorecard/plan skills, methodology guidance, report/design/plan templates, and helper CLIs for evidence-based architecture reports.
 
-Use this file as a short map to the highest-signal project docs. The Architect assesses and plans; it does not mutate source code. Establish intended architecture before scoring, cite evidence for every finding, record missing tools as confidence gaps, and prefer incremental refactoring with fitness checks.
+Use this file as a short map to the highest-signal project docs. The Architect designs, assesses, and plans; it does not mutate production source code. Establish intended architecture before scoring, cite evidence for every finding, record missing tools as confidence gaps, and prefer incremental refactoring with fitness checks.
 
 Source templates and `src/templates/scorecard.yaml` are authoritative when prose docs disagree.
 
@@ -15,16 +15,18 @@ Source templates and `src/templates/scorecard.yaml` are authoritative when prose
 
 - [Architecture plugin manifest](src/plugins/architecture/plugin.yaml): Runtime package composition.
 - [Architect role prompt](src/agents/architect/AGENT.md): Read-only role boundary, evidence discipline, and handoff contract.
+- [Architecture design skill](src/skills/architecture-design/SKILL.md): Requirements-to-architecture workflow with contracts, tests, fitness checks, and self-review.
 - [Architecture review skill](src/skills/architecture-review/SKILL.md): Review workflow from intent capture through report writing.
 - [Architecture scorecard skill](src/skills/architecture-scorecard/SKILL.md): How to assign defensible scores and confidence.
-- [Architecture plan skill](src/skills/architecture-plan/SKILL.md): How to turn findings into incremental refactoring plans.
+- [Architecture plan skill](src/skills/architecture-plan/SKILL.md): How to turn findings or approved designs into incremental architecture plans.
 
 ## Report contracts
 
 - [Scorecard contract](src/templates/scorecard.yaml): Authoritative dimensions, bands, confidence levels, and comparability rules.
 - [Report template](src/templates/report.md): Required architecture-report structure.
-- [Plan template](src/templates/plan.md): Required refactoring-plan structure.
-- [Report and plan format](docs/report-format.md): Human-readable explanation of report frontmatter, evidence refs, tool coverage, and plan sections.
+- [Design template](src/templates/design.md): Target architecture, module map, contracts, tests, and handoff structure.
+- [Plan template](src/templates/plan.md): Required architecture-plan structure.
+- [Report, design, and plan format](docs/report-format.md): Human-readable explanation of report frontmatter, evidence refs, tool coverage, audience-specific diagram guidance, design sections, and plan sections.
 - [Scoring guide](docs/scoring.md): Human-readable summary of the score rubric and validation rules.
 
 ## Methodology and tools

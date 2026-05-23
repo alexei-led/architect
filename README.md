@@ -2,9 +2,9 @@
 
 Instruction-first architecture review for AI coding agents.
 
-`architect` packages a read-only Architect role, portable Agent Skills, report and plan templates, and helper CLIs for evidence-based architecture review. It is built for Claude Code, Codex CLI, Pi, and other runtimes that can load Agent Skills-style capabilities.
+`architect` packages a read-only Architect role, portable Agent Skills, report/design/plan templates, and helper CLIs for evidence-based architecture design and review. It is built for Claude Code, Codex CLI, Pi, and other runtimes that can load Agent Skills-style capabilities.
 
-The Architect does not rewrite systems. It establishes intended architecture, maps observed structure, gathers local evidence, scores architecture quality with confidence, and returns a cited report plus an optional incremental refactoring plan.
+The Architect does not rewrite systems. It designs target architecture from requirements, establishes intended architecture, maps observed structure, gathers local evidence, scores architecture quality with confidence, and returns design artifacts, a cited report, and/or an incremental architecture plan.
 
 ## Install
 
@@ -77,11 +77,11 @@ architect-compare-reports base-report.md head-report.md
 ## What it contains
 
 - One architecture-review plugin named `architecture`.
-- A read-only Architect role for assessment and planning, not implementation.
-- Review, scorecard, and planning skills for the core workflow.
+- A read-only Architect role for assessment, design, and planning, not implementation.
+- Design, review, scorecard, and planning skills for the core workflow.
 - Methodology skills for Balanced Coupling and architecture fitness functions.
 - Tool skills that guide evidence collection with local OSS CLIs.
-- Report and plan templates with machine-checkable contracts.
+- Report, design, and plan templates with machine-checkable review contracts; human reports may use Mermaid summaries, while AI-targeted reports stay plain text.
 - Helper CLIs for tool coverage checks, report validation, and report comparison.
 
 ## What it does
@@ -93,11 +93,19 @@ A full review follows this order:
 3. Gather evidence across discovery, structural, semantic, dependency, change, operational, security, and report dimensions.
 4. Score architecture dimensions with a fixed rubric and explicit confidence.
 5. Write an architecture report with addressable evidence references.
-6. Optionally write an incremental refactoring plan tied to findings and verification checks.
+6. Optionally write an incremental architecture plan tied to findings and verification checks.
+
+A design flow follows this order:
+
+1. Read requirements, existing docs, and prior reports.
+2. Check existing implementation for drift when code exists; design docs are intent, not proof.
+3. Validate the working model with the user.
+4. Produce domain, module, integration-contract, test-specification, and fitness-check sections.
+5. Self-review the design for coupling imbalances and hand off to `architecture-plan` for sequencing.
 
 Hard boundaries:
 
-- No source edits by the Architect.
+- No production source edits by the Architect.
 - No finding without evidence.
 - No score before the system map.
 - No high-quality score on low-confidence evidence.
@@ -130,7 +138,7 @@ Domain volatility uses DDD-style core/supporting/generic distinctions when judgi
 
 - [Methodology](docs/methodology.md) — Balanced Coupling and architecture fitness summaries.
 - [Scoring](docs/scoring.md) — score dimensions, bands, confidence, and comparability.
-- [Report and plan format](docs/report-format.md) — report frontmatter, evidence refs, tool coverage, and plan sections.
+- [Report, design, and plan format](docs/report-format.md) — report frontmatter, evidence refs, tool coverage, design sections, and plan sections.
 - [Tools and coverage](docs/tools.md) — tool registry, applicability, and confidence impact.
 - [Contributing](CONTRIBUTING.md) — maintainer setup, packaging notes, tests, and validation.
 

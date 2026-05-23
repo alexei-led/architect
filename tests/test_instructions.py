@@ -12,6 +12,7 @@ AGENT_FILE = AGENTS_DIR / "architect" / "AGENT.md"
 SKILLS_DIR = SRC / "skills"
 
 TASK3_SKILLS = {
+    "architecture-design",
     "architecture-review",
     "architecture-scorecard",
     "architecture-plan",

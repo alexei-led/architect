@@ -25,6 +25,14 @@ DEFAULT_SCORECARD = PACKAGE_ROOT.parent / "templates" / "scorecard.yaml"
 META_DIMENSION = "analysis_confidence"
 CONFIDENCE_LEVELS = ("low", "medium", "high")
 SEVERITIES = ("critical", "high", "medium", "low")
+FINDING_NARRATIVE_FIELDS = (
+    "problem",
+    "knowledge_or_boundary_leakage",
+    "complexity_impact",
+    "cascading_change_scenarios",
+    "recommended_improvement",
+    "tradeoffs",
+)
 EVIDENCE_TYPES = ("file", "command", "graph-query", "interview")
 # Type-dependent required field per evidence entry.
 EVIDENCE_REQUIRED_FIELD = {

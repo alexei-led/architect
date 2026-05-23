@@ -26,17 +26,31 @@ evaluates the **connection** between two components along three dimensions:
    advantage) → high; **supporting** and **generic** → low functional volatility.
 
 **The balance rule:** modularity emerges when strength and distance
-_counterbalance_ (one high, one low); complexity emerges when they _match_. High
-strength + low distance = healthy cohesion; low strength + high distance = healthy
-loose coupling. **High strength + high distance = tight coupling** — the step
-toward a distributed monolith. Volatility is the override: unbalanced coupling on
-something that never changes is tolerable. The worst case, flagged first, is
-**high strength + high distance + high volatility**.
+_counterbalance_ (one high, one low); complexity emerges when they _match_. Use
+this compact mnemonic:
+
+```text
+BALANCE = (STRENGTH XOR DISTANCE) OR NOT VOLATILITY
+```
+
+High strength + low distance = healthy cohesion; low strength + high distance =
+healthy loose coupling. **High strength + high distance = tight coupling** — the
+step toward a distributed monolith. Volatility is the override: unbalanced
+coupling on something that never changes is tolerable. The worst case, flagged
+first, is **high strength + high distance + high volatility**.
+
+Generic subdomains need extra suspicion. Their business function may be stable,
+but their implementation can be volatile if provider swaps, dual-provider runs,
+or vendor-specific errors and DTOs are plausible. In that case, provider leakage
+into core code is still a coupling risk.
 
 The skill does not recommend generic "decouple everything" advice — breaking
 balanced (high-cohesion, low-distance) coupling adds distance and _unbalances_ it.
 Fixes move one dimension: introduce a contract (lower strength), co-locate (lower
-distance), or confirm low volatility leaves it alone — never a rewrite.
+distance), or confirm low volatility leaves it alone — never a rewrite. When two
+relationships look equally risky, use connascence as a tie-breaker: shared
+meaning, algorithm, timing, identity, or call order usually beats a mere shared
+name for priority.
 
 ### Attribution and licensing
 

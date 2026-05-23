@@ -24,7 +24,37 @@ risk lives; or wants to compare intended and observed architecture. For comparin
 two existing reports use `architect-compare-reports`. For a combined "review and
 refactor" request, finish the read-only review first, then use
 `architecture-plan` to draft the handoff plan; a mutator or engineer applies
-changes after approval.
+changes after approval. For target architecture or requirements-to-design work,
+use `architecture-design` instead.
+
+## Skill navigation
+
+- Missing target architecture or requirements brief: try `architecture-design`
+  before reviewing implementation quality.
+- Current skill: use `architecture-review` to compare intended architecture with
+  observed implementation. Treat design docs as intent only; actual code,
+  runtime config, and tests may have drifted.
+- Next skill after a report: use `architecture-plan` for evidence-backed
+  remediation, or `architecture-design` when the finding means the target
+  architecture itself must be clarified.
+- After implementation, run `architecture-review` again with comparable scope to
+  check whether the code now matches intent.
+
+## Task list discipline
+
+Maintain a visible task list for the review flow. Track at least:
+
+1. Context and scope confirmed.
+2. Working model validated.
+3. System map built.
+4. Evidence gathered by dimension.
+5. Findings triaged.
+6. Scores assigned.
+7. Report written and checked.
+8. Next skill recommendation made.
+
+Keep task names outcome-based. Do not expose runtime-specific mechanics in the
+instructions or report.
 
 ## Procedure
 
@@ -38,14 +68,23 @@ changes after approval.
    reconstruct intent from docs/ADRs/CLAUDE.md/changelog, label the context
    reconstructed, and cap `analysis_confidence` accordingly. Never invent intent.
 
-2. **Build the system map before judging quality.** Establish what exists:
+2. **Validate the working model.** Before scoring, surface your current
+   understanding for correction: system purpose, candidate units, responsibilities,
+   major integrations, domain classifications, ownership/deploy assumptions,
+   known pain, and doc-vs-code drift risks. Existing architecture docs describe
+   intended design, not necessarily current implementation. Ask only for
+   corrections that would change the assessment. In non-interactive runs, mark
+   this model as reconstructed and record unconfirmed assumptions in
+   `missing_evidence`.
+
+3. **Build the system map before judging quality.** Establish what exists:
    languages, package managers, units, deploy units, public interfaces, declared
    modules (manifests/dirs) vs observed modules (graphs/imports/churn), high-risk
    entrypoints, and missing evidence. This populates `system_map` in the report
    frontmatter. Scoring before a map is forbidden. Scoring from directory shape
    alone is explicitly forbidden — a directory tree is not an architecture.
 
-3. **Gather evidence across applicable dimensions.** Use `tools-code-search` for
+4. **Gather evidence across applicable dimensions.** Use `tools-code-search` for
    local search/read/grep, then the relevant specialized tool skills (ast-grep,
    codegraph, GitNexus, LSP/tree-sitter, language and operational tool skills)
    to cover discovery, structural, semantic, dependency, change, and operational
@@ -67,20 +106,22 @@ changes after approval.
      git history across the old and new path, halving apparent churn. Scope churn
      to current paths or use `git log --follow` per file.
 
-4. **Triage before scoring.** Sort signal from noise: which observations are
+5. **Triage before scoring.** Sort signal from noise: which observations are
    facts, which are hypotheses, which actually bear on a score. See
    `references/triage.md`.
 
-5. **Score with the scorecard skill.** Use the architecture-scorecard skill for
+6. **Score with the scorecard skill.** Use the architecture-scorecard skill for
    every score. Read `src/templates/scorecard.yaml` for dimensions, bands,
    anchors, and rules — it is the source of truth. Each non-meta score needs at
    least one evidence ref. Low confidence caps the quality claim.
 
-6. **Write the report from the template.** Use `src/templates/report.md` as the
+7. **Write the report from the template.** Use `src/templates/report.md` as the
    skeleton. Fill frontmatter (interview context, system map, scores, findings,
-   evidence, tool coverage) and the prose sections. Findings carry stable IDs.
+   evidence, tool coverage) and the prose sections. Findings carry stable IDs
+   and human-facing narratives: knowledge or boundary leakage, complexity impact,
+   cascading-change scenarios, recommendation, and trade-offs.
 
-7. **Hand off requested refactors through architecture-plan.** If the user asks
+8. **Hand off requested refactors through architecture-plan.** If the user asks
    for review and immediate refactoring, do not edit source or mix audit with
    implementation. Finish the report, then use the architecture-plan skill for
    warranted changes. The handoff must include finding/evidence IDs, scoped
@@ -91,15 +132,21 @@ changes after approval.
 
 A completed review produces an architecture report using `src/templates/report.md`.
 The report must include `interview_context`, `system_map`, `scores`, `findings`,
-`evidence`, and `tool_coverage`. If refactoring is requested, the only follow-up
-artifact is an `architecture-plan` handoff tied to finding/evidence IDs.
+`evidence`, and `tool_coverage`. Each finding must include a human-facing
+narrative explaining the leak or drift, complexity impact, cascading-change
+scenarios, recommendation, and trade-offs. If refactoring is requested, the only
+follow-up artifact is an `architecture-plan` handoff tied to finding/evidence
+IDs.
 
 ## Required response clauses
 
 When asked to describe the review workflow, include these clauses explicitly:
 
 - Inspect docs, ADRs, manifests, and repository structure before asking.
+- Treat architecture/design docs as intended architecture, not proof that the
+  implementation still matches them.
 - Ask only for missing context whose answer changes the architecture assessment.
+- Validate the working model before scoring.
 - Build the system map before scoring; never score from directory shape alone.
 - Require cited evidence and per-dimension tool coverage before findings or scores.
 - Keep the review read-only on source; route implementation to a mutator or
@@ -126,8 +173,10 @@ main review flow:
 
 ## Hard rules
 
-- No scoring before a system map; never score from directory shape alone.
-- No finding without cited evidence.
+- No scoring before a validated working model and system map; never score from
+  directory shape alone.
+- No trusting stale architecture docs as implementation truth.
+- No finding without cited evidence and a human-facing narrative.
 - No high-quality band on low confidence.
 - Read-only on source. Route implementation to a mutator or engineer via
   architecture-plan with verification-backed acceptance criteria.

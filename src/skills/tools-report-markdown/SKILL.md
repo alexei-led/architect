@@ -21,9 +21,17 @@ Evidence dimension: **report** (quality of the artifact, not the architecture).
 ## When to use
 
 Use during the write-the-report step and before declaring a report or plan done.
-Use to validate YAML frontmatter parses, render the system map as a diagram, and
-check links/spelling. Diagrams are evidence summaries — a Mermaid module graph
-beats a pasted edge list.
+First decide the audience:
+
+- **Human-facing reports:** consider a small Mermaid diagram for the system map,
+  dependency clusters, or boundary drift when it improves comprehension.
+- **AI/agent-targeted reports:** prefer plain text adjacency lists, cited bullets,
+  and compact structure. Do not spend tokens on fancy diagrams, broad tables, or
+  formatting polish; models do not read diagrams as evidence.
+
+Use to validate YAML frontmatter parses, render human-facing diagrams when
+chosen, and check links/spelling. Diagrams are summaries for people, not
+architecture evidence.
 
 ## Commands
 
@@ -35,7 +43,7 @@ architect-validate-report report.md
 python -c 'from pathlib import Path; print(Path("report.md").read_text().split("---", 2)[1])' > /tmp/report-frontmatter.yaml
 yq -o=json '.' /tmp/report-frontmatter.yaml | jq '.tool_coverage'
 
-# Render a Mermaid diagram to SVG (system map / dependency graph)
+# Optional for human-facing reports: render a Mermaid diagram to SVG
 mmdc -i map.mmd -o map.svg
 
 # Graphviz / D2 for graphs produced by pydeps, goda, go-callvis
@@ -62,7 +70,7 @@ Record:
 
 - `dimension`: report.
 - `source`: validation/render/link/spell command and artifact path.
-- `facts`: parsed frontmatter, rendered diagrams, valid links, or reported failures.
+- `facts`: parsed frontmatter, optional rendered diagrams, valid links, or reported failures.
 - `limits`: skipped cosmetic checks, missing renderer, or dropped diagrams.
 
 ## Confidence impact
@@ -70,7 +78,7 @@ Record:
 This dimension does not affect architecture scores. A beautiful report with
 thin evidence is still low confidence; a plain report with strong evidence is
 high. Report tooling guards readability and machine-parseability only — never
-let diagram polish stand in for evidence coverage.
+let Mermaid, tables, or formatting polish stand in for evidence coverage.
 
 ## Failure and missing-tool handling
 
@@ -83,14 +91,17 @@ let diagram polish stand in for evidence coverage.
 
 ## When to stop
 
-Validate frontmatter, render the one or two diagrams the report needs, run a link
-and spell pass. Stop there — don't generate a gallery of diagrams or chase
-stylistic lint that doesn't change comprehension. Report tooling is the last
-mile, not a place to spend the evidence budget.
+Validate frontmatter. For human-facing reports, render at most the one or two
+Mermaid diagrams the report needs. For AI-targeted reports, skip diagrams and use
+plain text. Run a link and spell pass. Stop there — don't generate a gallery of
+diagrams or chase stylistic lint that doesn't change comprehension. Report
+tooling is the last mile, not a place to spend the evidence budget.
 
 ## Hard rules
 
 - Frontmatter must parse; everything else here is optional polish.
+- Mermaid diagrams are optional and human-facing; plain text is preferred for
+  AI-targeted reports.
 - Diagrams summarize evidence — they never substitute for cited refs.
 - Report quality never raises an architecture score or its confidence.
 - Use the CLIs; the authoritative schema check is `architect-validate-report`.

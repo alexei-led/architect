@@ -75,6 +75,39 @@ Judge volatility from the domain, not the git log:
 Either way, commit frequency is a hint, not the measure. Confirm against
 subdomain classification before letting volatility move a finding.
 
+## Generic subdomains and provider volatility
+
+Generic functionality can be stable while its implementation is not. Auth,
+payments, search, notifications, storage, AI providers, and media processing are
+often solved problems at the business level, but the chosen vendor or library may
+change. Design/review questions to ask:
+
+- Is swapping providers plausible within the product horizon?
+- Must multiple providers run at the same time?
+- Do provider-specific DTOs, errors, retry rules, or limits leak into core code?
+- Would a provider change be localized to one adapter, or would it ripple across
+  business modules?
+
+If provider churn is plausible, treat implementation volatility as high enough to
+justify explicit contracts or anti-corruption boundaries even when functional
+volatility is low. If provider churn is implausible and switching cost is
+accepted, document the trade-off instead of manufacturing abstraction theater.
+
+## Connascence as tie-breaker
+
+Use connascence when two relationships sit in the same broad strength level and
+you need finer prioritization:
+
+- Static coupling visible in code: shared names, types, meanings, positions, or
+  algorithms. Algorithm/meaning coupling is usually riskier than name coupling.
+- Dynamic coupling visible in behavior: required call order, timing, shared
+  values, identity, or execution context. Timing/order coupling is especially
+  fragile across high-distance boundaries.
+
+Do not lead with terminology. Lead with the shared knowledge and change scenario;
+use connascence only to explain why one similar-looking dependency is worse than
+another.
+
 ## Prior models, incorporated
 
 Integration strength refines the classic module-coupling vocabulary (content,

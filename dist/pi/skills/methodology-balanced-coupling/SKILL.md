@@ -24,12 +24,22 @@ tables/diagrams from the source.
 ## When to use
 
 Use when judging whether a coupling relationship is a problem — scoring the
-`coupling_balance` dimension, deciding what to flag as structural risk, or
-sanity-checking a "decouple this" recommendation. The architecture-review skill
-reaches for this when it finds two components that share knowledge and asks
-whether that sharing is balanced. Not for assigning the score itself
-(architecture-scorecard) or for executable enforcement
-(methodology-architecture-fitness).
+`coupling_balance` dimension, deciding what to flag as structural risk,
+designing module boundaries, or sanity-checking a "decouple this"
+recommendation. The architecture-review and architecture-design skills reach for
+this when they find two components that share knowledge and ask whether that
+sharing is balanced. Not for assigning the score itself (architecture-scorecard)
+or for executable enforcement (methodology-architecture-fitness).
+
+## Skill navigation
+
+- Missing relationship evidence: return to `architecture-review` for observed
+  code or `architecture-design` for proposed boundaries.
+- Current skill: use `methodology-balanced-coupling` to classify strength,
+  distance, volatility, severity, and balancing move.
+- Next skill: use `architecture-scorecard` when scoring a review,
+  `architecture-design` when revising target boundaries, or `architecture-plan`
+  when sequencing an approved balancing move.
 
 ## The three dimensions
 
@@ -86,14 +96,44 @@ other low. Complexity emerges when they match — both high or both low.
 - High strength + high distance = tight coupling. Frequent cascades that are
   expensive to make. A step toward a distributed monolith.
 
-Volatility is the pragmatic override: unbalanced coupling on a component that
-won't change is tolerable. The worst case — the thing to flag first — is high
-strength + high distance + high volatility.
+Use the compact decision rule as a mnemonic, not fake math:
 
-## Using it in a review
+```text
+BALANCE = (STRENGTH XOR DISTANCE) OR NOT VOLATILITY
+```
 
-- Flag a finding when strength and distance are both high and the area is
+That means a relationship is acceptable when strength and distance counterbalance
+or when the relationship is unlikely to change. The worst case — the thing to
+flag first — is high strength + high distance + high volatility.
+
+Keep the level of abstraction explicit. A public class method can be a contract
+inside one module and still be private implementation detail across a service
+boundary. If the level changes, reclassify the relationship instead of reusing
+the same label.
+
+## Examples to calibrate judgment
+
+- A module reads another module's private table or storage layout: intrusive
+  strength. If those modules are owned or deployed apart and the domain changes,
+  this is a priority finding.
+- Frontend and backend duplicate a pricing rule: functional strength even when
+  no import edge exists. The coupling is implicit; a requirement change must hit
+  both sides.
+- Two services share a broad `Customer` model: model strength. This may be fine
+  inside one bounded context; across distant teams it needs a narrower contract.
+- A payment adapter exposes provider DTOs everywhere: contract in name only. The
+  provider model leaks, so implementation volatility should push toward an
+  anti-corruption boundary.
+- A single module keeps strongly-related rules and state together: high strength
+  plus low distance. Do not split it merely to make a diagram cleaner. Diagrams,
+  being obedient liars, will applaud anything.
+
+## Using it in review and design
+
+- Flag a review finding when strength and distance are both high and the area is
   volatile. That ordering is your severity signal — see severity mapping below.
+- In a design, choose boundaries so high-strength relationships sit close and
+  high-distance relationships use explicit contracts.
 - Don't recommend decoupling balanced coupling. High-cohesion, low-distance
   coupling is correct; breaking it adds distance and unbalances it.
 - To fix unbalanced coupling, move on one dimension: lower strength (introduce a
