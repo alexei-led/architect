@@ -1,98 +1,42 @@
 # architect
 
-> Instruction-first architecture review plugin for AI coding runtimes. It ships a read-only Architect agent, architecture review/scorecard/plan skills, methodology guidance, report/plan templates, and Python helper CLIs for validating and comparing evidence-based architecture reports.
+> Instruction-first architecture review package for AI coding runtimes. It ships a read-only Architect role, review/scorecard/plan skills, methodology guidance, report/plan templates, and helper CLIs for evidence-based architecture reports.
 
-This file orients AI agents working in this repository. It follows the emerging `/llms.txt` convention: a concise Markdown guide with links to the highest-signal project files. This repo uses the requested singular filename `llm.txt`; for web or crawler discovery, also expose the same content as `llms.txt`.
+Use this file as a short map to the highest-signal project docs. The Architect assesses and plans; it does not mutate source code. Establish intended architecture before scoring, cite evidence for every finding, record missing tools as confidence gaps, and prefer incremental refactoring with fitness checks.
 
-## Read first
+Source templates and `src/templates/scorecard.yaml` are authoritative when prose docs disagree.
 
-- [README.md](README.md): project overview, layout, setup, and local gates.
-- [src/plugins/architecture/plugin.yaml](src/plugins/architecture/plugin.yaml): plugin manifest and shipped agent/skills.
-- [src/agents/architect/AGENT.md](src/agents/architect/AGENT.md): core Architect role prompt, read-only boundary, evidence discipline, and review flow.
-- [src/templates/scorecard.yaml](src/templates/scorecard.yaml): authoritative scoring dimensions, bands, confidence levels, and comparability rules.
-- [src/templates/report.md](src/templates/report.md): canonical architecture report template.
-- [src/templates/plan.md](src/templates/plan.md): canonical refactoring plan template.
-- [docs/report-format.md](docs/report-format.md): report frontmatter, body sections, evidence refs, tool coverage, and plan format.
-- [docs/scoring.md](docs/scoring.md): human-readable score rubric summary.
-- [docs/methodology.md](docs/methodology.md): Balanced Coupling and architecture-fitness summaries.
-- [docs/tools.md](docs/tools.md): local analysis tool registry and coverage semantics.
+## Start here
 
-## Repository map
+- [README](README.md): User-facing overview, install paths, capabilities, methodology, and docs index.
+- [Contributing](CONTRIBUTING.md): Maintainer setup, validation, packaging notes, and documentation rules.
 
-- `src/agents/architect/AGENT.md` — the single source role prompt. No runtime frontmatter in this source file.
-- `src/skills/*/SKILL.md` — activation-scoped procedures for review, planning, scoring, methodology, and tool usage.
-- `src/templates/` — report, plan, and scorecard contracts used by the agent and validators.
-- `src/architect_tools/` — Python CLIs: `architect-doctor`, `architect-validate-report`, and `architect-compare-reports`.
-- `src/plugins/architecture/plugin.yaml` — package manifest declaring what ships.
-- `docs/` — explanatory docs mirroring the source contracts. Source files win if docs disagree.
-- `tests/` — contract, scaffold, skill-eval, template, and CLI tests.
-- `scripts/git-hooks/` — local pre-commit/pre-push hooks wired by `make setup`.
+## Agent and skills
 
-## Agent operating rules
+- [Architecture plugin manifest](src/plugins/architecture/plugin.yaml): Runtime package composition.
+- [Architect role prompt](src/agents/architect/AGENT.md): Read-only role boundary, evidence discipline, and handoff contract.
+- [Architecture review skill](src/skills/architecture-review/SKILL.md): Review workflow from intent capture through report writing.
+- [Architecture scorecard skill](src/skills/architecture-scorecard/SKILL.md): How to assign defensible scores and confidence.
+- [Architecture plan skill](src/skills/architecture-plan/SKILL.md): How to turn findings into incremental refactoring plans.
 
-- Treat production source code as read-only when acting as the Architect role. The Architect reviews, reports, and plans; it does not rewrite systems.
-- Write only approved architecture reports and refactoring plans, using the templates verbatim as skeletons.
-- Separate facts, hypotheses, scores, and recommendations. Every finding needs an evidence reference.
-- Establish intended architecture before judging observed architecture. Source order: user interview, docs/ADRs/README, manifests/config, directory structure, inferred clusters.
-- Never score from directory shape alone. Use observed behavior, dependency evidence, graph/search output, commands, and cited files.
-- Apply `src/templates/scorecard.yaml` before assigning scores. Do not invent dimensions, bands, confidence labels, or comparability keys.
-- Missing or failed tools are coverage gaps, not fatal errors. Record the confidence impact instead of pretending coverage exists.
-- Recommend incremental refactoring only: seams, characterization tests, boundary repair, and fitness checks. No big-bang rewrites.
+## Report contracts
 
-## Primary workflows
+- [Scorecard contract](src/templates/scorecard.yaml): Authoritative dimensions, bands, confidence levels, and comparability rules.
+- [Report template](src/templates/report.md): Required architecture-report structure.
+- [Plan template](src/templates/plan.md): Required refactoring-plan structure.
+- [Report and plan format](docs/report-format.md): Human-readable explanation of report frontmatter, evidence refs, tool coverage, and plan sections.
+- [Scoring guide](docs/scoring.md): Human-readable summary of the score rubric and validation rules.
 
-### Architecture review
+## Methodology and tools
 
-1. Interview for missing intended architecture and constraints.
-2. Build a system map before quality judgment.
-3. Gather cited evidence across discovery, structural, semantic, dependency, change, operational, security, and report dimensions.
-4. Apply the scorecard skill and rubric contract.
-5. Produce a report from `src/templates/report.md`.
-6. Validate with `architect-validate-report`.
+- [Methodology](docs/methodology.md): Balanced Coupling and architecture fitness summaries with attribution.
+- [Tools and coverage](docs/tools.md): Evidence tool registry, applicability, and confidence-impact rules.
+- [Balanced Coupling skill](src/skills/methodology-balanced-coupling/SKILL.md): Coupling analysis procedure.
+- [Architecture fitness skill](src/skills/methodology-architecture-fitness/SKILL.md): Fitness-function assessment procedure.
 
-### Refactoring plan
+## Optional
 
-1. Start from report findings and evidence refs.
-2. Keep one hotspot, boundary, or flow per plan unless a roadmap is requested.
-3. Use `src/templates/plan.md`.
-4. Include success criteria, phases, preconditions, postconditions, verification checks, and safety notes.
-5. Pair each boundary repair with a fitness check so the boundary cannot silently rot again.
-
-### Report comparison
-
-- Compare only reports with matching `scope`, `rubric_version`, and `tool_coverage_level`.
-- If comparability keys differ, emit the non-comparability reason. Do not invent a trend.
-
-## Local commands
-
-```sh
-make setup                         # install hooks and dev dependencies with uv
-make lint                          # ruff check + ruff format --check
-make test                          # pytest
-make check                         # lint + test
-uv run architect-doctor --repo .    # inspect local analysis tool availability
-uv run architect-validate-report path/to/report.md
-uv run architect-compare-reports base-report.md head-report.md
-```
-
-## Development conventions
-
-- Python 3.12+ project managed by `uv`.
-- Keep instruction files concise, activation-scoped, and testable.
-- Skill files require YAML frontmatter with `name` and `description`, and a `## When to use` section.
-- The source Architect role prompt must start with `# Architect` and must not have runtime frontmatter.
-- Template paths referenced by prompts/skills must resolve under `src/templates/`.
-- Avoid placeholder markers in agent and skill instruction files; tests reject them.
-- Comments should be short and useful. Dead code should be removed, not parked.
-
-## Methodology constraints
-
-- Balanced Coupling evaluates integration strength, distance, and volatility. Coupling is not automatically bad; imbalance is the problem.
-- Architecture fitness means executable checks that can fail the build. Documentation alone does not raise the fitness score.
-- Balanced Coupling material is summary-only with attribution. Do not paste or closely paraphrase external reference text into this repo.
-
-## Verification checklist for agents
-
-- Run `make check` before claiming implementation work is done.
-- For report artifacts, run `uv run architect-validate-report <report>`.
-- For changes to skills, role prompts, templates, or docs, inspect tests under `tests/` for contract expectations before editing.
+- [Project metadata](pyproject.toml): Python package metadata and helper CLI entry points.
+- [Instruction tests](tests/test_instructions.py): Contracts for role and skill instruction files.
+- [Template tests](tests/test_templates.py): Contracts for report, plan, and scorecard templates.
+- [Doctor tests](tests/tools/test_doctor.py): Contracts for local tool detection.
