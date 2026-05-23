@@ -8,8 +8,8 @@ description: >-
   between intended and observed architecture. Drives local search/read/grep,
   code graph, GitNexus/change-history, AST/LSP, language, and operational tool
   evidence; scores with the scorecard and writes cited findings. NOT for
-  line-level code review or applying refactors (use architecture-plan for the
-  handoff).
+  line-level code review, target architecture design (use architecture-design),
+  or implementation sequencing (use architecture-plan after design approval).
 ---
 
 # Architecture review
@@ -22,21 +22,25 @@ Use when a user wants their architecture reviewed, audited, or scored; wants to
 understand where modularity, coupling, dependency, blast-radius, or fragility
 risk lives; or wants to compare intended and observed architecture. For comparing
 two existing reports use `architect-compare-reports`. For a combined "review and
-refactor" request, finish the read-only review first, then use
-`architecture-plan` to draft the handoff plan; a mutator or engineer applies
-changes after approval. For target architecture or requirements-to-design work,
-use `architecture-design` instead.
+refactor" request, finish the read-only review first, then recommend exactly one
+primary next skill: `architecture-design` when remediation needs a target state,
+or `architecture-plan` only when an approved target design already exists. A
+mutator or engineer applies changes after approval. For target architecture or
+requirements-to-design work without review, use `architecture-design` instead.
 
 ## Skill navigation
 
-- Missing target architecture or requirements brief: try `architecture-design`
-  before reviewing implementation quality.
+- User asks to define target architecture or work from requirements: use
+  `architecture-design` instead of reviewing implementation quality.
 - Current skill: use `architecture-review` to compare intended architecture with
   observed implementation. Treat design docs as intent only; actual code,
   runtime config, and tests may have drifted.
-- Next skill after a report: use `architecture-plan` for evidence-backed
-  remediation, or `architecture-design` when the finding means the target
-  architecture itself must be clarified.
+- Next skill after a report: choose one primary next step:
+  - stop when the user asked for audit/scoring only;
+  - `architecture-design` when findings need target boundaries, contracts,
+    tests, or fitness checks;
+  - `architecture-plan` only when the target design is already approved and the
+    user asks for implementation sequencing.
 - After implementation, run `architecture-review` again with comparable scope to
   check whether the code now matches intent.
 
@@ -121,10 +125,19 @@ instructions or report.
    and human-facing narratives: knowledge or boundary leakage, complexity impact,
    cascading-change scenarios, recommendation, and trade-offs.
 
-8. **Hand off requested refactors through architecture-plan.** If the user asks
-   for review and immediate refactoring, do not edit source or mix audit with
-   implementation. Finish the report, then use the architecture-plan skill for
-   warranted changes. The handoff must include finding/evidence IDs, scoped
+8. **Recommend the next primary skill.** If the user asks for review and
+   immediate refactoring, do not edit source or mix audit with implementation.
+   Finish the report, then choose one next skill:
+   - `architecture-design` when the target boundaries, contracts, tests, or
+     fitness checks are not yet approved;
+   - `architecture-plan` when an approved design already exists and the user
+     wants executable sequencing;
+   - no next skill when the user asked for audit/scoring only.
+
+   If the user asks for the full remediation pipeline, name the sequence:
+   `architecture-review` → `architecture-design` → `architecture-plan` →
+   implementation by a mutator/engineer → `architecture-review` re-check. The
+   final handoff must include finding/evidence IDs, design decision IDs, scoped
    modules/files, incremental steps, verification checks, acceptance criteria,
    risk/rollback notes, and an explicit mutator/engineer implementation step.
 
@@ -134,9 +147,10 @@ A completed review produces an architecture report using `../../templates/report
 The report must include `interview_context`, `system_map`, `scores`, `findings`,
 `evidence`, and `tool_coverage`. Each finding must include a human-facing
 narrative explaining the leak or drift, complexity impact, cascading-change
-scenarios, recommendation, and trade-offs. If refactoring is requested, the only
-follow-up artifact is an `architecture-plan` handoff tied to finding/evidence
-IDs.
+scenarios, recommendation, and trade-offs. If remediation is requested, recommend
+exactly one primary next skill unless the user asks for the full pipeline:
+`architecture-design` for target-state work, or `architecture-plan` only when an
+approved design already exists and implementation sequencing is requested.
 
 ## Required response clauses
 
@@ -153,10 +167,11 @@ When asked to describe the review workflow, include these clauses explicitly:
   engineer.
 
 When the user asks to review and refactor, separate the response into review,
-scoring/recommendations, and implementation handoff. Use the exact skill name
-`architecture-plan` for warranted changes. State that the architect refuses
-source edits, and that the handoff includes verification steps and acceptance
-criteria for the mutator or engineer.
+scoring/recommendations, next-skill recommendation, and implementation handoff.
+Use the exact skill name that applies next: `architecture-design` when target
+state is missing, or `architecture-plan` when an approved design already exists.
+State that the architect refuses source edits, and that the handoff includes
+verification steps and acceptance criteria for the mutator or engineer.
 
 ## Structured questions by runtime
 
@@ -178,5 +193,7 @@ main review flow:
 - No trusting stale architecture docs as implementation truth.
 - No finding without cited evidence and a human-facing narrative.
 - No high-quality band on low confidence.
-- Read-only on source. Route implementation to a mutator or engineer via
-  architecture-plan with verification-backed acceptance criteria.
+- Read-only on source. Recommend exactly one primary next skill: route target
+  definition through `architecture-design`, or route approved implementation
+  sequencing to a mutator/engineer via `architecture-plan` with
+  verification-backed acceptance criteria.

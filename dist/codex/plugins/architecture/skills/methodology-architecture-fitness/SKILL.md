@@ -34,7 +34,8 @@ the check.
 - Current skill: use `methodology-architecture-fitness` to distinguish existing
   enforced checks from recommended checks.
 - Next skill: use `architecture-scorecard` when scoring a review, include checks
-  in `architecture-design`, or sequence missing checks in `architecture-plan`.
+  in `architecture-design`, or sequence approved missing checks in
+  `architecture-plan`.
 
 ## Existing checks vs recommended checks
 

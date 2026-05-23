@@ -25,9 +25,10 @@ report.
   not a substitute for evidence.
 - Current skill: use `architecture-scorecard` only to assign defensible values,
   bands, confidence, and score rationales.
-- Next skill: write the `architecture-review` report, then use
-  `architecture-plan` for warranted changes or `architecture-design` if the
-  intended target architecture is missing.
+- Next skill: write the `architecture-review` report, then recommend one primary
+  next step: `architecture-design` when findings need target-state decisions,
+  `architecture-plan` only when an approved design already exists and sequencing
+  is requested, or no next skill for pure audit/scoring.
 
 ## Procedure
 

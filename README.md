@@ -93,7 +93,7 @@ A full review follows this order:
 3. Gather evidence across discovery, structural, semantic, dependency, change, operational, security, and report dimensions.
 4. Score architecture dimensions with a fixed rubric and explicit confidence.
 5. Write an architecture report with addressable evidence references.
-6. Optionally write an incremental architecture plan tied to findings and verification checks.
+6. Recommend one primary next skill: usually `architecture-design` for remediation target-state work, `architecture-plan` only when an approved design already exists, or no next skill for pure audit.
 
 A design flow follows this order:
 
@@ -101,7 +101,14 @@ A design flow follows this order:
 2. Check existing implementation for drift when code exists; design docs are intent, not proof.
 3. Validate the working model with the user.
 4. Produce domain, module, integration-contract, test-specification, and fitness-check sections.
-5. Self-review the design for coupling imbalances and hand off to `architecture-plan` for sequencing.
+5. Self-review the design for coupling imbalances and recommend `architecture-plan` only when implementation sequencing is requested.
+
+Default user-facing routing:
+
+- Existing-code remediation: `architecture-review` → `architecture-design` → `architecture-plan` → implementation by a mutator/engineer → `architecture-review` re-check.
+- Greenfield or requirements-to-architecture work: `architecture-design` → `architecture-plan` when sequencing is requested.
+- Pure audit: `architecture-review` only.
+- Already-approved target design: `architecture-plan`.
 
 Hard boundaries:
 

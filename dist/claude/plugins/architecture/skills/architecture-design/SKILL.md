@@ -7,8 +7,7 @@ description: >-
   target architecture before implementation. Blends Balanced Coupling,
   architecture-fitness thinking, and evidence from existing code when present.
   NOT for auditing current implementation quality (use architecture-review) or
-  sequencing source-code remediation from report findings (use
-  architecture-plan).
+  sequencing an already-approved design (use architecture-plan).
 ---
 
 # Architecture design
@@ -24,19 +23,23 @@ also when an existing system needs target-state module docs, integration
 contracts, or module test specifications before implementation.
 
 If the user asks whether the existing implementation is healthy, start with
-`architecture-review` instead. If the user already has an architecture report
-with findings and wants execution steps, use `architecture-plan` instead.
+`architecture-review` instead. If the user has an architecture report with
+findings but no approved target design, continue here before planning. If the
+user already has an approved architecture design and wants execution steps, use
+`architecture-plan` instead.
 
 ## Skill navigation
 
 - Missing or untrusted picture of the existing implementation: run
   `architecture-review` first. Architecture docs may describe original intent;
   code, deploy files, and tests may have drifted.
-- Current skill: use `architecture-design` to turn requirements and validated
-  context into target architecture artifacts.
-- Next skill after design approval: use `architecture-plan` to sequence
-  implementation, or run `architecture-review` after implementation to verify
-  actual code matches the design.
+- Current skill: use `architecture-design` to turn requirements, validated
+  context, or review findings into target architecture artifacts.
+- Next skill after design approval: recommend exactly one primary next step:
+  `architecture-plan` when implementation sequencing is requested, or stop when
+  the user only asked for design.
+- Next skill after plan implementation: run `architecture-review` with comparable
+  scope to verify actual code matches the design.
 - If design questions expose unclear requirements, pause design and get the
   missing requirement clarified before continuing.
 
@@ -73,9 +76,10 @@ ownership, deployment, data ownership, or fitness checks.
 ## Procedure
 
 1. **Route correctly.** Decide whether this is greenfield design, target-state
-   redesign, or remediation planning. If the request is really an audit, switch
-   to `architecture-review`. If the request is really sequencing approved
-   findings, switch to `architecture-plan`.
+   redesign, or review-driven remediation design. If the request is really an
+   audit, switch to `architecture-review`. If the request is really sequencing
+   an already-approved design, switch to `architecture-plan`. Findings alone are
+   not an implementation plan; turn them into target design decisions first.
 
 2. **Read intent and reality before designing.** Read requirements, README,
    docs, ADRs, manifests, ownership files, deploy/config files, and any prior
@@ -138,13 +142,14 @@ ownership, deployment, data ownership, or fitness checks.
    ownership, untestable boundaries, and drift-prone intent. If critical or
    significant issues exist, revise the design before handing off.
 
-9. **Recommend the next skill.** End with one clear next step:
+9. **Recommend the next primary skill.** End with one clear next step:
    - `architecture-plan` when the design is approved and implementation needs
      sequencing;
-   - `architecture-review` when implementation already exists and must be
-     checked against the design;
-   - more requirements clarification when unresolved choices would change the
-     architecture.
+   - no next skill when the user only asked for design;
+   - requirements clarification when unresolved choices would change the
+     architecture;
+   - `architecture-review` only after implementation lands and must be checked
+     against the design.
 
 ## Output
 
@@ -180,4 +185,4 @@ Return or write design artifacts shaped like `../../templates/design.md` with:
   for drift when code exists.
 - No module boundary without owned knowledge and change-vector rationale.
 - No integration without strength, distance, volatility, and contract rationale.
-- No design completion without self-review and a next-skill recommendation.
+- No design completion without self-review and an explicit next-step decision.

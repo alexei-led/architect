@@ -39,20 +39,28 @@ the deliverable, not a specific agent that may not exist in every runtime:
 - You hand off: an approved plan with cited findings and verification steps.
 - You do not: open files for edit, run formatters/codemods, or commit code.
 
-## Artifact families
+## Artifact families and routing
 
-Architecture work produces artifact families in a fixed order for each flow:
+Architecture work produces artifact families in conditional flows, not one
+mandatory chain:
 
-1. Interview context — intended architecture and constraints from the user.
-2. System map — what exists, established before any quality judgment.
-3. Architecture design — optional target architecture from requirements or an
-   approved redesign brief.
-4. Architecture report — scored assessment with cited evidence.
-5. Architecture plan — optional implementation/refactoring sequence derived from
-   a report or approved design.
+- Existing-code remediation: `architecture-review` → `architecture-design` →
+  `architecture-plan` → implementation by a mutator/engineer →
+  `architecture-review` re-check.
+- Greenfield or requirements-to-architecture work: `architecture-design` →
+  `architecture-plan` when implementation sequencing is requested.
+- Pure audit or scoring: `architecture-review` only, unless the user asks for
+  remediation.
+- Approved target design already exists: `architecture-plan` can be the next
+  primary skill.
 
-The first two feed review frontmatter (`interview_context`, `system_map`). The
-report, design, and plan use the shipped templates verbatim as their skeleton.
+Recommend exactly one primary next skill unless the user asks for a full
+pipeline. Tool, methodology, and scorecard skills are supporting skills; do not
+present them as the main user-facing next step.
+
+Interview context and system map feed review frontmatter (`interview_context`,
+`system_map`). The report, design, and plan use the shipped templates verbatim as
+their skeleton.
 
 ## Evidence discipline
 
@@ -118,17 +126,21 @@ artifact should show progress and decisions, not harness plumbing.
 
 ## User-facing flows
 
-- **Architecture design** — requirements/brief → working model validation →
-  domain map → module map → contracts/tests/fitness checks → self-review. Use
-  the architecture-design skill.
 - **Architecture review** — interview (if context missing) → working model
   validation → system map → evidence gathering → scorecard → report. Use the
-  architecture-review skill.
+  architecture-review skill. Next primary skill is usually `architecture-design`
+  only when remediation needs a target state; otherwise stop.
+- **Architecture design** — requirements, review findings, or approved brief →
+  working model validation → domain map → module map → contracts/tests/fitness
+  checks → self-review. Use the architecture-design skill. Next primary skill is
+  `architecture-plan` when the design is approved and implementation sequencing
+  is requested.
+- **Make architecture plan** — derive an incremental plan from an approved design
+  and supporting report findings. Use the architecture-plan skill. Next primary
+  skill after implementation is `architecture-review` for comparable re-check.
 - **Compare reports** — run `architect-compare-reports` on two reports; surface
   score deltas, confidence deltas, and any non-comparability reason. Never
   invent a trend across non-comparable reports.
-- **Make architecture plan** — derive an incremental plan from a report's
-  findings or an approved design. Use the architecture-plan skill.
 
 ## Recommendations: incremental only
 

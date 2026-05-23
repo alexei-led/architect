@@ -26,8 +26,31 @@ def test_scorecard_parses():
 
 def test_plan_template_has_core_sections():
     body = (TEMPLATES / "plan.md").read_text()
-    for section in ("## Overview", "## Source artifact", "## Phases", "## Acceptance criteria"):
+    for section in (
+        "## Overview",
+        "## Source artifact",
+        "## Validation Commands",
+        "## Phases",
+        "## Acceptance criteria",
+    ):
         assert section in body
+
+
+def test_plan_template_uses_executable_task_sections():
+    body = (TEMPLATES / "plan.md").read_text()
+    assert "### Task 1:" in body
+    assert "### Phase" not in body
+    assert "ralphex" not in body.lower()
+
+    in_executable_task = False
+    for line in body.splitlines():
+        if line.startswith("### Task ") or line.startswith("### Iteration "):
+            in_executable_task = True
+        elif line.startswith("## "):
+            in_executable_task = False
+
+        if line.lstrip().startswith(("- [ ]", "- [x]")):
+            assert in_executable_task, f"checkbox outside executable task section: {line}"
 
 
 def test_design_template_has_core_sections():

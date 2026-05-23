@@ -39,7 +39,7 @@ or for executable enforcement (methodology-architecture-fitness).
   distance, volatility, severity, and balancing move.
 - Next skill: use `architecture-scorecard` when scoring a review,
   `architecture-design` when revising target boundaries, or `architecture-plan`
-  when sequencing an approved balancing move.
+  only when sequencing an approved balancing move.
 
 ## The three dimensions
 

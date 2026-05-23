@@ -106,8 +106,9 @@ Review the design before handoff.
 
 ## Handoff
 
-- Recommended next skill: `architecture-plan` / `architecture-review` / more
-  requirements clarification.
+- Recommended next step: `architecture-plan` when implementation sequencing is
+  requested / no next skill when design-only / requirements clarification when
+  unresolved choices remain / `architecture-review` after implementation lands.
 - Implementation notes: REPLACE.
 - Acceptance signals: REPLACE what proves the design has been implemented or
   remains aligned with code.

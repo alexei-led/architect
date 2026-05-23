@@ -86,3 +86,26 @@ def test_structured_questions_do_not_depend_on_agent_overlays():
     assert "per-target overlays" in text
     assert "only when that tool is actually exposed" in text
     assert "ask exactly one plain prose question" in text
+
+
+def test_architecture_plan_defaults_to_docs_plans_destination():
+    text = (SKILLS_DIR / "architecture-plan" / "SKILL.md").read_text()
+    assert "docs/plans/<kebab-case-target>.md" in text
+    assert "Create `docs/plans/` if it is missing" in text
+
+
+def test_architecture_next_skill_routing_is_conditional():
+    agent = AGENT_FILE.read_text()
+    review = (SKILLS_DIR / "architecture-review" / "SKILL.md").read_text()
+    design = (SKILLS_DIR / "architecture-design" / "SKILL.md").read_text()
+    plan = (SKILLS_DIR / "architecture-plan" / "SKILL.md").read_text()
+
+    assert "Recommend exactly one primary next skill" in agent
+    assert "Tool, methodology, and scorecard skills are supporting skills" in agent
+    assert "Existing-code remediation: `architecture-review` → `architecture-design`" in agent
+    assert "Greenfield or requirements-to-architecture work: `architecture-design`" in agent
+    assert "choose one next skill" in review
+    assert "no next skill when the user asked for audit/scoring only" in review
+    assert "`architecture-plan` when an approved design already exists" in review
+    assert "no next skill when the user only asked for design" in design
+    assert "Missing approved target architecture: recommend `architecture-design` before" in plan

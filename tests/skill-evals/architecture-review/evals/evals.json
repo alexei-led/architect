@@ -30,12 +30,13 @@
       "id": "refactor-request-boundary",
       "name": "refactor request boundary",
       "prompt": "A user asks the architect to review structural risk and then immediately refactor the code. Describe the response and handoff.",
-      "expected_output": "The response reviews and plans only: it produces findings and an incremental refactoring plan, refuses to edit production source itself, and hands implementation to a mutator or engineer after approval.",
+      "expected_output": "The response reviews first, refuses source edits, then recommends one primary next skill: architecture-design when target boundaries/contracts are not approved yet, or architecture-plan only when an approved design already exists and executable sequencing is requested.",
       "assertions": [
         "The output separates review, scoring, and recommendations from implementation.",
-        "The output uses architecture-plan for an incremental plan when changes are warranted.",
+        "The output recommends architecture-design before architecture-plan when target-state decisions are missing.",
+        "The output uses architecture-plan only when an approved design already exists and sequencing is requested.",
         "The output refuses source edits by the architect role.",
-        "The output includes verification steps and acceptance criteria for the mutator handoff."
+        "The output includes verification steps and acceptance criteria for the mutator handoff when a plan is the selected next step."
       ]
     }
   ]

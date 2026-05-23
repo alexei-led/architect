@@ -103,23 +103,32 @@ domain/volatility map, module map, integration contracts, key flows, module test
 specifications, architecture-fitness checks, trade-offs, self-review, risks, and
 handoff.
 
-Use design for requirements-to-architecture work. Use review when judging current
-implementation health. Use plan when sequencing implementation.
+Use review when judging current implementation health. Use design for
+requirements-to-architecture work, review-driven target-state decisions, or
+boundary/contract definitions. Use plan only when sequencing an approved design.
+For existing-code remediation, the normal pipeline is review → design → plan;
+for greenfield work it is design → plan; for pure audit it is review only.
 
 ## Plan format
 
-The architecture plan is plain Markdown for humans and coding agents. One
-hotspot, boundary, module, or flow per plan unless a roadmap is requested; keep
-the next execution horizon to five phases or fewer before re-review.
+The architecture plan is plain Markdown for humans and coding agents. Generated
+plan files default to `docs/plans/<kebab-case-target>.md` unless the user gives a
+different path. One hotspot, boundary, module, or flow per plan unless a roadmap
+is requested; keep the next execution horizon to five tasks or fewer before
+re-review.
 
 - **Overview** — the problem the plan addresses.
-- **Source artifact** — source report/design ID plus finding IDs, evidence refs,
-  design decisions, contract IDs, risks, or module names it derives from.
-- **Success criteria** — observable, checkbox outcomes, each tied to a finding,
-  score dimension, design decision, contract, module responsibility, or risk.
-- **Phases** — each with a justification (finding ID + evidence ref),
-  preconditions, postconditions, small independently-verifiable tasks, and a
-  verification check (test, fitness check, command).
+- **Source artifact** — approved design ID plus design decisions, contract IDs,
+  risks, or module names it derives from; include source report finding IDs and
+  evidence refs when the design came from a review.
+- **Success criteria** — observable outcomes, each tied to a finding, score
+  dimension, design decision, contract, module responsibility, or risk.
+- **Validation Commands** — project-wide and focused commands the executor can
+  run after task completion.
+- **Phases** — executable work uses `### Task N:` headings. Each task carries a
+  justification (finding ID + evidence ref), preconditions, postconditions,
+  small independently-verifiable checkbox items, and a verification check (test,
+  fitness check, command). Checkboxes belong only inside task sections.
 - **Acceptance criteria** — conditions for accepting the whole plan; prefer
   characterization tests, seam creation, boundary repair, and fitness checks
   before cosmetic cleanup.
