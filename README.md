@@ -107,7 +107,8 @@ Hard boundaries:
 
 `architect-doctor` checks whether useful local analysis tools are available and records gaps as coverage limits, not fatal errors. The skills guide the agent across these tool families:
 
-- Discovery and change: `fd`, `rg`, `git`, GitNexus.
+- Discovery and targeted reading: `tools-code-search` with `fd`, `rg`, `git grep`, and file reads.
+- Change history: GitNexus and `git log` fallbacks.
 - Structural search: `ast-grep`, language linters.
 - Semantic analysis: codegraph, LSP/tree-sitter, type checkers, static analyzers.
 - Dependency graphs: dependency-cruiser, madge, knip, import-linter, pydeps, deptry, goda.

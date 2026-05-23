@@ -12,6 +12,7 @@ skills:
   - methodology-architecture-fitness
   - methodology-balanced-coupling
   - tools-ast-grep
+  - tools-code-search
   - tools-codegraph
   - tools-gitnexus
   - tools-go

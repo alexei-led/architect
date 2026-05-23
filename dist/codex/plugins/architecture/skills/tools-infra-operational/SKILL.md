@@ -1,27 +1,29 @@
 ---
 name: tools-infra-operational
 description: >-
-  Validate and analyze operational config for review evidence — Helm, Kustomize,
-  Kubernetes, Terraform/OpenTofu, Docker, GitHub Actions, policy tools, SBOM,
-  and vulnerability scanners. Use when a target ships deploy units and you need
-  evidence about runtime topology, deploy-time coupling, or supply chain. NOT
-  for application source graphs (use the language tool skills).
+  Gather deployment and runtime-architecture evidence from operational config:
+  Helm, Kustomize, Kubernetes, Terraform/OpenTofu, Docker, GitHub Actions,
+  policy tools, SBOM, and vulnerability scanners. Use when a target ships deploy
+  units and you need runtime topology, deploy-time coupling, config drift,
+  CI/CD, or supply-chain evidence for architecture review. NOT for application
+  source graphs (use tools-codegraph or the language tool skills).
 ---
 
 # Infrastructure / operational tools
 
 A system's architecture includes how it deploys and runs. These tools turn
 manifests into evidence about deploy units, runtime topology, deploy-time
-coupling, and supply-chain risk — the **operational** and **security**
-dimensions a source-only review would miss.
+coupling, and supply-chain risk — the operational and security dimensions a
+source-only review would miss.
 
-Evidence dimensions: **operational**, **security/supply-chain**.
+Evidence dimensions: operational and security/supply-chain.
 
 ## When to use
 
 Use when the system map finds Helm charts, Kustomize bases, raw k8s manifests,
-Terraform/OpenTofu, Dockerfiles, or CI workflows. Render and validate before
-judging — a chart's values determine the real topology, not the template text.
+Terraform/OpenTofu, Dockerfiles, CI workflows, policy files, or SBOM/vulnerability
+scan inputs. Render and validate before judging — a chart's values determine the
+real topology, not the template text.
 
 ## Commands
 
@@ -59,6 +61,15 @@ syft dir:. -o spdx-json
 grype dir:.                 # or: trivy fs .
 ```
 
+## Evidence output
+
+Record:
+
+- `dimension`: operational or security/supply-chain.
+- `source`: command, deploy unit, values/overlay/backend context, and scanner DB date when relevant.
+- `facts`: rendered topology, validation findings, policy violations, vuln/SBOM summary, or clean scope.
+- `limits`: unrendered templates, missing values, offline/stale scanner DB, or no cluster-runtime evidence.
+
 ## Confidence impact
 
 - Rendered-then-validated manifests are direct operational evidence:
@@ -66,7 +77,7 @@ grype dir:.                 # or: trivy fs .
   and config drift. Judging from un-rendered templates is weaker — note it.
 - `trivy`/`grype`/`govulncheck`-class output is security/supply-chain evidence;
   cite the component and severity, summarize counts, never paste the full table.
-- An **existing** CI step running kubeconform / conftest / tfsec is an enforced
+- An existing CI step running kubeconform / conftest / tfsec is an enforced
   operational fitness check — count it toward `architecture_fitness`.
 
 ## Failure and missing-tool handling
@@ -84,7 +95,7 @@ grype dir:.                 # or: trivy fs .
 
 Render + validate once per deploy unit, then run one supply-chain scan. Stop and
 record coverage once topology and the vuln summary are established — don't run
-trivy _and_ grype _and_ a manual audit for the same answer. Cluster-runtime
+trivy and grype and a manual audit for the same answer. Cluster-runtime
 questions you can't answer from manifests (actual running state) are a coverage
 gap, not something to infer.
 

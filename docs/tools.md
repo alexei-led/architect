@@ -12,6 +12,10 @@ mirrors it.
 
 ## Tools by evidence dimension
 
+The `tools-code-search` skill covers the always-applicable discovery pass with
+`fd`, `rg`, `git grep`, `git ls-files`, targeted file reads, and `git log`
+fallbacks. Use it before heavier AST, graph, language, or history tools.
+
 Tools without an applicability column are always applicable; the rest apply only
 when the matching ecosystem marker is present in the repo.
 
@@ -76,7 +80,9 @@ a shaky high score as settled. See [scoring.md](scoring.md).
 
 ## Stop rule
 
-Coverage is breadth across dimensions, not depth in one tool. When a dimension is
-already covered, stop and record any remaining gap instead of running another
-redundant or expensive scan. Tool output is summarized into evidence refs, never
-pasted wholesale into the report.
+Coverage is breadth across dimensions, not depth in one tool. Start with
+`tools-code-search` to find the paths and concepts, then switch to the narrowest
+specialized tool that can prove the claim. When a dimension is already covered,
+stop and record any remaining gap instead of running another redundant or
+expensive scan. Tool output is summarized into evidence refs, never pasted
+wholesale into the report.

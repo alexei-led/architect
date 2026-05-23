@@ -1,12 +1,13 @@
 ---
 name: tools-codegraph
 description: >-
-  Use codegraph to build and query a persistent code graph — definitions,
-  references, call edges, and what a change affects. Use when gathering
-  dependency and semantic evidence at whole-repo scale: cycles, hubs, fan-in/out,
-  and blast radius. Index staleness is a coverage gap, not evidence. NOT for
-  single-pattern searches (use tools-ast-grep) or git-history change locality
-  (use tools-gitnexus).
+  Gather whole-repo dependency and semantic graph evidence with codegraph:
+  definitions, references, call edges, cycles, hubs, fan-in/out, and blast
+  radius. Use when assessing module boundaries, dependency direction, coupling,
+  impact of change, or fragile graph shape at architecture-review scale. Index
+  staleness is a coverage gap, not evidence. NOT for exact text discovery (use
+  tools-code-search), single-pattern searches (use tools-ast-grep), or
+  git-history change locality (use tools-gitnexus).
 ---
 
 # codegraph
@@ -20,9 +21,10 @@ Evidence dimensions: **dependency** and **semantic**.
 
 ## When to use
 
-Use to map observed module structure against declared modules, to find import
-cycles and high-fan-in hubs, and to size the blast radius of a proposed change.
-Build the graph during the system-map step; query it during evidence gathering.
+Use to map observed module structure against declared modules, to find import or
+call cycles, high-fan-in hubs, wrong-way dependencies, and to size the blast
+radius of a proposed change. Build the graph during the system-map step; query
+it during evidence gathering.
 
 ## Commands
 
@@ -47,8 +49,17 @@ not match the working tree, the graph describes an old repo:
 
 - Run `codegraph sync` (incremental) or `codegraph index` (full) to refresh.
 - If you cannot refresh (read-only target, time budget), the stale graph is
-  **not evidence** — record the dependency dimension `tools_failed` with reason
+  not evidence — record the dependency dimension `tools_failed` with reason
   "stale index," and do not score dependency health from it.
+
+## Evidence output
+
+Record:
+
+- `dimension`: dependency or semantic.
+- `source`: `codegraph status` freshness, query/context/affected command, and scope.
+- `facts`: cycles, hubs, fan-in/out, callers/callees, affected paths, or confirmed absence.
+- `limits`: stale index, partial language coverage, unsupported files, or failed indexing.
 
 ## Confidence impact
 
@@ -73,9 +84,8 @@ not match the working tree, the graph describes an old repo:
 
 The graph answers cycles, hubs, and blast radius once. After you've recorded
 those for the applicable modules, stop querying — don't fish the graph for
-incidental edges that don't bear on a score. If a question is about _change over
-time_ (who keeps touching this together), that is tools-gitnexus territory, not
-another codegraph query.
+incidental edges that don't bear on a score. If a question is about change over time (who keeps touching this together), that
+is tools-gitnexus territory, not another codegraph query.
 
 ## Hard rules
 

@@ -1,12 +1,15 @@
 ---
 name: architecture-review
 description: >-
-  Run an evidence-based architecture review. Use when asked to review, audit, or
-  assess a codebase's architecture, find structural risk, or check how a system's
-  structure matches its intent. Interviews for missing context, builds a system
-  map, gathers tool evidence, scores against the scorecard rubric, and writes a
-  cited report. NOT for applying refactors (hand off a plan) or line-level code
-  review.
+  Run a repeatable, evidence-based architecture review of an existing codebase.
+  Use when asked to assess modularity, coupling, cohesion, dependency direction,
+  circular dependencies, blast radius, fragile seams, shallow modules,
+  testability, ownership boundaries, architectural drift, structural risk, or fit
+  between intended and observed architecture. Drives local search/read/grep,
+  code graph, GitNexus/change-history, AST/LSP, language, and operational tool
+  evidence; scores with the scorecard and writes cited findings. NOT for
+  line-level code review or applying refactors (use architecture-plan for the
+  handoff).
 ---
 
 # Architecture review
@@ -15,11 +18,13 @@ The review loop, in order. Do not skip ahead — each step gates the next.
 
 ## When to use
 
-Use when a user wants their architecture reviewed, audited, or scored, or wants
-to understand where structural risk lives. For comparing two existing reports
-use `architect-compare-reports`. For a combined "review and refactor" request,
-finish the read-only review first, then use `architecture-plan` to draft the
-handoff plan; a mutator or engineer applies changes after approval.
+Use when a user wants their architecture reviewed, audited, or scored; wants to
+understand where modularity, coupling, dependency, blast-radius, or fragility
+risk lives; or wants to compare intended and observed architecture. For comparing
+two existing reports use `architect-compare-reports`. For a combined "review and
+refactor" request, finish the read-only review first, then use
+`architecture-plan` to draft the handoff plan; a mutator or engineer applies
+changes after approval.
 
 ## Procedure
 
@@ -40,12 +45,13 @@ handoff plan; a mutator or engineer applies changes after approval.
    frontmatter. Scoring before a map is forbidden. Scoring from directory shape
    alone is explicitly forbidden — a directory tree is not an architecture.
 
-3. **Gather evidence across applicable dimensions.** Use the relevant tool
-   skills (ast-grep, codegraph, GitNexus, LSP/tree-sitter, language and
-   operational tool skills) to cover discovery, structural, semantic, dependency,
-   change, and operational evidence. Cite tools and files you used. Record
-   coverage — used, skipped, missing, failed — per dimension, even where you find
-   nothing wrong. Summarize output; do not paste raw dumps.
+3. **Gather evidence across applicable dimensions.** Use `tools-code-search` for
+   local search/read/grep, then the relevant specialized tool skills (ast-grep,
+   codegraph, GitNexus, LSP/tree-sitter, language and operational tool skills)
+   to cover discovery, structural, semantic, dependency, change, and operational
+   evidence. Cite tools and files you used. Record coverage — used, skipped,
+   missing, failed — per dimension, even where you find nothing wrong. Summarize
+   output; do not paste raw dumps.
    - **Check persistent indexes for staleness first.** Before trusting codegraph
      or GitNexus, confirm the index matches the current commit (e.g.
      `gitnexus status`). A stale index is a coverage gap, not evidence — record
@@ -80,6 +86,13 @@ handoff plan; a mutator or engineer applies changes after approval.
    warranted changes. The handoff must include finding/evidence IDs, scoped
    modules/files, incremental steps, verification checks, acceptance criteria,
    risk/rollback notes, and an explicit mutator/engineer implementation step.
+
+## Output
+
+A completed review produces an architecture report using `src/templates/report.md`.
+The report must include `interview_context`, `system_map`, `scores`, `findings`,
+`evidence`, and `tool_coverage`. If refactoring is requested, the only follow-up
+artifact is an `architecture-plan` handoff tied to finding/evidence IDs.
 
 ## Required response clauses
 

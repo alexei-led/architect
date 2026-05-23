@@ -1,11 +1,13 @@
 ---
 name: tools-report-markdown
 description: >-
-  Produce and validate the review report's rendering — Markdown, Mermaid
-  diagrams, jq/yq for frontmatter, Graphviz/D2 for graphs, plus link, spelling,
-  and format checks. Use when writing or checking the report and plan artifacts.
-  This is report-quality evidence, not architecture evidence. NOT for gathering
-  findings (use the language and graph tool skills).
+  Produce and validate architecture-review report and plan artifacts: Markdown,
+  YAML frontmatter, Mermaid diagrams, jq/yq checks, Graphviz/D2 graphs, links,
+  spelling, and format. Use when writing or checking cited reports, system-map
+  diagrams, score summaries, or refactoring plans. This is report-quality
+  evidence, not architecture evidence. NOT for gathering findings (use
+  tools-code-search, tools-codegraph, tools-ast-grep, tools-lsp-tree-sitter,
+  language, and operational tool skills).
 ---
 
 # Report and Markdown tools
@@ -18,10 +20,10 @@ Evidence dimension: **report** (quality of the artifact, not the architecture).
 
 ## When to use
 
-Use during the write-the-report step and before declaring a report done. Use to
-validate YAML frontmatter parses, render the system map as a diagram, and check
-links/spelling. Diagrams are evidence summaries — a Mermaid module graph beats a
-pasted edge list.
+Use during the write-the-report step and before declaring a report or plan done.
+Use to validate YAML frontmatter parses, render the system map as a diagram, and
+check links/spelling. Diagrams are evidence summaries — a Mermaid module graph
+beats a pasted edge list.
 
 ## Commands
 
@@ -52,9 +54,18 @@ The authoritative frontmatter/section validation is the
 `validate-report` helper (Task 7) — these CLIs are for quick local checks and
 diagram rendering, not a replacement for it.
 
+## Evidence output
+
+Record:
+
+- `dimension`: report.
+- `source`: validation/render/link/spell command and artifact path.
+- `facts`: parsed frontmatter, rendered diagrams, valid links, or reported failures.
+- `limits`: skipped cosmetic checks, missing renderer, or dropped diagrams.
+
 ## Confidence impact
 
-This dimension does **not** affect architecture scores. A beautiful report with
+This dimension does not affect architecture scores. A beautiful report with
 thin evidence is still low confidence; a plain report with strong evidence is
 high. Report tooling guards readability and machine-parseability only — never
 let diagram polish stand in for evidence coverage.

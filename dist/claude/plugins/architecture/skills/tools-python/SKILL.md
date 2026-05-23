@@ -1,11 +1,13 @@
 ---
 name: tools-python
 description: >-
-  Run Python dependency and quality tools for review evidence — import-linter,
-  pydeps, pyright/basedpyright, ruff, deptry, pipdeptree, uv tree, radon/lizard,
-  and vulture. Use when the target is a Python repo and you need import
-  contracts, module graphs, type state, complexity, dead code, or dependency
-  health. NOT for TS/JS (use tools-typescript) or Go (use tools-go).
+  Gather Python architecture evidence with import-linter, pydeps,
+  pyright/basedpyright, ruff, deptry, pipdeptree, uv tree, radon/lizard, and
+  vulture. Use when a Python repo needs import contracts, module graphs,
+  layer-boundary checks, type state, complexity hotspots, dead code, or
+  dependency health for modularity and coupling review. NOT for TS/JS (use
+  tools-typescript), Go (use tools-go), exact text discovery (use
+  tools-code-search), or generic structural patterns (use tools-ast-grep).
 ---
 
 # Python tools
@@ -21,7 +23,9 @@ checkers), **change** proxy (complexity hotspots).
 Use when the system map shows `pyproject.toml` / `setup.py` / `requirements`.
 Pick to the question: layering contracts (import-linter), module graph (pydeps),
 types (pyright/basedpyright), lint (ruff), dependency hygiene (deptry,
-pipdeptree, uv tree), complexity/size (radon, lizard), dead code (vulture).
+pipdeptree, uv tree), complexity/size (radon, lizard), dead code (vulture). Use
+the results to judge module boundaries, dependency direction, cohesion, and
+architecture fitness.
 
 ## Commands
 
@@ -54,13 +58,22 @@ uvx radon cc -s src      # or: uvx lizard src
 uvx vulture src
 ```
 
+## Evidence output
+
+Record:
+
+- `dimension`: dependency, structural, semantic, or complexity hotspot.
+- `source`: Python command, package path, environment/tool runner, and cache location.
+- `facts`: import contracts, module edges, cycles, type/lint findings, dead-code hypotheses, or clean scope.
+- `limits`: missing deps, dynamic imports, optional deps, cache failures, or partial package coverage.
+
 ## Confidence impact
 
 - import-linter contracts and pydeps cycles are direct dependency/boundary
   evidence: `tools_used`, raises `dependency_graph_health` and
   `boundary_integrity` confidence.
-- An **existing** import-linter contract run in CI is an enforced fitness check
-  — count it toward `architecture_fitness`. A contract you'd recommend is not.
+- An existing import-linter contract run in CI is an enforced fitness check —
+  count it toward `architecture_fitness`. A contract you'd recommend is not.
 - radon/lizard complexity flags cohesion/size hotspots (god modules); pair with
   the dependency graph before scoring `cohesion_modularity`.
 - vulture and deptry have false positives (dynamic imports, optional deps) —
@@ -80,7 +93,7 @@ uvx vulture src
 
 One graph/contract tool plus one type/lint pass answers the structural and
 semantic questions for a package. Stop once cycles, contracts, types, and obvious
-hotspots are recorded — don't run radon _and_ lizard _and_ vulture for the same
+hotspots are recorded — don't run radon and lizard and vulture for the same
 answer. Dynamic-dispatch reachability that static tools can't resolve is a
 coverage gap: record it rather than guessing.
 

@@ -1,11 +1,13 @@
 ---
 name: tools-go
 description: >-
-  Run Go dependency and quality tools for review evidence — go list, go mod
-  graph, goda, gopls, staticcheck, govulncheck, and go-callvis. Use when the
-  target is a Go module and you need package graphs, import cycles, dead code,
-  vulnerabilities, or call graphs. NOT for TS/JS (use tools-typescript), Python
-  (use tools-python), or generic structural search (use tools-ast-grep).
+  Gather Go architecture evidence with go list, go mod graph, goda, gopls,
+  staticcheck, govulncheck, and go-callvis. Use when a Go module needs package
+  graphs, import cycles, dependency direction, package-boundary checks,
+  call/reference facts, dead code, vulnerabilities, or call graphs for
+  modularity and coupling review. NOT for TS/JS (use tools-typescript), Python
+  (use tools-python), exact text discovery (use tools-code-search), or generic
+  structural patterns (use tools-ast-grep).
 ---
 
 # Go tools
@@ -21,7 +23,8 @@ staticcheck), **security** (govulncheck).
 Use when the system map shows `go.mod`. Pick to the question: package
 import/dependency facts (go list, go mod graph), boundary/graph analysis (goda),
 semantic refs (gopls), bug/dead-code analysis (staticcheck), known
-vulnerabilities (govulncheck), call graph (go-callvis).
+vulnerabilities (govulncheck), call graph (go-callvis). Use the results to judge
+package modularity, dependency direction, coupling, and architecture fitness.
 
 ## Commands
 
@@ -50,15 +53,24 @@ govulncheck ./...
 go-callvis -format dot ./...
 ```
 
+## Evidence output
+
+Record:
+
+- `dimension`: dependency, structural, semantic, or security.
+- `source`: Go command, package pattern, build tags/GOOS, and module root.
+- `facts`: package edges, cycles, diagnostics, call paths, vulnerabilities, or confirmed clean scope.
+- `limits`: non-building packages, missing tools, build tags, generated code, or uncovered GOOS targets.
+
 ## Confidence impact
 
 - `go list` / `go mod graph` / goda output is direct dependency evidence:
   `tools_used`, raises `dependency_graph_health` and `boundary_integrity`
   confidence. Cycles from `goda cycle` are concrete findings.
-- `govulncheck` is the security/supply-chain dimension; it reports _reachable_
+- `govulncheck` is the security/supply-chain dimension; it reports reachable
   vulnerabilities, which is stronger than a raw advisory match — cite the call
   path.
-- An **existing** goda/staticcheck rule gating CI is an enforced fitness check —
+- An existing goda/staticcheck rule gating CI is an enforced fitness check —
   count it toward `architecture_fitness`; one you'd recommend is not.
 - staticcheck's `U1000` (unused) is reliable for unexported symbols; reflection
   and build tags can hide reachability — confirm before scoring.

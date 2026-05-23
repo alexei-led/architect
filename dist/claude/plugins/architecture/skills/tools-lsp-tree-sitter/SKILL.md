@@ -1,32 +1,33 @@
 ---
 name: tools-lsp-tree-sitter
 description: >-
-  Use a language server (LSP) for semantic facts — definitions, references,
-  implementations, diagnostics, symbols — and tree-sitter for syntax-level
-  queries when no server is available. Use when a finding needs real
-  resolution (who actually calls this) rather than text matching. NOT for
-  repo-scale dependency graphs (use tools-codegraph) or git history (use
-  tools-gitnexus).
+  Gather resolved semantic evidence with LSP and syntax fallback with
+  tree-sitter. Use when architecture findings need actual definitions,
+  references, callers, implementations, diagnostics, or symbols rather than text
+  matches — especially for coupling and boundary claims. Use tree-sitter when no
+  language server is available or the question is purely syntactic. NOT for
+  exact text discovery (use tools-code-search), repo-scale dependency graphs
+  (use tools-codegraph), or git history (use tools-gitnexus).
 ---
 
 # LSP and tree-sitter
 
-A **language server** resolves symbols the way the compiler does: it knows the
-real definition, every reference, the implementations of an interface, and the
-diagnostics the toolchain reports. **tree-sitter** parses syntax without
-resolution — fast, language-agnostic, but it cannot tell you what a name
-_resolves to_. Reach for LSP when you need semantic truth; fall back to
-tree-sitter when no server is configured.
+A language server resolves symbols the way the compiler does: it knows the real
+definition, every reference, the implementations of an interface, and the
+diagnostics the toolchain reports. tree-sitter parses syntax without resolution
+— fast, language-agnostic, but it cannot tell you what a name resolves to. Reach
+for LSP when you need semantic truth; fall back to tree-sitter when no server is
+configured.
 
 Evidence dimensions: **semantic** (LSP) and **structural** (tree-sitter).
 
 ## When to use
 
 Use LSP to confirm a real call/reference relationship before claiming coupling,
-to find every implementation of a boundary interface, and to surface compiler
-diagnostics. Use tree-sitter syntax queries when LSP is unavailable or when the
-question is purely syntactic (find all functions, all type declarations) and a
-server would be overkill.
+to find every implementation of a boundary interface, to verify callers/callees
+at a seam, and to surface compiler diagnostics. Use tree-sitter syntax queries
+when LSP is unavailable or when the question is purely syntactic (find all
+functions, all type declarations) and a server would be overkill.
 
 ## Commands
 
@@ -52,6 +53,15 @@ tree-sitter parse src/foo.py            # inspect the tree to write a query
 ```
 
 A `.scm` query file holds the capture patterns; run it across the target files.
+
+## Evidence output
+
+Record:
+
+- `dimension`: semantic for LSP, structural for tree-sitter.
+- `source`: operation, file:line:col or query file, and project/build context.
+- `facts`: definitions, references, implementations, diagnostics, symbols, or syntax matches.
+- `limits`: missing server, non-building project, partial workspace, or syntax-only fallback.
 
 ## Confidence impact
 

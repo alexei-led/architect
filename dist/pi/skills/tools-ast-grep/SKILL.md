@@ -1,12 +1,13 @@
 ---
 name: tools-ast-grep
 description: >-
-  Use ast-grep to find structural code patterns by syntax tree, not regex.
-  Use when gathering structural evidence for a review — locating imports,
-  exports, direct DB access, route declarations, or framework leaks across a
-  module boundary. Yields exact file:line evidence refs. NOT for whole-graph
-  dependency analysis (use tools-codegraph) or type-level facts (use
-  tools-lsp-tree-sitter).
+  Gather structural-pattern architecture evidence with ast-grep syntax-tree
+  queries. Use when checking module boundaries, layer violations, forbidden
+  imports, direct DB/framework access, route declarations, exported surface area,
+  or framework leaks across seams. Yields exact file:line evidence for
+  modularity, coupling, and fragility claims. NOT for whole-graph dependency
+  analysis (use tools-codegraph), exact text discovery (use tools-code-search),
+  or semantic/type resolution (use tools-lsp-tree-sitter).
 ---
 
 # ast-grep
@@ -19,11 +20,12 @@ Evidence dimension: **structural**. Output is a concrete evidence ref per match.
 
 ## When to use
 
-Use when a finding hypothesis is a pattern: "domain code imports the ORM
-directly," "routes are declared outside the router module," "this framework type
-leaks past the boundary." ast-grep confirms presence/absence with line-anchored
-hits. Use it before claiming a boundary is bypassed — a claim about a pattern
-needs the matched lines.
+Use when a finding hypothesis is a structural code pattern: "domain code imports
+the ORM directly," "routes are declared outside the router module," "this
+framework type leaks past the boundary," or "a module exports too much surface."
+ast-grep confirms presence/absence with line-anchored hits. Use it before
+claiming a boundary is bypassed — a claim about a pattern needs the matched
+lines.
 
 ## Commands
 
@@ -54,9 +56,18 @@ For reusable, named rules (relational metavariable constraints, `inside`,
 `not`), put them in a YAML rule file and run `ast-grep scan -r rule.yml`. See
 `references/rules.md` for the rule patterns this review relies on.
 
+## Evidence output
+
+Record:
+
+- `dimension`: structural.
+- `source`: ast-grep command, language, pattern/rule file, and searched scope.
+- `facts`: matched file:line refs or confirmed zero-match scope.
+- `limits`: parse errors, unsupported language, regex fallback, or lack of semantic reachability.
+
 ## Confidence impact
 
-- A pattern **search that runs** and returns hits or a clean zero is direct
+- A pattern search that runs and returns hits or a clean zero is direct
   structural evidence: `tools_used` for the structural dimension, raises
   confidence for the related finding.
 - ast-grep proves syntactic presence, not runtime reachability. A matched

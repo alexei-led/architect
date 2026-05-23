@@ -9,6 +9,19 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Architecture-review routing
+
+- Added `tools-code-search` for local `fd`/`rg`/`git grep` discovery and targeted read evidence.
+- Tightened architecture-review and tool skill descriptions around modularity, coupling, dependency direction, blast radius, and fragility.
+- Added evidence-output contracts to tool skills for repeatable architecture-report evidence collection.
+
+### Runtime packaging
+
+- Included `tools-code-search` in Claude, Codex, and Pi runtime plugin artifacts.
+- Clarified tool coverage docs for discovery, generated/vendor scope, and specialized-tool handoff.
+- Fixed brittle shell quoting in the code-search import/dependency search example.
+- Removed obsolete `.gitkeep` files from populated template directories.
+
 ## [0.1.0] - 2026-05-23
 
 ### Added

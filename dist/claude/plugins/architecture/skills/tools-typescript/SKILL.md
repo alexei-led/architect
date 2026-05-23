@@ -1,11 +1,13 @@
 ---
 name: tools-typescript
 description: >-
-  Run TypeScript/JavaScript dependency and quality tools for review evidence —
-  dependency-cruiser, madge, knip, tsc, ESLint, and the package manager. Use
-  when the target is a TS/JS repo and you need module graphs, cycles, dead code,
-  type errors, or boundary-rule violations. NOT for Python (use tools-python),
-  Go (use tools-go), or generic structural search (use tools-ast-grep).
+  Gather TypeScript/JavaScript architecture evidence with dependency-cruiser,
+  madge, knip, tsc, ESLint, and the package manager. Use when a TS/JS repo needs
+  module graphs, workspace/package boundaries, import cycles, dependency
+  direction, dead code, type errors, or boundary-rule violations for modularity
+  and coupling review. NOT for Python (use tools-python), Go (use tools-go),
+  exact text discovery (use tools-code-search), or generic structural patterns
+  (use tools-ast-grep).
 ---
 
 # TypeScript / JavaScript tools
@@ -19,8 +21,10 @@ Evidence dimensions: **dependency**, **structural**, **semantic** (tsc).
 ## When to use
 
 Use when the system map shows a `package.json` / `tsconfig.json`. Pick the tool
-to the question: graph and cycles (dependency-cruiser, madge), dead/unused
-exports and deps (knip), type correctness (tsc), boundary lint rules (ESLint).
+to the question: graph and cycles (dependency-cruiser, madge), workspace/package
+boundaries, dead/unused exports and deps (knip), type correctness (tsc), boundary
+lint rules (ESLint). Use the results to judge module boundaries, dependency
+direction, coupling, and architecture fitness.
 
 ## Commands
 
@@ -47,15 +51,24 @@ npx eslint . --max-warnings 0
 ls package-lock.json yarn.lock pnpm-lock.yaml 2>/dev/null
 ```
 
+## Evidence output
+
+Record:
+
+- `dimension`: dependency, structural, or semantic.
+- `source`: command, package/workspace scope, config file, and package manager.
+- `facts`: module edges, cycles, boundary violations, unused surface, type/lint findings, or clean scope.
+- `limits`: missing install, partial monorepo coverage, generated code, or config gaps.
+
 ## Confidence impact
 
 - `depcruise`/`madge` cycle and boundary output is direct dependency evidence:
   `tools_used`, raises confidence for `dependency_graph_health` and
   `boundary_integrity`.
-- An **existing** `.dependency-cruiser.cjs` with `forbidden` rules, or ESLint
-  boundary rules wired into CI, is evidence of an _enforced_ fitness check —
-  count it toward `architecture_fitness` (see methodology-architecture-fitness).
-  A rule you'd recommend adding is not.
+- An existing `.dependency-cruiser.cjs` with `forbidden` rules, or ESLint
+  boundary rules wired into CI, is evidence of an enforced fitness check — count
+  it toward `architecture_fitness` (see methodology-architecture-fitness). A rule
+  you'd recommend adding is not.
 - `tsc --noEmit` clean is semantic evidence the types hold; errors are concrete
   findings.
 
@@ -72,8 +85,8 @@ ls package-lock.json yarn.lock pnpm-lock.yaml 2>/dev/null
 ## When to stop
 
 One cycle tool plus one boundary/unused tool answers the dependency question for
-a package. Don't run depcruise _and_ madge _and_ knip hunting for more if the
-graph is already clear. Stop and record coverage once cycles, boundaries, and
+a package. Don't run depcruise and madge and knip hunting for more if the graph
+is already clear. Stop and record coverage once cycles, boundaries, and
 dead surface are established; deeper call-level questions go to
 tools-lsp-tree-sitter or tools-codegraph.
 
