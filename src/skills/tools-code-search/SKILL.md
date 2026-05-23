@@ -39,7 +39,7 @@ runtime's file-read tool for targeted reads after search narrows the scope.
 
 ```sh
 # High-signal structure and intent files
-fd '(^README|CONTEXT|ARCHITECTURE|adr|decisions|ownership|CODEOWNERS|package.json|pyproject.toml|go.mod|Chart.yaml|kustomization.yaml|Dockerfile|\.github)' .
+fd -H '(^README|CONTEXT|ARCHITECTURE|adr|decisions|ownership|CODEOWNERS|package.json|pyproject.toml|go.mod|Chart.yaml|kustomization.yaml|Dockerfile|\.github)' .
 
 # Files by language / package marker
 fd 'package.json|tsconfig.json|pyproject.toml|requirements.txt|go.mod|main.tf|Chart.yaml|kustomization.yaml'
@@ -58,7 +58,8 @@ git log --name-only --pretty=format: -- <path> | sort | uniq -c | sort -nr | hea
 ```
 
 Prefer `git grep -n <pattern>` when the review should ignore untracked/generated
-files and only search the versioned source.
+files and only search the versioned source. If the target is not a git repo,
+record that limit and use scoped `fd` / `rg` instead.
 
 ## Evidence output
 
