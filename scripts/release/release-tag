@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create a release tag with version bump and changelog promotion.
+# Create a release tag with version bump and generated runtime artifacts.
 #
 # Usage: scripts/release/release-tag v0.2.0
 set -euo pipefail
@@ -45,16 +45,15 @@ files = [
 
 for path in files:
     text = path.read_text(encoding="utf-8")
-    if path.suffix == ".toml" or path.name == "uv.lock":
-        if path.name == "pyproject.toml":
-            text = re.sub(r'(?m)^version = "[^"]+"', f'version = "{version}"', text, count=1)
-        else:
-            text = re.sub(
-                r'(?m)^(name = "architect"\nversion = ")[^"]+("\n)',
-                rf"\g<1>{version}\2",
-                text,
-                count=1,
-            )
+    if path.name == "pyproject.toml":
+        text = re.sub(r'(?m)^version = "[^"]+"', f'version = "{version}"', text, count=1)
+    elif path.name == "uv.lock":
+        text = re.sub(
+            r'(?m)^(name = "architect"\nversion = ")[^"]+("\n)',
+            rf"\g<1>{version}\2",
+            text,
+            count=1,
+        )
     else:
         text = re.sub(r"(?m)^version: .+", f"version: {version}", text, count=1)
     path.write_text(text, encoding="utf-8")
@@ -80,9 +79,23 @@ if f"## [{version}]" not in text:
 PY
 
 uv lock
-make check secrets-history
+make build
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+command -v gitleaks >/dev/null 2>&1 || { echo "gitleaks not installed"; exit 1; }
+gitleaks git --redact --no-banner
 
-git add pyproject.toml uv.lock src/plugins/architecture/plugin.yaml CHANGELOG.md
+git add \
+	pyproject.toml \
+	uv.lock \
+	src/plugins/architecture/plugin.yaml \
+	CHANGELOG.md \
+	package.json \
+	.claude-plugin/ \
+	.agents/ \
+	dist/
+
 if ! git diff --cached --quiet; then
 	git commit -m "chore: bump version to $VERSION"
 fi

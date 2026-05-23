@@ -40,6 +40,8 @@ enabled = true
 
 Restart Codex after changing plugin configuration.
 
+The Codex custom agent is generated at `dist/codex/agents/architect.toml`; copy or symlink it into `~/.codex/agents/` or `.codex/agents/` when you want subagent spawning.
+
 ### Pi
 
 ```sh
@@ -53,6 +55,8 @@ pi install -l git:github.com/alexei-led/architect
 ```
 
 Restart Pi or run `/reload` after installing.
+
+Pi package install loads skills. If you use a Pi subagent loader, symlink `dist/pi/agents` from the installed checkout into that loader's agent directory.
 
 ### Helper CLIs
 

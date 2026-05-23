@@ -18,9 +18,10 @@ __pycache__/
 *secret*
 *token*
 
-# Build artifacts
-build/
-dist/
+# Python build artifacts
+/build/
+dist/*.whl
+dist/*.tar.gz
 *.egg-info/
 
 # Tool caches

@@ -14,4 +14,7 @@ if [[ $have_input -eq 1 && $all_deletes -eq 1 ]]; then
 fi
 
 echo "=== pre-push ==="
-make pre-push
+make check
+
+command -v gitleaks >/dev/null 2>&1 || { echo "gitleaks not installed"; exit 1; }
+gitleaks git --redact --no-banner

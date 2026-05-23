@@ -2,4 +2,10 @@
 set -euo pipefail
 
 echo "=== pre-commit ==="
-make pre-commit
+
+command -v gitleaks >/dev/null 2>&1 || { echo "gitleaks not installed"; exit 1; }
+gitleaks git --staged --redact --no-banner
+
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest tests/test_instructions.py

@@ -1,0 +1,19 @@
+{
+  "name": "alexei-led-architect",
+  "interface": {
+    "displayName": "architect"
+  },
+  "plugins": [
+    {
+      "name": "architecture",
+      "source": {
+        "source": "local",
+        "path": "./dist/codex/plugins/architecture"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      }
+    }
+  ]
+}

@@ -21,11 +21,10 @@ This installs development dependencies with `uv` and points Git hooks at `script
 ## Local checks
 
 ```sh
-make lint               # instruction lint + ruff check + ruff format --check
-make lint-instructions  # agent and skill instruction checks only
-make test               # pytest
-make check              # lint + tests
-make secrets-history    # full Gitleaks scan before public push
+make build       # compile runtime artifacts from src/ into dist/
+make check        # build + generated-artifact drift check + ruff + pytest
+make evals        # paid Agent Skills evals
+make evals FAST=1 # advisory eval loop: no baseline, no HTML, higher concurrency
 ```
 
 Run `make check` before sending changes. For README or docs-only edits, also run:
@@ -38,16 +37,14 @@ If `markdownlint-cli2` is not installed, state that in the change notes.
 
 ## Secret scanning
 
-The local git hooks run Gitleaks before commits and pushes:
+The local git hooks run Gitleaks directly:
 
-```sh
-make secrets-staged   # staged diff only; used by pre-commit
-make secrets-history  # full git history; used by pre-push and release validation
-```
+- pre-commit: staged diff
+- pre-push and release: full history
 
 `.env` and other local secret material are ignored. Do not commit real keys,
 credential files, tokens, or generated Gitleaks reports. Before making the repo
-public, run `make check secrets-history` from a clean tree.
+public, run `make check` and `gitleaks git --redact --no-banner` from a clean tree.
 
 ## Skill evals
 
@@ -55,10 +52,8 @@ Paid Agent Skills evals read `OPENAI_API_KEY` from the environment or local `.en
 The `.env` file is ignored and must not be committed.
 
 ```sh
-make skill-evals-prepare  # build /tmp/architect-skill-eval-root from src/skills + fixtures
-make skill-evals          # run evals with baseline and HTML report
-make skill-evals-fast     # no baseline, no HTML report, advisory exit
-make skill-evals-summary  # summarize latest workspace
+make evals        # run evals with baseline and HTML report
+make evals FAST=1 # no baseline, no HTML report, advisory exit
 ```
 
 ## Release
@@ -71,7 +66,8 @@ make release V=0.2.0
 
 The release script updates `pyproject.toml`, `uv.lock`, and
 `src/plugins/architecture/plugin.yaml`, promotes the `CHANGELOG.md` Unreleased
-section when needed, runs `make check secrets-history`, commits the version bump,
+section when needed, rebuilds runtime artifacts, runs ruff, pytest, and a
+full-history Gitleaks scan, commits the version bump plus generated artifacts,
 and creates an annotated `vX.Y.Z` tag. Push the branch and tag to publish through
 GitHub Actions.
 
@@ -93,9 +89,21 @@ uv tool install --editable .
 
 ## Packaging and compile notes
 
-The hand-edited source of truth is under `src/`: role prompts, skills, templates, plugin metadata, and helper CLIs. Generated target artifacts are not committed here.
+The hand-edited source of truth is under `src/`: role prompts, skills, templates, plugin metadata, and helper CLIs. `make build` compiles runtime artifacts into:
 
-When adding runtime-native packaging:
+```text
+.claude-plugin/marketplace.json      # Claude marketplace → ./dist/claude/plugins/*
+.agents/plugins/marketplace.json     # Codex marketplace → ./dist/codex/plugins/*
+package.json                         # Pi package manifest → ./dist/pi/skills
+dist/claude/plugins/architecture/    # Claude plugin root
+dist/codex/plugins/architecture/     # Codex plugin root, skills only
+dist/codex/agents/architect.toml     # Codex custom agent TOML
+dist/pi/{skills,agents,templates}/   # Pi flat package tree
+```
+
+Generated runtime artifacts are committed. Edit `src/`, then run `make build`, then commit source and generated output together. `make check` fails when generated artifacts drift.
+
+Rules:
 
 - Keep target-specific generated output out of source directories.
 - Keep user install instructions in `README.md` focused on GitHub marketplace/plugin/extension install paths.

@@ -14,30 +14,45 @@ SKILL_EVAL_BASELINE ?= 1
 SKILL_EVAL_CONCURRENCY ?= 4
 SKILL_EVAL_STRICT ?= 1
 SKILL_EVAL_CLI ?= $(shell if command -v agent-skills-eval >/dev/null 2>&1; then printf 'agent-skills-eval'; elif command -v bunx >/dev/null 2>&1; then printf 'bunx agent-skills-eval'; elif command -v fnm >/dev/null 2>&1; then printf 'fnm exec --using $(NODE_VERSION) -- npx --yes agent-skills-eval'; else printf 'npx --yes agent-skills-eval'; fi)
+GENERATED_PATHS := dist .claude-plugin .agents package.json
 
-.PHONY: setup lint lint-instructions test skill-evals-prepare skill-evals skill-evals-fast skill-evals-summary secrets-staged secrets-history secrets release check pre-commit pre-push help
+ifeq ($(FAST),1)
+SKILL_EVAL_BASELINE := 0
+SKILL_EVAL_HTML_REPORT := 0
+SKILL_EVAL_CONCURRENCY := 8
+SKILL_EVAL_STRICT := 0
+endif
+
+.PHONY: setup build check evals release help
 
 setup: ## Install repo git hooks and dev deps
 	git config core.hooksPath scripts/git-hooks
 	uv sync
 
-lint: lint-instructions ## Run linters
+build: ## Compile runtime artifacts from src/ into dist/
+	uv run python scripts/build/compile.py
+
+check: build ## Build, verify generated artifacts, lint, and test
+	@if ! git diff --quiet -- $(GENERATED_PATHS); then \
+		echo "ERROR: generated artifacts drifted; run 'make build' and commit the output."; \
+		git --no-pager diff --stat -- $(GENERATED_PATHS); \
+		exit 1; \
+	fi
+	@untracked=$$(git ls-files --others --exclude-standard -- $(GENERATED_PATHS)); \
+	if [ -n "$$untracked" ]; then \
+		echo "ERROR: build produced untracked generated artifacts:"; \
+		echo "$$untracked" | sed 's/^/  /'; \
+		exit 1; \
+	fi
 	uv run ruff check .
 	uv run ruff format --check .
-
-lint-instructions: ## Lint agent and skill instruction files
-	uv run pytest tests/test_instructions.py
-
-test: ## Run tests
 	uv run pytest
 
-skill-evals-prepare: ## Build temporary Agent Skills eval tree under /tmp
-	uv run python scripts/evals/prepare-skill-evals.py --out $(SKILL_EVAL_ROOT)
-
-skill-evals: skill-evals-prepare ## Run paid Agent Skills evals and print fix-focused summary
+evals: ## Run paid skill evals (use FAST=1 for advisory fast mode)
 	@set -u; \
 	if [ -f .env ]; then set -a; . ./.env; set +a; fi; \
 	test -n "$${OPENAI_API_KEY:-}" || { echo "OPENAI_API_KEY missing"; exit 2; }; \
+	uv run python scripts/evals/prepare-skill-evals.py --out $(SKILL_EVAL_ROOT); \
 	mkdir -p $(SKILL_EVAL_WORKSPACE); \
 	baseline_flag=""; \
 	if [ "$(SKILL_EVAL_BASELINE)" != "0" ]; then baseline_flag="--baseline"; fi; \
@@ -62,34 +77,12 @@ skill-evals: skill-evals-prepare ## Run paid Agent Skills evals and print fix-fo
 	if [ "$(SKILL_EVAL_STRICT)" = "0" ]; then exit 0; fi; \
 	exit $$status
 
-skill-evals-fast: ## Fast paid skill eval loop: no baseline, no HTML, advisory
-	$(MAKE) skill-evals SKILL_EVAL_BASELINE=0 SKILL_EVAL_HTML_REPORT=0 SKILL_EVAL_CONCURRENCY=8 SKILL_EVAL_STRICT=0
-
-skill-evals-summary: ## Print summary for latest skill eval workspace
-	uv run python scripts/evals/summarize-skill-evals.py $(SKILL_EVAL_WORKSPACE) --markdown $(SKILL_EVAL_REPORT)
-
-secrets-staged: ## Scan staged changes for secrets with Gitleaks
-	@command -v gitleaks >/dev/null 2>&1 || { echo "gitleaks not installed"; exit 1; }
-	gitleaks git --staged --redact --no-banner
-
-secrets-history: ## Scan full git history for secrets with Gitleaks
-	@command -v gitleaks >/dev/null 2>&1 || { echo "gitleaks not installed"; exit 1; }
-	gitleaks git --redact --no-banner
-
-secrets: secrets-history ## Run secret scan gate
-
 release: ## Bump version, update changelog, commit, and tag (usage: make release V=0.2.0)
 ifndef V
 	$(error Usage: make release V=0.2.0)
 endif
 	scripts/release/release-tag v$(V)
 
-check: lint test ## Run local push gate
-
-pre-commit: secrets-staged lint ## Fast commit gate
-
-pre-push: check secrets-history ## Full push gate
-
 help: ## Show targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
-		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'

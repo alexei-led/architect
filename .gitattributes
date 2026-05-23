@@ -1,0 +1,3 @@
+dist/** linguist-generated=true
+.claude-plugin/marketplace.json linguist-generated=true
+.agents/plugins/marketplace.json linguist-generated=true
