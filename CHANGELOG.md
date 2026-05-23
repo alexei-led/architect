@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-23
+
 ### Architecture workflow
 
 - Added conditional next-skill routing for architecture review, design, and plan flows.
