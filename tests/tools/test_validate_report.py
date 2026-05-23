@@ -100,10 +100,95 @@ def test_catches_bad_tool_coverage():
     assert any("missing field 'tools_failed'" in e for e in errors)
 
 
+def test_catches_duplicate_evidence_id():
+    fm, body, sc = _load()
+    fm["evidence"].append({"id": "E1", "type": "file", "ref": "x", "summary": "dup"})
+    errors = vr.validate_report(fm, body, sc)
+    assert any("duplicate id 'E1'" in e for e in errors)
+
+
+def test_catches_missing_evidence_summary():
+    fm, body, sc = _load()
+    fm["evidence"].append({"id": "EZ", "type": "file", "ref": "x"})
+    errors = vr.validate_report(fm, body, sc)
+    assert any("EZ" in e and "missing summary" in e for e in errors)
+
+
+def test_catches_duplicate_finding_id():
+    fm, body, sc = _load()
+    existing = fm["findings"][0]
+    fm["findings"].append(dict(existing))
+    errors = vr.validate_report(fm, body, sc)
+    assert any("duplicate id" in e for e in errors)
+
+
+def test_catches_unknown_dimension_in_scores():
+    fm, body, sc = _load()
+    fm["scores"]["phantom"] = {"value": 50, "band": "mixed", "confidence": "medium"}
+    errors = vr.validate_report(fm, body, sc)
+    assert any("scores.phantom" in e and "unknown dimension" in e for e in errors)
+
+
+def test_catches_non_dict_scores():
+    fm, body, sc = _load()
+    fm["scores"] = ["not", "a", "dict"]
+    errors = vr.validate_report(fm, body, sc)
+    assert any("scores: missing or not a mapping" in e for e in errors)
+
+
+def test_catches_non_list_evidence_without_crash():
+    fm, body, sc = _load()
+    fm["evidence"] = "bad"
+    errors = vr.validate_report(fm, body, sc)
+    assert any("evidence: not a list" in e for e in errors)
+
+
+def test_catches_missing_interview_context():
+    fm, body, sc = _load()
+    del fm["interview_context"]
+    errors = vr.validate_report(fm, body, sc)
+    assert any("interview_context" in e and "missing" in e for e in errors)
+
+
+def test_catches_empty_interview_system_goal():
+    fm, body, sc = _load()
+    fm["interview_context"]["system_goal"] = ""
+    errors = vr.validate_report(fm, body, sc)
+    assert any("interview_context" in e and "system_goal" in e for e in errors)
+
+
+def test_catches_missing_system_map():
+    fm, body, sc = _load()
+    del fm["system_map"]
+    errors = vr.validate_report(fm, body, sc)
+    assert any("system_map: missing" in e for e in errors)
+
+
+def test_catches_empty_observed_modules():
+    fm, body, sc = _load()
+    fm["system_map"]["observed_modules"] = []
+    errors = vr.validate_report(fm, body, sc)
+    assert any("observed_modules" in e for e in errors)
+
+
+def test_catches_missing_comparability():
+    fm, body, sc = _load()
+    del fm["comparability"]
+    errors = vr.validate_report(fm, body, sc)
+    assert any("comparability: missing" in e for e in errors)
+
+
+def test_catches_empty_comparability_key():
+    fm, body, sc = _load()
+    fm["comparability"]["scope"] = None
+    errors = vr.validate_report(fm, body, sc)
+    assert any("comparability" in e and "scope" in e for e in errors)
+
+
 def test_main_smoke(capsys):
     rc = vr.main([str(EXAMPLE_REPORT), "--scorecard", str(SCORECARD)])
     assert rc == 0
-    assert "valid" in capsys.readouterr().out
+    assert capsys.readouterr().out.rstrip().endswith(": valid")
 
 
 def test_main_reports_violations(tmp_path, capsys):
@@ -118,3 +203,9 @@ def test_main_reports_violations(tmp_path, capsys):
     rc = vr.main([str(report), "--scorecard", str(SCORECARD)])
     assert rc == 1
     assert "violation" in capsys.readouterr().out
+
+
+def test_main_exit_code_2_on_unreadable_file(tmp_path, capsys):
+    rc = vr.main([str(tmp_path / "nope.md"), "--scorecard", str(SCORECARD)])
+    assert rc == 2
+    assert "error" in capsys.readouterr().err

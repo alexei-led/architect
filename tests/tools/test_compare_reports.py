@@ -99,7 +99,9 @@ def test_rejects_reports_missing_comparability_block():
 def test_main_comparable_exit_zero(capsys):
     rc = cr.main([str(EXAMPLE_REPORT), str(EXAMPLE_REPORT), "--scorecard", str(SCORECARD)])
     assert rc == 0
-    assert "COMPARABLE" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert out.startswith("COMPARABLE\n")
+    assert "NOT COMPARABLE" not in out
 
 
 def test_main_noncomparable_exit_one(tmp_path, capsys):

@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from architect_tools._contract import (
+    CONFIDENCE_LEVELS,
     comparability_reason,
     confidence_rank,
     is_int_score,
@@ -59,11 +60,7 @@ def compare_reports(
         bv, hv = b.get("value"), h.get("value")
         if is_int_score(bv) and is_int_score(hv):
             score_deltas[name] = hv - bv
-        if b.get("confidence") in {"low", "medium", "high"} and h.get("confidence") in {
-            "low",
-            "medium",
-            "high",
-        }:
+        if b.get("confidence") in CONFIDENCE_LEVELS and h.get("confidence") in CONFIDENCE_LEVELS:
             confidence_deltas[name] = confidence_rank(h["confidence"]) - confidence_rank(
                 b["confidence"]
             )

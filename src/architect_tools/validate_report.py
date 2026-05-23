@@ -37,6 +37,8 @@ def validate_report(frontmatter: dict[str, Any], body: str, scorecard: dict[str,
     dimensions = [d["name"] for d in scorecard["dimensions"]]
     rules = scorecard["rules"]
 
+    _check_structural_blocks(frontmatter, scorecard, errors)
+
     scores = frontmatter.get("scores")
     if not isinstance(scores, dict):
         errors.append("scores: missing or not a mapping")
@@ -46,19 +48,51 @@ def validate_report(frontmatter: dict[str, Any], body: str, scorecard: dict[str,
     for name in sorted(missing):
         errors.append(f"scores.{name}: missing score for required dimension")
 
-    evidence = frontmatter.get("evidence") or []
-    evidence_ids = _check_evidence(evidence, errors)
+    evidence_ids = _check_evidence(frontmatter.get("evidence"), errors)
 
     _check_scores(scores, dimensions, bands, rules, evidence_ids, errors)
-    _check_findings(frontmatter.get("findings") or [], dimensions, evidence_ids, errors)
-    _check_tool_coverage(frontmatter.get("tool_coverage") or [], errors)
+    _check_findings(frontmatter.get("findings"), dimensions, evidence_ids, errors)
+    _check_tool_coverage(frontmatter.get("tool_coverage"), errors)
     _check_sections(body, errors)
 
     return errors
 
 
-def _check_evidence(evidence: list[Any], errors: list[str]) -> set[str]:
+def _check_structural_blocks(
+    frontmatter: dict[str, Any], scorecard: dict[str, Any], errors: list[str]
+) -> None:
+    """Enforce the three structural frontmatter blocks every report must carry."""
+    interview = frontmatter.get("interview_context")
+    if not isinstance(interview, dict):
+        errors.append("interview_context: missing or not a mapping")
+    elif not interview.get("system_goal"):
+        errors.append("interview_context: missing or empty system_goal")
+
+    system_map = frontmatter.get("system_map")
+    if not isinstance(system_map, dict):
+        errors.append("system_map: missing or not a mapping")
+    else:
+        for key in ("observed_modules", "declared_modules"):
+            if not system_map.get(key):
+                errors.append(f"system_map: missing or empty {key}")
+
+    comparability = frontmatter.get("comparability")
+    if not isinstance(comparability, dict):
+        errors.append("comparability: missing or not a mapping")
+        return
+    must_match = scorecard.get("comparability", {}).get("must_match", [])
+    for key in must_match:
+        if comparability.get(key) in (None, ""):
+            errors.append(f"comparability: missing or empty {key}")
+
+
+def _check_evidence(evidence: Any, errors: list[str]) -> set[str]:
     evidence_ids: set[str] = set()
+    if evidence is None:
+        evidence = []
+    if not isinstance(evidence, list):
+        errors.append("evidence: not a list")
+        return evidence_ids
     for i, item in enumerate(evidence):
         if not isinstance(item, dict):
             errors.append(f"evidence[{i}]: not a mapping")
@@ -137,11 +171,16 @@ def _check_scores(
 
 
 def _check_findings(
-    findings: list[Any],
+    findings: Any,
     dimensions: list[str],
     evidence_ids: set[str],
     errors: list[str],
 ) -> None:
+    if findings is None:
+        findings = []
+    if not isinstance(findings, list):
+        errors.append("findings: not a list")
+        return
     seen: set[str] = set()
     for i, finding in enumerate(findings):
         if not isinstance(finding, dict):
@@ -163,9 +202,12 @@ def _check_findings(
                 errors.append(f"findings[{fid or i}]: evidence ref {ref!r} not found in evidence")
 
 
-def _check_tool_coverage(coverage: list[Any], errors: list[str]) -> None:
-    if not coverage:
+def _check_tool_coverage(coverage: Any, errors: list[str]) -> None:
+    if coverage is None or coverage == []:
         errors.append("tool_coverage: missing or empty")
+        return
+    if not isinstance(coverage, list):
+        errors.append("tool_coverage: not a list")
         return
     for i, cov in enumerate(coverage):
         if not isinstance(cov, dict):
