@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-05-24
+
 ### Plugin marketplace metadata
 
 - Fixed Claude Code marketplace metadata to satisfy the current manifest schema.
