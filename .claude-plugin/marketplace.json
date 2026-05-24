@@ -1,12 +1,20 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "alexei-led-architect",
+  "version": "0.3.0",
+  "description": "Instruction-first architecture design and review: one read-only architect role, evidence-based design/review/scorecard/plan skills, methodology and tool skills, and report/design/plan templates.",
+  "owner": {
+    "name": "Alexei Ledenev"
+  },
   "plugins": [
     {
       "name": "architecture",
       "source": "./dist/claude/plugins/architecture",
       "description": "Instruction-first architecture design and review: one read-only architect role, evidence-based design/review/scorecard/plan skills, methodology and tool skills, and report/design/plan templates.",
-      "version": "0.3.0"
+      "version": "0.3.0",
+      "author": {
+        "name": "Alexei Ledenev"
+      }
     }
-  ],
-  "version": "0.3.0"
+  ]
 }

@@ -9,6 +9,11 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Plugin marketplace metadata
+
+- Fixed Claude Code marketplace metadata to satisfy the current manifest schema.
+- Updated Codex marketplace and plugin metadata for current plugin installation and UI surfaces.
+
 ## [0.3.0] - 2026-05-23
 
 ### Architecture workflow

@@ -175,15 +175,51 @@ def write_codex_agent(
     dst.write_text(text, encoding="utf-8")
 
 
-def plugin_metadata(plugin: Mapping[str, Any]) -> dict[str, Any]:
-    out = {
-        "name": plugin["name"],
-        "version": plugin.get("version", "0.0.0"),
-    }
+def plugin_metadata(
+    plugin: Mapping[str, Any],
+    *,
+    schema: str | None = None,
+    structured_author: bool = False,
+) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    if schema is not None:
+        out["$schema"] = schema
+    out["name"] = plugin["name"]
+    out["version"] = plugin.get("version", "0.0.0")
     for key in ("description", "author", "license", "homepage", "repository", "keywords"):
         value = plugin.get(key)
-        if value is not None:
+        if value is None:
+            continue
+        if structured_author and key == "author":
+            out[key] = person_metadata(value)
+        else:
             out[key] = value
+    return out
+
+
+def person_metadata(value: Any) -> dict[str, str]:
+    if isinstance(value, Mapping):
+        name = value.get("name")
+        if not isinstance(name, str) or not name:
+            raise ValueError("person metadata requires a non-empty name")
+        out = {"name": name}
+        for key in ("email", "url"):
+            item = value.get(key)
+            if isinstance(item, str) and item:
+                out[key] = item
+        return out
+    if isinstance(value, str) and value:
+        return {"name": value}
+    return {"name": "Alexei Ledenev", "url": "https://github.com/alexei-led"}
+
+
+def codex_plugin_metadata(plugin: Mapping[str, Any]) -> dict[str, Any]:
+    out = plugin_metadata(plugin, structured_author=True)
+    interface = plugin.get("interface")
+    if interface is not None:
+        if not isinstance(interface, Mapping):
+            raise ValueError(f"plugin {plugin['name']!r}: interface must be a mapping")
+        out["interface"] = dict(interface)
     return out
 
 
@@ -234,9 +270,16 @@ def compile_plugin(root: Path, plugin: Mapping[str, Any]) -> None:
             codex_agent_templates,
         )
 
-    write_json(claude_root / ".claude-plugin" / "plugin.json", plugin_metadata(plugin))
+    write_json(
+        claude_root / ".claude-plugin" / "plugin.json",
+        plugin_metadata(
+            plugin,
+            schema="https://json.schemastore.org/claude-code-plugin-manifest.json",
+            structured_author=True,
+        ),
+    )
 
-    codex_meta = plugin_metadata(plugin)
+    codex_meta = codex_plugin_metadata(plugin)
     if skills:
         codex_meta["skills"] = "./skills"
     write_json(codex_root / ".codex-plugin" / "plugin.json", codex_meta)
@@ -249,17 +292,21 @@ def write_root_manifests(root: Path, plugins: Sequence[Mapping[str, Any]]) -> No
     write_json(
         root / ".claude-plugin" / "marketplace.json",
         {
+            "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
             "name": "alexei-led-architect",
+            "version": version,
+            "description": first.get("description", "Architecture plugin marketplace."),
+            "owner": person_metadata(first.get("author")),
             "plugins": [
                 {
                     "name": plugin["name"],
                     "source": f"./dist/claude/plugins/{plugin['name']}",
                     "description": plugin.get("description", ""),
                     "version": plugin.get("version", version),
+                    "author": person_metadata(plugin.get("author")),
                 }
                 for plugin in plugins
             ],
-            "version": version,
         },
     )
 
@@ -275,7 +322,8 @@ def write_root_manifests(root: Path, plugins: Sequence[Mapping[str, Any]]) -> No
                         "source": "local",
                         "path": f"./dist/codex/plugins/{plugin['name']}",
                     },
-                    "policy": {"installation": "AVAILABLE", "authentication": "ON_USE"},
+                    "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+                    "category": plugin.get("category", "Productivity"),
                 }
                 for plugin in plugins
             ],

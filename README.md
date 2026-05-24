@@ -21,24 +21,18 @@ Use `--scope project` if you want the plugin recorded in project settings.
 
 ### Codex CLI
 
-Open Codex and install from the plugin marketplace:
+```sh
+codex plugin marketplace add alexei-led/architect
+codex plugin add architecture@alexei-led-architect
+```
+
+Or use the Codex UI:
 
 ```text
 /plugins → Add marketplace → https://github.com/alexei-led/architect → install architecture
 ```
 
-Equivalent config form:
-
-```toml
-[marketplaces.alexei-led-architect]
-source_type = "git"
-source = "https://github.com/alexei-led/architect.git"
-
-[plugins."architecture@alexei-led-architect"]
-enabled = true
-```
-
-Restart Codex after changing plugin configuration.
+Restart Codex after installing or updating plugins.
 
 The Codex custom agent is generated at `dist/codex/agents/architect.toml`; copy or symlink it into `~/.codex/agents/` or `.codex/agents/` when you want subagent spawning.
 

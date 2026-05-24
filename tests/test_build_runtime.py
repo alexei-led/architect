@@ -10,16 +10,39 @@ def read_json(path: str):
 
 
 def test_runtime_discovery_manifests_point_to_generated_artifacts():
-    assert read_json(".claude-plugin/marketplace.json")["plugins"][0]["source"] == (
-        "./dist/claude/plugins/architecture"
+    claude_marketplace = read_json(".claude-plugin/marketplace.json")
+    assert (
+        claude_marketplace["$schema"] == "https://json.schemastore.org/claude-code-marketplace.json"
     )
-    assert read_json(".agents/plugins/marketplace.json")["plugins"][0]["source"] == {
+    assert claude_marketplace["owner"] == {"name": "Alexei Ledenev"}
+    assert claude_marketplace["plugins"][0]["source"] == "./dist/claude/plugins/architecture"
+    assert claude_marketplace["plugins"][0]["author"] == {"name": "Alexei Ledenev"}
+    codex_marketplace_plugin = read_json(".agents/plugins/marketplace.json")["plugins"][0]
+    assert codex_marketplace_plugin["source"] == {
         "source": "local",
         "path": "./dist/codex/plugins/architecture",
     }
+    assert codex_marketplace_plugin["policy"] == {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL",
+    }
+    assert codex_marketplace_plugin["category"] == "Productivity"
     assert read_json("package.json")["pi"] == {"skills": ["./dist/pi/skills"]}
 
+    claude_plugin = read_json("dist/claude/plugins/architecture/.claude-plugin/plugin.json")
+    assert (
+        claude_plugin["$schema"] == "https://json.schemastore.org/claude-code-plugin-manifest.json"
+    )
+    assert claude_plugin["author"] == {"name": "Alexei Ledenev"}
+    assert claude_plugin["homepage"] == "https://github.com/alexei-led/architect"
+    assert claude_plugin["keywords"] == ["architecture", "code-review", "modularity"]
+
     codex_plugin = read_json("dist/codex/plugins/architecture/.codex-plugin/plugin.json")
+    assert codex_plugin["author"] == {"name": "Alexei Ledenev"}
+    assert codex_plugin["homepage"] == "https://github.com/alexei-led/architect"
+    assert codex_plugin["interface"]["displayName"] == "Architect"
+    assert codex_plugin["interface"]["category"] == "Productivity"
+    assert codex_plugin["interface"]["capabilities"] == ["Read"]
     assert codex_plugin["skills"] == "./skills"
     assert "agents" not in codex_plugin
 
