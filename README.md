@@ -1,14 +1,29 @@
 # architect
 
-Instruction-first architecture review for AI coding agents.
+Architecture review and design package for AI coding agents.
 
-`architect` packages a read-only Architect role, portable Agent Skills, report/design/plan templates, and helper CLIs for evidence-based architecture design and review. It is built for Claude Code, Codex CLI, Pi, and other runtimes that can load Agent Skills-style capabilities.
+`architect` gives an agent a read-only Architect role for reviewing an existing codebase, designing a target architecture, or turning an approved design into an implementation plan. It works with Claude Code, Codex CLI, and Pi.
 
-The Architect does not rewrite systems. It designs target architecture from requirements, establishes intended architecture, maps observed structure, gathers local evidence, scores architecture quality with confidence, and returns design artifacts, a cited report, and/or an incremental architecture plan.
+## What it does
+
+Use it to:
+
+- review architecture with cited evidence
+- score architecture quality with explicit confidence
+- design target architecture from requirements or existing code
+- produce an incremental refactor plan
+
+It does not edit production code.
+
+## What’s included
+
+- `architecture` plugin/package
+- Architect agent role
+- skills for review, design, planning, scoring, and evidence gathering
+- report and plan templates
+- helper CLIs: `architect-doctor`, `architect-validate-report`, `architect-compare-reports`
 
 ## Install
-
-Install from GitHub through your runtime's plugin, marketplace, or package mechanism.
 
 ### Claude Code
 
@@ -17,8 +32,6 @@ Install from GitHub through your runtime's plugin, marketplace, or package mecha
 /plugin install architecture@architect
 ```
 
-Use `--scope project` if you want the plugin recorded in project settings.
-
 ### Codex CLI
 
 ```sh
@@ -26,15 +39,13 @@ codex plugin marketplace add alexei-led/architect
 codex plugin add architecture@alexei-led-architect
 ```
 
-Or use the Codex UI:
+Optional custom agent file:
 
 ```text
-/plugins → Add marketplace → https://github.com/alexei-led/architect → install architecture
+dist/codex/agents/architect.toml
 ```
 
-Restart Codex after installing or updating plugins.
-
-The Codex custom agent is generated at `dist/codex/agents/architect.toml`; copy or symlink it into `~/.codex/agents/` or `.codex/agents/` when you want subagent spawning.
+Copy or symlink it into `~/.codex/agents/` or `.codex/agents/` if you want subagent spawning.
 
 ### Pi
 
@@ -42,25 +53,34 @@ The Codex custom agent is generated at `dist/codex/agents/architect.toml`; copy 
 pi install git:github.com/alexei-led/architect
 ```
 
-Use project scope when the architecture-review package should travel with a repository:
+Project-local install:
 
 ```sh
 pi install -l git:github.com/alexei-led/architect
 ```
 
-Restart Pi or run `/reload` after installing.
-
-Pi package install loads skills. If you use a Pi subagent loader, symlink `dist/pi/agents` from the installed checkout into that loader's agent directory.
-
 ### Helper CLIs
-
-The Python CLIs can be installed directly from GitHub:
 
 ```sh
 uv tool install git+https://github.com/alexei-led/architect.git
 ```
 
-Then run:
+## Use
+
+Typical flows:
+
+- existing codebase: `architecture-review` → `architecture-design` → `architecture-plan`
+- greenfield or requirements: `architecture-design`
+- approved design, need sequencing: `architecture-plan`
+- audit only: `architecture-review`
+
+Example prompts:
+
+- `Review this repo's architecture. Find coupling problems, boundary violations, and testability risks.`
+- `Design a target architecture for this service based on the current code and docs.`
+- `Turn this approved architecture into an incremental implementation plan.`
+
+## CLI tools
 
 ```sh
 architect-doctor --repo /path/to/repo
@@ -68,82 +88,15 @@ architect-validate-report path/to/report.md
 architect-compare-reports base-report.md head-report.md
 ```
 
-## What it contains
-
-- One architecture-review plugin named `architecture`.
-- A read-only Architect role for assessment, design, and planning, not implementation.
-- Design, review, scorecard, and planning skills for the core workflow.
-- Methodology skills for Balanced Coupling and architecture fitness functions.
-- Tool skills that guide evidence collection with local OSS CLIs.
-- Report, design, and plan templates with machine-checkable review contracts; human reports may use Mermaid summaries, while AI-targeted reports stay plain text.
-- Helper CLIs for tool coverage checks, report validation, and report comparison.
-
-## What it does
-
-A full review follows this order:
-
-1. Capture intended architecture and constraints from the user, docs, ADRs, manifests, and config.
-2. Build a system map before judging quality.
-3. Gather evidence across discovery, structural, semantic, dependency, change, operational, security, and report dimensions.
-4. Score architecture dimensions with a fixed rubric and explicit confidence.
-5. Write an architecture report with addressable evidence references.
-6. Recommend one primary next skill: usually `architecture-design` for remediation target-state work, `architecture-plan` only when an approved design already exists, or no next skill for pure audit.
-
-A design flow follows this order:
-
-1. Read requirements, existing docs, and prior reports.
-2. Check existing implementation for drift when code exists; design docs are intent, not proof.
-3. Validate the working model with the user.
-4. Produce domain, module, integration-contract, test-specification, and fitness-check sections.
-5. Self-review the design for coupling imbalances and recommend `architecture-plan` only when implementation sequencing is requested.
-
-Default user-facing routing:
-
-- Existing-code remediation: `architecture-review` → `architecture-design` → `architecture-plan` → implementation by a mutator/engineer → `architecture-review` re-check.
-- Greenfield or requirements-to-architecture work: `architecture-design` → `architecture-plan` when sequencing is requested.
-- Pure audit: `architecture-review` only.
-- Already-approved target design: `architecture-plan`.
-
-Hard boundaries:
-
-- No production source edits by the Architect.
-- No finding without evidence.
-- No score before the system map.
-- No high-quality score on low-confidence evidence.
-- No big-bang rewrite plans.
-
-## Tools
-
-`architect-doctor` checks whether useful local analysis tools are available and records gaps as coverage limits, not fatal errors. The skills guide the agent across these tool families:
-
-- Discovery and targeted reading: `tools-code-search` with `fd`, `rg`, `git grep`, and file reads.
-- Change history: GitNexus and `git log` fallbacks.
-- Structural search: `ast-grep`, language linters.
-- Semantic analysis: codegraph, LSP/tree-sitter, type checkers, static analyzers.
-- Dependency graphs: dependency-cruiser, madge, knip, import-linter, pydeps, deptry, goda.
-- Operational and security evidence: Helm, Kustomize, Terraform, govulncheck, Trivy, Syft.
-- Report support: `jq`, `yq`, Mermaid CLI.
-
-Missing tools lower confidence and are recorded in report tool coverage. They do not justify pretending the evidence exists.
-
-## Methodology
-
-The review is built around two explicit models:
-
-- **Balanced Coupling** — Vlad Khononov's model of integration strength, distance, and volatility. Coupling is not automatically bad; unbalanced coupling is. See [coupling.dev](https://coupling.dev/) and _Balancing Coupling in Software Design_. This project summarizes the model with attribution and does not copy source material.
-- **Architecture fitness functions** — from Neal Ford and _Building Evolutionary Architectures_: architectural intent should be executable checks that can fail a build. Documentation alone does not raise the fitness score.
-
-Domain volatility uses DDD-style core/supporting/generic distinctions when judging change risk. Recommendations favor seams, characterization tests, boundary repair, and fitness checks over cosmetic reshuffling.
+`architect-doctor` reports which local analysis tools are available and where coverage is missing.
 
 ## Docs
 
-- [Methodology](docs/methodology.md) — Balanced Coupling and architecture fitness summaries.
-- [Scoring](docs/scoring.md) — score dimensions, bands, confidence, and comparability.
-- [Report, design, and plan format](docs/report-format.md) — report frontmatter, evidence refs, tool coverage, design sections, and plan sections.
-- [Tools and coverage](docs/tools.md) — tool registry, applicability, and confidence impact.
-- [Contributing](CONTRIBUTING.md) — maintainer setup, packaging notes, tests, and validation.
-
-The source templates and scorecard are the contract. If prose docs and templates disagree, templates win.
+- [Methodology](docs/methodology.md)
+- [Scoring](docs/scoring.md)
+- [Report format](docs/report-format.md)
+- [Tools](docs/tools.md)
+- [Contributing](CONTRIBUTING.md)
 
 ## License
 

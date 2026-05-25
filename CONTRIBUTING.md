@@ -1,14 +1,14 @@
 # Contributing
 
-Development notes for `architect`. User install instructions live in [README.md](README.md).
+Maintainer notes for `architect`. User-facing install and usage stay in [README.md](README.md).
 
 ## Requirements
 
 - Python 3.12+
 - `uv`
 - `make`
-- `gitleaks` for secret scanning before commit/push
-- Optional: `markdownlint-cli2` for Markdown linting
+- `gitleaks`
+- optional: `markdownlint-cli2`
 
 ## Setup
 
@@ -16,64 +16,44 @@ Development notes for `architect`. User install instructions live in [README.md]
 make setup
 ```
 
-This installs development dependencies with `uv` and points Git hooks at `scripts/git-hooks/`.
+Installs dev dependencies and sets Git hooks from `scripts/git-hooks/`.
 
-## Local checks
+## Checks
 
 ```sh
-make build       # compile runtime artifacts from src/ into dist/
-make check        # build + generated-artifact drift check + ruff + pytest
+make build        # generate runtime artifacts into dist/
+make check        # build + drift check + ruff + pytest
 make evals        # paid Agent Skills evals
-make evals FAST=1 # advisory eval loop: no baseline, no HTML, higher concurrency
+make evals FAST=1 # faster advisory eval loop
 ```
 
-Run `make check` before sending changes. For README or docs-only edits, also run:
+Run `make check` before opening a PR.
+
+For docs-only changes, also run:
 
 ```sh
 markdownlint-cli2 README.md CONTRIBUTING.md docs/*.md
 ```
 
-If `markdownlint-cli2` is not installed, state that in the change notes.
-
 ## Secret scanning
 
-The local git hooks run Gitleaks directly:
+Git hooks run `gitleaks`:
 
 - pre-commit: staged diff
-- pre-push and release: full history
+- pre-push: full history
+- release: full history
 
-`.env` and other local secret material are ignored. Do not commit real keys,
-credential files, tokens, or generated Gitleaks reports. Before making the repo
-public, run `make check` and `gitleaks git --redact --no-banner` from a clean tree.
+Do not commit secrets, credential files, tokens, `.env`, or Gitleaks reports.
 
-## Skill evals
-
-Paid Agent Skills evals read `OPENAI_API_KEY` from the environment or local `.env`.
-The `.env` file is ignored and must not be committed.
+Before making the repo public:
 
 ```sh
-make evals        # run evals with baseline and HTML report
-make evals FAST=1 # no baseline, no HTML report, advisory exit
+gitleaks git --redact --no-banner
 ```
-
-## Release
-
-Release tags require curated changelog notes and a clean tree:
-
-```sh
-make release V=0.2.0
-```
-
-The release script updates `pyproject.toml`, `uv.lock`, and
-`src/plugins/architecture/plugin.yaml`, promotes the `CHANGELOG.md` Unreleased
-section when needed, rebuilds runtime artifacts, runs ruff, pytest, and a
-full-history Gitleaks scan, commits the version bump plus generated artifacts,
-and creates an annotated `vX.Y.Z` tag. Push the branch and tag to publish through
-GitHub Actions.
 
 ## Helper CLIs
 
-Run CLIs from the checkout while developing:
+Run from the repo:
 
 ```sh
 uv run architect-doctor --repo /path/to/repo
@@ -81,38 +61,50 @@ uv run architect-validate-report path/to/report.md
 uv run architect-compare-reports base-report.md head-report.md
 ```
 
-Install locally when you need command names on `PATH`:
+Install on `PATH` during development:
 
 ```sh
 uv tool install --editable .
 ```
 
-## Packaging and compile notes
+## Release
 
-The hand-edited source of truth is under `src/`: role prompts, skills, templates, plugin metadata, and helper CLIs. `make build` compiles runtime artifacts into:
-
-```text
-.claude-plugin/marketplace.json      # Claude marketplace → ./dist/claude/plugins/*
-.agents/plugins/marketplace.json     # Codex marketplace → ./dist/codex/plugins/*
-package.json                         # Pi package manifest → ./dist/pi/skills
-dist/claude/plugins/architecture/    # Claude plugin root
-dist/codex/plugins/architecture/     # Codex plugin root, skills only
-dist/codex/agents/architect.toml     # Codex custom agent TOML
-dist/pi/{skills,agents,templates}/   # Pi flat package tree
+```sh
+make release V=0.2.0
 ```
 
-Generated runtime artifacts are committed. Edit `src/`, then run `make build`, then commit source and generated output together. `make check` fails when generated artifacts drift.
+Requires a clean tree. Updates versioned files, rebuilds generated artifacts, runs checks, scans with Gitleaks, commits the release, and creates tag `vX.Y.Z`.
 
-Rules:
+Push branch and tag to publish through GitHub Actions.
 
-- Keep target-specific generated output out of source directories.
-- Keep user install instructions in `README.md` focused on GitHub marketplace/plugin/extension install paths.
-- Keep build, compile, validation, and drift-check instructions in this file.
-- Do not duplicate score dimensions, report schema, or tool registry in prose when a source contract already exists.
+## Packaging
 
-## Documentation rules
+Source of truth is under `src/`. Generated artifacts in `dist/` are committed.
 
-- README is for users: what the package does, how to install it, and where to read more.
-- CONTRIBUTING is for maintainers: setup, compile/package work, tests, validation, release mechanics.
-- Docs under `docs/` explain methodology, report contracts, scoring, and tool coverage.
-- Source templates and `src/templates/scorecard.yaml` win when prose docs disagree.
+Main outputs:
+
+```text
+.claude-plugin/marketplace.json
+.agents/plugins/marketplace.json
+package.json
+dist/claude/plugins/architecture/
+dist/codex/plugins/architecture/
+dist/codex/agents/architect.toml
+dist/pi/{skills,agents,templates}/
+```
+
+When changing prompts, skills, templates, or plugin metadata:
+
+1. edit `src/`
+2. run `make build`
+3. commit source and generated output together
+
+`make check` fails on generated-artifact drift.
+
+## Docs
+
+- `README.md`: user-facing install and usage
+- `CONTRIBUTING.md`: maintainer workflow
+- `docs/`: methodology, scoring, report format, tool coverage
+
+Templates and source contracts win if prose drifts.
