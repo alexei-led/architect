@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-06-06
+
 ### Skill instructions
 
 - Tightened architecture skill write-safety, runtime-tool, scoped validation, and package-runner guidance.
