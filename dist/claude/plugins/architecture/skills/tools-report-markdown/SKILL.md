@@ -30,10 +30,15 @@ First decide the audience:
   formatting polish; models do not read diagrams as evidence.
 
 Use to validate YAML frontmatter parses, render human-facing diagrams when
-chosen, and check links/spelling. Diagrams are summaries for people, not
-architecture evidence.
+chosen, and check links/spelling. Scope checks to the target report or plan;
+broaden to repo-wide docs only when the user asks. Diagrams are summaries for
+people, not architecture evidence.
 
 ## Commands
+
+Use the repo's detected package runner for Node-based formatters. The example
+uses `npm exec`; substitute `pnpm exec`, `bunx`, or the configured script when
+that is the project runner.
 
 ```sh
 # Validate report frontmatter with the authoritative helper
@@ -51,13 +56,13 @@ dot -Tsvg graph.dot -o graph.svg
 d2 graph.d2 graph.svg
 
 # Link check (catches dead evidence refs and doc links)
-lychee report.md docs/
+lychee report.md
 
 # Spelling (technical dictionary as needed)
 codespell report.md
 
-# Format check (matches the repo's prose style if configured)
-npx prettier --check "**/*.md"
+# Format check for the target artifact(s), using the repo's package runner
+npm exec -- prettier --check report.md
 ```
 
 The authoritative frontmatter/section validation is
@@ -93,9 +98,10 @@ let Mermaid, tables, or formatting polish stand in for evidence coverage.
 
 Validate frontmatter. For human-facing reports, render at most the one or two
 Mermaid diagrams the report needs. For AI-targeted reports, skip diagrams and use
-plain text. Run a link and spell pass. Stop there — don't generate a gallery of
-diagrams or chase stylistic lint that doesn't change comprehension. Report
-tooling is the last mile, not a place to spend the evidence budget.
+plain text. Run scoped link and spell passes on the target artifact. Stop there —
+don't generate a gallery of diagrams, run repo-wide format sweeps, or chase
+stylistic lint that doesn't change comprehension. Report tooling is the last
+mile, not a place to spend the evidence budget.
 
 ## Hard rules
 

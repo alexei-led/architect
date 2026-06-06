@@ -9,6 +9,10 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Skill instructions
+
+- Tightened architecture skill write-safety, runtime-tool, scoped validation, and package-runner guidance.
+
 ## [0.3.1] - 2026-05-24
 
 ### Plugin marketplace metadata

@@ -4,9 +4,10 @@ Plain Markdown. Useful to humans, coding agents, and task runners. One hotspot,
 boundary, module, or flow per plan unless a roadmap is requested. Keep the next
 execution horizon to five tasks or fewer before re-review.
 
-Place generated plans in `docs/plans/` unless the project configured another
-plans directory. If this file is stored elsewhere, run the task runner with this
-exact path or copy/symlink it into the configured plans directory.
+When the user confirms a file destination, place generated plans in `docs/plans/`
+unless the project configured another plans directory. If this file is stored
+elsewhere, run the task runner with this exact path or copy/symlink it into the
+configured plans directory.
 
 Task runners execute `### Task N:` or `### Iteration N:` sections. Use checkboxes
 only inside those task/iteration sections. Use plain bullets or prose for

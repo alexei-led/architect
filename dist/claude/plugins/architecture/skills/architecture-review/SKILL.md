@@ -96,16 +96,20 @@ instructions or report.
    missing, failed — per dimension, even where you find nothing wrong. Summarize
    output; do not paste raw dumps.
    - **Check persistent indexes for staleness first.** Before trusting codegraph
-     or GitNexus, confirm the index matches the current commit (e.g.
-     `gitnexus status`). A stale index is a coverage gap, not evidence — record
-     it as `tools_failed`, do not score from it.
+     or GitNexus, confirm the index matches the current commit. For GitNexus,
+     prefer an exposed runtime status/freshness capability when available;
+     otherwise use the CLI (`gitnexus status` / `gitnexus detect-changes`). A
+     stale index is a coverage gap, not evidence — record it as `tools_failed`,
+     do not score from it.
    - **No working tool for an applicable dimension** is recorded as
      `tools_missing` with explicit `confidence_impact`. Do not silently score a
      dimension (e.g. dependency health) from imports alone without flagging the
      gap and capping confidence.
-   - **Redirect tool caches** to a writable temp dir when a tool writes a cache
-     into the target repo (e.g. `RUFF_CACHE_DIR=$TMPDIR/...`); a sandboxed or
-     read-only target will otherwise fail the tool.
+   - **Redirect tool caches and local state** to a writable temp dir when a tool
+     would write generated data into the target repo (e.g.
+     `RUFF_CACHE_DIR=$TMPDIR/...`, `TF_DATA_DIR=$TMPDIR/...`); a sandboxed or
+     read-only target will otherwise fail the tool. Ask before writing generated
+     tool artifacts into the target repo.
    - **Churn across renames:** a directory/package rename splits each file's
      git history across the old and new path, halving apparent churn. Scope churn
      to current paths or use `git log --follow` per file.

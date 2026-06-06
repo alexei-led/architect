@@ -5,7 +5,7 @@ own words; see `attribution.md` for source attribution and licensing.
 
 ## Implicit vs explicit coupling
 
-Integration strength also tracks how _visible_ the shared knowledge is:
+Integration strength also tracks how visible the shared knowledge is:
 
 - **Contract** coupling is the most explicit — the dependency is declared and
   stable.
@@ -39,7 +39,7 @@ exchange.
 
 The model applies at every level — methods, objects, packages, services,
 systems — but what counts as a contract, a model, or an intrusive dependency
-_shifts_ with the level. A class's public interface is a contract at the object
+shifts with the level. A class's public interface is a contract at the object
 level but an implementation detail at the service level.
 
 Always state which level of abstraction you are assessing before applying the
@@ -67,10 +67,10 @@ module-level review.
 
 Judge volatility from the domain, not the git log:
 
-- **Accidental volatility** — a component churns because it is _badly designed_,
+- **Accidental volatility** — a component churns because it is badly designed,
   not because the domain demands it.
 - **Accidental involatility** — a component looks stable only because changing
-  it is too risky; the business _wants_ to change it but can't.
+  it is too risky; the business wants to change it but can't.
 
 Either way, commit frequency is a hint, not the measure. Confirm against
 subdomain classification before letting volatility move a finding.

@@ -86,10 +86,11 @@ def test_structured_questions_do_not_depend_on_agent_overlays():
     assert "ask exactly one plain prose question" in text
 
 
-def test_architecture_plan_defaults_to_docs_plans_destination():
+def test_architecture_plan_requires_confirmed_file_destination():
     text = (SKILLS_DIR / "architecture-plan" / "SKILL.md").read_text()
     assert "docs/plans/<kebab-case-target>.md" in text
-    assert "Create `docs/plans/` if it is missing" in text
+    assert "Create `docs/plans/`\nonly after the destination is confirmed" in text
+    assert "return it in the conversation unless they confirm a file path" in text
     assert "copy/symlink" in text
 
 

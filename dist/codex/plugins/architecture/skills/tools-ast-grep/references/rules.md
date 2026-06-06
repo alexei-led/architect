@@ -48,7 +48,7 @@ constraints:
     regex: "^(get|post|put|patch|delete)$"
 ```
 
-Run this scoped to everything _except_ the router dir; surviving hits are leaks.
+Run this scoped to everything except the router dir; surviving hits are leaks.
 
 ## Framework type leaking past a boundary
 

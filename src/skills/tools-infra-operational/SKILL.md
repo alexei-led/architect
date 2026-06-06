@@ -41,10 +41,10 @@ kubeconform -strict -summary manifests/
 kube-linter lint manifests/
 
 # Terraform / OpenTofu: structure + static security
-terraform init -backend=false  # if validation needs initialization; avoid backend side effects
+TF_DATA_DIR=${TMPDIR:-/tmp}/terraform-data terraform init -backend=false -input=false -lockfile=readonly
 terraform validate             # or: tofu validate
 tflint --recursive
-tfsec .                     # or: trivy config .
+tfsec .                       # or: trivy config .
 
 # Docker: image config / Dockerfile lint
 hadolint Dockerfile
@@ -89,7 +89,8 @@ Record:
   the topology claims as un-validated hypotheses.
 - `helm template` / `terraform validate` failing on missing values or
   uninitialized backend → `tools_failed` (config state), not "valid." Note what
-  was missing.
+  was missing. If initialization writes local state or cache, redirect it to
+  `$TMPDIR` or ask before writing into the target repo.
 - Scanners need network for advisory DBs; an offline run with a stale DB is a
   coverage limit — record the DB date.
 
@@ -107,6 +108,8 @@ gap, not something to infer.
   deployed shape.
 - Do not run `kubectl apply`, `helm upgrade`, `terraform apply`, `tofu apply`,
   delete, or destroy commands without explicit user approval.
+- Redirect tool caches/state such as Terraform `.terraform` data to `$TMPDIR`,
+  or ask before writing generated operational artifacts into the target repo.
 - Distinguish an enforced CI validation step (raises fitness) from a recommended
   one.
 - Summarize scanner output; cite component + severity, never dump the table.

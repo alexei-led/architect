@@ -96,4 +96,6 @@ tools-lsp-tree-sitter or tools-codegraph.
 
 - Distinguish an enforced boundary rule (raises fitness) from a recommended one.
 - Tool failure from a non-installing project is `tools_failed`, not clean.
-- Use the CLIs via npx; do not reimplement graph analysis in package code.
+- Use the repo's detected package-manager runner for CLIs; fall back to `npx`
+  only when no configured runner works. Do not reimplement graph analysis in
+  package code.

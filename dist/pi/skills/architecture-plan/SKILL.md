@@ -59,9 +59,11 @@ names.
 
 ## Destination
 
-When the user asks to write or generate a plan and gives no destination, write it
-under `docs/plans/` using a kebab-case slug from the target, for example
-`docs/plans/extract-auth-boundary.md`. Create `docs/plans/` if it is missing.
+When the user explicitly asks for a plan file and gives no destination, ask to
+confirm the default path under `docs/plans/` using a kebab-case slug from the
+target, for example `docs/plans/extract-auth-boundary.md`. Create `docs/plans/`
+only after the destination is confirmed. If the user only asks to generate or
+create a plan, return it in the conversation unless they confirm a file path.
 Use a user-specified path only when provided. If the user-specified path is
 outside `docs/plans/`, state that the executor must be invoked with that exact
 path or the plan must be copied/symlinked into the configured plans directory.
@@ -79,10 +81,11 @@ path or the plan must be copied/symlinked into the configured plans directory.
    Re-review. Put checkboxes only inside `### Task N:` or `### Iteration N:`
    sections; context sections must use plain bullets or prose.
 
-3. **Resolve the destination.** For written artifacts, default to
-   `docs/plans/<kebab-case-target>.md` unless the user gives another path. When
-   the path is outside `docs/plans/`, include the exact execution path or the
-   copy/symlink instruction in the handoff.
+3. **Resolve the destination.** For file artifacts, use the user's path. If no
+   path is provided, ask to confirm `docs/plans/<kebab-case-target>.md` before
+   writing or creating directories. When the path is outside `docs/plans/`,
+   include the exact execution path or the copy/symlink instruction in the
+   handoff.
 
 4. **Order for safety.** Prefer characterization tests, seam creation, boundary
    repair, and fitness checks before cosmetic cleanup. Establish a safety net
@@ -133,8 +136,8 @@ path or the plan must be copied/symlinked into the configured plans directory.
 ## Output
 
 Return or write a Markdown plan shaped like `../../templates/plan.md`. When
-writing the file and no path is provided, use `docs/plans/<kebab-case-target>.md`.
-Include:
+writing a file with no path provided, use the confirmed default path
+`docs/plans/<kebab-case-target>.md`. Include:
 
 - `## Source artifact`: approved design path or ID plus decision, contract,
   risk, or module IDs used; include supporting report finding/evidence IDs when
@@ -161,8 +164,8 @@ Include:
 - Task headers must be `### Task N:` or `### Iteration N:`; `N` may be an
   integer or a small variant such as `2.5` or `2a`.
 - Checkboxes must appear only under executable task/iteration headings.
-- Generated plan files default to `docs/plans/<kebab-case-target>.md` unless the
-  user provides a different path.
+- Generated plan files use the user-provided path, or a confirmed default path
+  under `docs/plans/<kebab-case-target>.md`.
 - If a generated plan is outside `docs/plans/`, the handoff must say how to run
   it by exact path or copy/symlink it into the configured plans directory.
 - Every task has a file list and concrete per-task verification command.
