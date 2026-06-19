@@ -1,6 +1,6 @@
 {
   "name": "architecture",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Instruction-first architecture design and review: one read-only architect role, evidence-based design/review/scorecard/plan skills, methodology and tool skills, and report/design/plan templates.",
   "author": {
     "name": "Alexei Ledenev"

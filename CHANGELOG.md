@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-19
+
 ### Architecture review workflow
 
 - Added a quick-sweep review mode for multi-repo or low-budget comparisons that returns evidence-backed candidates, next checks, and an explicit quality self-check instead of forcing partial scores.
