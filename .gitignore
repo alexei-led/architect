@@ -1,7 +1,11 @@
+# OS junk
+.DS_Store
+**/.DS_Store
+
 # Local agent state
 .pi/
 
-# Python
+# Python env and caches
 .venv/
 __pycache__/
 *.py[cod]
@@ -18,11 +22,11 @@ __pycache__/
 *secret*
 *token*
 
-# Python build artifacts
+# Build artifacts
 /build/
 dist/*.whl
 dist/*.tar.gz
 *.egg-info/
 
-# Tool caches
+# Tool outputs
 .gitleaks-report.*
