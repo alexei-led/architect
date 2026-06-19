@@ -9,15 +9,15 @@ disagree, the file wins.
 
 Six architecture dimensions plus one meta-dimension that scores the review itself:
 
-| Dimension                 | Measures                                                                |
-| ------------------------- | ----------------------------------------------------------------------- |
-| `boundary_integrity`      | Whether code respects intended module, layer, and ownership boundaries. |
-| `coupling_balance`        | Integration strength vs distance vs volatility (Balanced Coupling).     |
-| `dependency_graph_health` | Cycles, hubs, bypassed layers, clusters vs intended modules.            |
-| `cohesion_modularity`     | Whether modules group related behavior; size skew; vocabulary mixing.   |
-| `change_locality`         | Whether changes stay inside intended boundaries over history.           |
-| `architecture_fitness`    | Whether architecture intent is executable via checks, not just docs.    |
-| `analysis_confidence`     | Meta: how trustworthy this review is given tool coverage and evidence.  |
+| Dimension                 | Measures                                                                                                                                |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `boundary_integrity`      | Whether code respects intended module, layer, and ownership boundaries.                                                                 |
+| `coupling_balance`        | Integration strength vs distance vs volatility (Balanced Coupling), scored from per-relationship records rather than prose impressions. |
+| `dependency_graph_health` | Cycles, hubs, bypassed layers, clusters vs intended modules.                                                                            |
+| `cohesion_modularity`     | Whether modules group related behavior; size skew; vocabulary mixing.                                                                   |
+| `change_locality`         | Whether changes stay inside intended boundaries over history.                                                                           |
+| `architecture_fitness`    | Whether architecture intent is executable via checks, not just docs.                                                                    |
+| `analysis_confidence`     | Meta: how trustworthy this review is given tool coverage and evidence.                                                                  |
 
 ## Score bands
 
@@ -31,8 +31,11 @@ Each dimension takes a `0..100` value mapped to a band (edges inclusive):
 | serviceable | 61–80  | Boundaries mostly respected; few cycles; most change stays local; some intent enforced by checks.                              |
 | strong      | 81–100 | Boundaries explicit and enforced; healthy dependency graph; change stays local; intent executable via fitness checks.          |
 
-The band must be the one whose range contains the value. Band/value disagreement
-is a hard error caught by `architect-validate-report`.
+For repeatability, score **band-first**: choose the band whose anchor best fits
+the evidence, then choose a value inside that band. Default to the band midpoint
+unless the evidence clearly supports an edge. The band must be the one whose
+range contains the value. Band/value disagreement is a hard error caught by
+`architect-validate-report`.
 
 ## Confidence
 
@@ -52,6 +55,9 @@ Missing or failed tools lower confidence (see [tools.md](tools.md)).
 - **Band matches value** — the band must contain the value.
 - **Evidence per score** — every non-meta score carries at least one evidence ref;
   no evidence means no score (record a coverage gap instead).
+- **Balanced Coupling needs relationship records** — `coupling_balance` is scored
+  from relationship-level strength, distance, volatility, and evidence records,
+  not from repo-level vibes.
 - **Low confidence caps high quality** — a `serviceable` or `strong` band requires
   at least `medium` confidence. A low-confidence review cannot present high
   quality as settled; lower the band or raise coverage.

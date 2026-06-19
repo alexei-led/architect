@@ -75,7 +75,9 @@ One entry per evidence dimension (`discovery`, `structural`, `semantic`,
 `dependency`, `change`, `operational`, `security`, `report`) listing
 `tools_used`, `tools_skipped`, `tools_missing`, `tools_failed`, and
 `confidence_impact`. Recorded even when no issue is found, so a clean dimension
-is distinguishable from an uninspected one. See [tools.md](tools.md).
+is distinguishable from an uninspected one. Some analysis tools return nonzero
+when they find issues; that output is evidence, not a tool failure. See
+[tools.md](tools.md).
 
 ## Report body sections
 
@@ -85,6 +87,16 @@ Boundary violations, Change locality and hotspots, Recommendations, Plan summary
 (when a plan accompanies the report), Evidence appendix, Tool coverage and gaps.
 Key findings render the narrative fields above, not just severity labels.
 
+The **Coupling review** section is structured, not free-form. For each important
+relationship, record:
+
+- relationship and abstraction level;
+- strength classification plus evidence;
+- distance split into code, ownership, runtime, and deploy distance plus evidence;
+- volatility from domain classification first, with implementation/provider volatility and churn/history as supporting evidence;
+- balance verdict and severity;
+- balancing move.
+
 For human-facing reports, a small Mermaid diagram may clarify the system map,
 dependency clusters, or boundary drift. Keep the same facts in text. For
 AI/agent-targeted reports, skip decorative diagrams, broad tables, and formatting
@@ -93,6 +105,30 @@ polish; use plain text evidence and adjacency lists.
 Intended architecture is rendered by source order (interview → docs → manifests →
 directories → inferred clusters), and disagreements between sources are reported
 rather than silently resolved.
+
+## Quick sweep format
+
+When a full report would be too expensive — for example, when comparing several
+repos — use an `architecture-review` **quick sweep** instead of forcing partial
+scores. A quick sweep is still evidence-based, but it returns **candidates and
+next checks**, not final findings or architecture scores.
+
+Per target, include:
+
+- `scope`
+- `intent_evidence`
+- `system_map`
+- `commands_run`
+- `tool_coverage`
+- `dependency_snapshot`
+- `coupling_candidates`
+- `likely_findings` (confirmed only; otherwise say none)
+- `next_checks`
+- `quality_self_check`
+
+The quality self-check explicitly answers: structure, clarity, usefulness,
+repeatability, and helpfulness. If any are weak, rerun the sweep with one deeper
+pass instead of pretending the result is good enough.
 
 ## Design format
 

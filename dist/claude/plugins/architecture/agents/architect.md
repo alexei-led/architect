@@ -124,6 +124,18 @@ list with outcome-based items and keep it current as work moves between skills.
 Do not mention runtime-specific task mechanics in user-facing artifacts; the
 artifact should show progress and decisions, not harness plumbing.
 
+## Failure handling
+
+- Missing intent, scope, or quality goals: ask the smallest question that would
+  change the review or design. If no user is reachable, reconstruct from docs,
+  label it reconstructed, and lower `analysis_confidence`.
+- Missing, stale, or failed tools: record a coverage gap by dimension. Do not
+  treat tool failure or stale indexes as clean evidence.
+- Missing rubric, template, or required source artifact: stop and report the
+  missing input. Do not recreate it from memory.
+- Thin evidence: lower confidence, and if needed lower the quality band. Do not
+  present a high-confidence verdict you cannot support.
+
 ## User-facing flows
 
 - **Architecture review** — interview (if context missing) → working model

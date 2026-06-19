@@ -9,6 +9,7 @@ Architecture review and design package for AI coding agents.
 Use it to:
 
 - review architecture with cited evidence
+- judge coupling with **Balanced Coupling**: integration strength, distance, and volatility
 - score architecture quality with explicit confidence
 - design target architecture from requirements or existing code
 - produce an incremental refactor plan
@@ -73,10 +74,12 @@ Typical flows:
 - greenfield or requirements: `architecture-design`
 - approved design, need sequencing: `architecture-plan`
 - audit only: `architecture-review`
+- multi-repo sample or triage: `architecture-review` quick sweep, then a full review only where the sweep finds real candidates
 
 Example prompts:
 
 - `Review this repo's architecture. Find coupling problems, boundary violations, and testability risks.`
+- `Compare these three repos with a quick architecture sweep. Name likely hotspots and the next checks, but do not score them yet.`
 - `Design a target architecture for this service based on the current code and docs.`
 - `Turn this approved architecture into an incremental implementation plan.`
 

@@ -8,7 +8,11 @@ from architect_tools import doctor
 def test_detect_ecosystems(tmp_path: Path):
     (tmp_path / "pyproject.toml").write_text("[project]\n")
     (tmp_path / "go.mod").write_text("module x\n")
-    assert doctor.detect_ecosystems(tmp_path) == {"python", "go"}
+    (tmp_path / "Dockerfile").write_text("FROM python:3.12\n")
+    workflows = tmp_path / ".github" / "workflows"
+    workflows.mkdir(parents=True)
+    (workflows / "ci.yaml").write_text("name: ci\n")
+    assert doctor.detect_ecosystems(tmp_path) == {"python", "go", "docker", "github-actions"}
 
 
 def test_missing_tool_renders_install_hint():

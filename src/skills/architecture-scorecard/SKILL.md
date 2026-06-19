@@ -41,9 +41,11 @@ report.
    invalid for every non-meta dimension. If you have no evidence, do not score —
    record a coverage gap and let `analysis_confidence` absorb it.
 
-3. **Pick the value, then the band.** Choose a 0..100 value justified by evidence
-   and the band anchors. The band must be the one whose range contains the value.
-   Band and value disagreeing is a hard error.
+3. **Pick the band, then the value.** Choose the band whose anchor best fits the
+   evidence first. Then choose a 0..100 value within that band; default to the
+   band midpoint unless the evidence clearly supports an edge. The band must be
+   the one whose range contains the value. Band and value disagreeing is a hard
+   error.
 
 4. **Set confidence independently of quality.** Confidence reflects how
    trustworthy the assessment is — coverage, recency, directness of evidence —

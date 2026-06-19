@@ -89,18 +89,30 @@ instructions or report.
    alone is explicitly forbidden — a directory tree is not an architecture.
 
 4. **Gather evidence across applicable dimensions.** Use `tools-code-search` for
-   local search/read/grep, then the relevant specialized tool skills (ast-grep,
-   codegraph, GitNexus, LSP/tree-sitter, language and operational tool skills)
-   to cover discovery, structural, semantic, dependency, change, and operational
-   evidence. Cite tools and files you used. Record coverage — used, skipped,
-   missing, failed — per dimension, even where you find nothing wrong. Summarize
-   output; do not paste raw dumps.
+   local search/read/grep first, then climb the narrowest evidence ladder that
+   can prove the claim: ast-grep/tree-sitter for syntactic presence, LSP for
+   resolved symbol truth, codegraph or language dependency tools for graph shape
+   and cycles, GitNexus or git history for co-change/churn, and operational
+   tools for deploy/runtime coupling. Cite tools and files you used. Record
+   coverage — used, skipped, missing, failed — per dimension, even where you
+   find nothing wrong. Summarize output; do not paste raw dumps.
    - **Check persistent indexes for staleness first.** Before trusting codegraph
      or GitNexus, confirm the index matches the current commit. For GitNexus,
      prefer an exposed runtime status/freshness capability when available;
      otherwise use the CLI (`gitnexus status` / `gitnexus detect-changes`). A
      stale index is a coverage gap, not evidence — record it as `tools_failed`,
      do not score from it.
+   - **Use semantic evidence only for semantic claims.** A "no callers / no
+     references" claim needs LSP resolution or a fresh code graph. ast-grep,
+     tree-sitter, and `rg` prove syntactic presence or absence only.
+   - **For every important coupling relationship, write a small evidence
+     matrix before scoring it.** Capture: relationship and abstraction level;
+     strength classification plus evidence; distance split into code,
+     ownership, runtime, and deploy distance plus evidence; volatility from
+     domain classification first, with implementation/provider volatility and
+     churn/history as supporting evidence;
+     balance verdict; severity; balancing move; confidence. Score
+     `coupling_balance` from these records, not from prose impressions.
    - **No working tool for an applicable dimension** is recorded as
      `tools_missing` with explicit `confidence_impact`. Do not silently score a
      dimension (e.g. dependency health) from imports alone without flagging the
@@ -156,6 +168,36 @@ exactly one primary next skill unless the user asks for the full pipeline:
 `architecture-design` for target-state work, or `architecture-plan` only when an
 approved design already exists and implementation sequencing is requested.
 
+## Quick sweep output
+
+Use this mode when the user asks to compare or sample multiple repos, or when a
+full report would be too expensive. A quick sweep is still evidence-based, but it
+returns hypotheses and next checks, not final scores.
+
+For each target, use this compact shape:
+
+- `scope`: repo/path and review depth (`quick-sweep`).
+- `intent_evidence`: README/ADR/agent-doc refs that define purpose and intended units.
+- `system_map`: languages, package/deploy units, major directories, public interfaces.
+- `tool_coverage`: tools used, missing, failed, stale, and confidence impact.
+- `commands_run`: exact commands or scripts used, scoped to the repo.
+- `dependency_snapshot`: package/module counts, cycles if checked, fan-in/out hotspots if checked; summarize as bullets, not raw JSON.
+- `coupling_candidates`: relationship records only where evidence exists; otherwise label hypotheses.
+- `likely_findings`: confirmed findings only; no evidence means no finding.
+- `next_checks`: the smallest follow-up commands that would turn hypotheses into findings.
+- `quality_self_check`: structure, clarity, usefulness, repeatability, helpfulness with a short reason for each; rerun or revise if any is `no` or weak.
+
+Quick-sweep hard rules:
+
+- Do not assign architecture scores unless the full review gates were met.
+- Do not call a hypothesis a finding.
+- Include enough commands and file refs that another agent can repeat the sweep.
+- Do not dump raw tool JSON or large dictionaries; turn them into ranked bullets with counts.
+- Parse tool output before treating a nonzero exit as failure; many analysis tools
+  use nonzero exits for confirmed findings.
+- If the result is only inventory, say it is not useful enough and run one deeper dependency or semantic pass.
+- Do not mark the quality self-check as all-yes without a reason for each criterion.
+
 ## Required response clauses
 
 When asked to describe the review workflow, include these clauses explicitly:
@@ -196,6 +238,8 @@ main review flow:
   directory shape alone.
 - No trusting stale architecture docs as implementation truth.
 - No finding without cited evidence and a human-facing narrative.
+- No `coupling_balance` score without per-relationship strength, distance,
+  volatility, and evidence records.
 - No high-quality band on low confidence.
 - Read-only on source. Recommend exactly one primary next skill: route target
   definition through `architecture-design`, or route approved implementation

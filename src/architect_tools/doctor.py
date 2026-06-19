@@ -23,87 +23,200 @@ RunFn = Callable[[list[str]], tuple[bool, str]]
 @dataclass(frozen=True)
 class Tool:
     name: str
-    dimension: str
+    dimensions: tuple[str, ...]
     version_cmd: tuple[str, ...]
     install_hint: str
     # Languages/ecosystems this tool applies to; empty means always applicable.
     applies_to: tuple[str, ...] = ()
 
+    @property
+    def dimension_label(self) -> str:
+        return "/".join(self.dimensions)
+
 
 # Grouped by evidence dimension. Kept declarative so the registry stays the only
 # place that knows about specific tools.
 TOOLS: tuple[Tool, ...] = (
-    Tool("fd", "discovery", ("fd", "--version"), "brew install fd / cargo install fd-find"),
-    Tool("rg", "discovery", ("rg", "--version"), "brew install ripgrep"),
-    Tool("git", "change", ("git", "--version"), "install git"),
-    Tool("ast-grep", "structural", ("ast-grep", "--version"), "brew install ast-grep"),
-    Tool("codegraph", "semantic", ("codegraph", "--version"), "see codegraph install docs"),
-    Tool("gitnexus", "change", ("gitnexus", "--version"), "see GitNexus install docs"),
+    Tool("fd", ("discovery",), ("fd", "--version"), "brew install fd / cargo install fd-find"),
+    Tool("rg", ("discovery",), ("rg", "--version"), "brew install ripgrep"),
+    Tool("git", ("change",), ("git", "--version"), "install git"),
+    Tool("gitnexus", ("change",), ("gitnexus", "--version"), "see GitNexus install docs"),
+    Tool("ast-grep", ("structural",), ("ast-grep", "--version"), "brew install ast-grep"),
+    Tool(
+        "tree-sitter",
+        ("structural",),
+        ("tree-sitter", "--version"),
+        "brew install tree-sitter-cli",
+    ),
+    Tool("ruff", ("structural",), ("ruff", "--version"), "uv pip install ruff", ("python",)),
+    Tool(
+        "radon",
+        ("structural",),
+        ("radon", "--version"),
+        "uv tool install radon",
+        ("python",),
+    ),
+    Tool(
+        "lizard",
+        ("structural",),
+        ("lizard", "--version"),
+        "uv tool install lizard",
+        ("python",),
+    ),
+    Tool(
+        "codegraph",
+        ("dependency", "semantic"),
+        ("codegraph", "--version"),
+        "see codegraph install docs",
+    ),
     Tool(
         "dependency-cruiser",
-        "dependency",
+        ("dependency",),
         ("depcruise", "--version"),
         "npm i -g dependency-cruiser",
         ("typescript", "javascript"),
     ),
     Tool(
         "madge",
-        "dependency",
+        ("dependency",),
         ("madge", "--version"),
         "npm i -g madge",
         ("typescript", "javascript"),
     ),
     Tool(
-        "knip", "dependency", ("knip", "--version"), "npm i -g knip", ("typescript", "javascript")
+        "knip",
+        ("dependency",),
+        ("knip", "--version"),
+        "npm i -g knip",
+        ("typescript", "javascript"),
     ),
     Tool(
         "import-linter",
-        "dependency",
+        ("dependency",),
         ("lint-imports", "--help"),
         "uv pip install import-linter",
         ("python",),
     ),
-    Tool("pydeps", "dependency", ("pydeps", "--version"), "uv pip install pydeps", ("python",)),
-    Tool("pyright", "semantic", ("pyright", "--version"), "npm i -g pyright", ("python",)),
-    Tool("deptry", "dependency", ("deptry", "--version"), "uv pip install deptry", ("python",)),
-    Tool("ruff", "structural", ("ruff", "--version"), "uv pip install ruff", ("python",)),
     Tool(
-        "goda", "dependency", ("goda", "version"), "go install github.com/loov/goda@latest", ("go",)
+        "pydeps",
+        ("dependency",),
+        ("pydeps", "--version"),
+        "uv pip install pydeps",
+        ("python",),
+    ),
+    Tool(
+        "deptry",
+        ("dependency",),
+        ("deptry", "--version"),
+        "uv pip install deptry",
+        ("python",),
+    ),
+    Tool(
+        "pipdeptree",
+        ("dependency",),
+        ("pipdeptree", "--version"),
+        "uv tool install pipdeptree",
+        ("python",),
+    ),
+    Tool(
+        "goda",
+        ("dependency",),
+        ("goda", "help"),
+        "go install github.com/loov/goda@latest",
+        ("go",),
+    ),
+    Tool(
+        "pyright",
+        ("semantic",),
+        ("pyright", "--version"),
+        "npm i -g pyright",
+        ("python",),
+    ),
+    Tool(
+        "basedpyright",
+        ("semantic",),
+        ("basedpyright", "--version"),
+        "uv tool install basedpyright",
+        ("python",),
     ),
     Tool(
         "staticcheck",
-        "semantic",
+        ("semantic",),
         ("staticcheck", "-version"),
         "go install honnef.co/go/tools/cmd/staticcheck@latest",
         ("go",),
     ),
     Tool(
         "govulncheck",
-        "security",
+        ("security",),
         ("govulncheck", "-version"),
         "go install golang.org/x/vuln/cmd/govulncheck@latest",
         ("go",),
     ),
-    Tool("helm", "operational", ("helm", "version"), "brew install helm", ("kubernetes",)),
+    Tool("trivy", ("security",), ("trivy", "--version"), "brew install trivy"),
+    Tool("syft", ("security",), ("syft", "version"), "brew install syft"),
+    Tool("grype", ("security",), ("grype", "version"), "brew install grype"),
+    Tool("tfsec", ("security",), ("tfsec", "--version"), "brew install tfsec", ("terraform",)),
+    Tool(
+        "zizmor", ("security",), ("zizmor", "--version"), "brew install zizmor", ("github-actions",)
+    ),
+    Tool("helm", ("operational",), ("helm", "version"), "brew install helm", ("kubernetes",)),
     Tool(
         "kustomize",
-        "operational",
+        ("operational",),
         ("kustomize", "version"),
         "brew install kustomize",
         ("kubernetes",),
     ),
     Tool(
+        "kubeconform",
+        ("operational",),
+        ("kubeconform", "-v"),
+        "brew install kubeconform",
+        ("kubernetes",),
+    ),
+    Tool(
+        "kube-linter",
+        ("operational",),
+        ("kube-linter", "version"),
+        "brew install kube-linter",
+        ("kubernetes",),
+    ),
+    Tool(
         "terraform",
-        "operational",
+        ("operational",),
         ("terraform", "version"),
         "brew install terraform",
         ("terraform",),
     ),
-    Tool("trivy", "security", ("trivy", "--version"), "brew install trivy"),
-    Tool("syft", "security", ("syft", "version"), "brew install syft"),
-    Tool("jq", "report", ("jq", "--version"), "brew install jq"),
-    Tool("yq", "report", ("yq", "--version"), "brew install yq"),
-    Tool("mmdc", "report", ("mmdc", "--version"), "npm i -g @mermaid-js/mermaid-cli"),
+    Tool("tofu", ("operational",), ("tofu", "version"), "brew install tofu", ("terraform",)),
+    Tool(
+        "tflint", ("operational",), ("tflint", "--version"), "brew install tflint", ("terraform",)
+    ),
+    Tool(
+        "hadolint",
+        ("operational",),
+        ("hadolint", "--version"),
+        "brew install hadolint",
+        ("docker",),
+    ),
+    Tool(
+        "actionlint",
+        ("operational",),
+        ("actionlint", "-version"),
+        "brew install actionlint",
+        ("github-actions",),
+    ),
+    Tool(
+        "conftest",
+        ("operational",),
+        ("conftest", "--version"),
+        "brew install conftest",
+        ("kubernetes", "terraform"),
+    ),
+    Tool("jq", ("report",), ("jq", "--version"), "brew install jq"),
+    Tool("yq", ("report",), ("yq", "--version"), "brew install yq"),
+    Tool("mmdc", ("report",), ("mmdc", "--version"), "npm i -g @mermaid-js/mermaid-cli"),
 )
 
 # Marker files that imply an ecosystem is in play, for applicability.
@@ -112,8 +225,10 @@ ECOSYSTEM_MARKERS = {
     "typescript": ("tsconfig.json",),
     "javascript": ("package.json",),
     "go": ("go.mod",),
-    "kubernetes": ("Chart.yaml", "kustomization.yaml"),
-    "terraform": ("main.tf",),
+    "kubernetes": ("Chart.yaml", "kustomization.yaml", "manifests/*.yaml", "manifests/*.yml"),
+    "terraform": ("main.tf", "*.tf"),
+    "docker": ("Dockerfile", "Containerfile"),
+    "github-actions": (".github/workflows/*.yml", ".github/workflows/*.yaml"),
 }
 
 
@@ -126,12 +241,18 @@ def _default_run(cmd: list[str]) -> tuple[bool, str]:
     return proc.returncode == 0, out[0] if out else ""
 
 
+def _marker_exists(repo: Path, marker: str) -> bool:
+    if (repo / marker).exists():
+        return True
+    return any(repo.glob(f"**/{marker}"))
+
+
 def detect_ecosystems(repo: Path) -> set[str]:
-    """Detect ecosystems present in repo from marker files (non-recursive + one level)."""
+    """Detect ecosystems present in repo from a bounded recursive marker scan."""
     found: set[str] = set()
     for eco, markers in ECOSYSTEM_MARKERS.items():
         for marker in markers:
-            if (repo / marker).exists() or any(repo.glob(f"*/{marker}")):
+            if _marker_exists(repo, marker):
                 found.add(eco)
                 break
     return found
@@ -172,10 +293,10 @@ def run_doctor(
 
 def render(statuses: list[ToolStatus]) -> str:
     lines = ["Architecture-review tool check", ""]
-    for st in sorted(statuses, key=lambda s: (s.tool.dimension, s.tool.name)):
+    for st in sorted(statuses, key=lambda s: (s.tool.dimension_label, s.tool.name)):
         mark = {"available": "ok", "missing": "MISSING", "failed": "FAILED"}[st.state]
         scope = "" if st.applicable else " (n/a for this repo)"
-        line = f"  [{mark:7}] {st.tool.dimension:11} {st.tool.name}{scope}"
+        line = f"  [{mark:7}] {st.tool.dimension_label:19} {st.tool.name}{scope}"
         if st.state == "available" and st.detail:
             line += f" — {st.detail}"
         lines.append(line)

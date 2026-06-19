@@ -9,6 +9,24 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Architecture review workflow
+
+- Added a quick-sweep review mode for multi-repo or low-budget comparisons that returns evidence-backed candidates, next checks, and an explicit quality self-check instead of forcing partial scores.
+- Tightened review guidance so `coupling_balance` is grounded in per-relationship records: strength, distance, volatility, evidence, severity, and balancing move.
+- Clarified that nonzero exits from analysis tools can be confirmed findings rather than tool failures.
+
+### Methodology and documentation
+
+- Aligned README, methodology, scoring, report-format, and tools docs with Balanced Coupling terminology and the current review workflow.
+- Documented the distance split used in reviews: code, ownership, runtime, and deploy distance.
+- Clarified domain volatility versus implementation/provider volatility and how quick sweeps differ from full reviews.
+
+### Tooling
+
+- Expanded `architect-doctor` coverage for newly supported analysis, operational, and security tools including `tree-sitter`, `basedpyright`, `pipdeptree`, `radon`, `lizard`, `kubeconform`, `kube-linter`, `hadolint`, `actionlint`, `tflint`, `tofu`, `conftest`, `grype`, `tfsec`, and `zizmor`.
+- Improved repo applicability detection for Docker, GitHub Actions, recursive Terraform markers, and Kubernetes manifests.
+- Updated release automation to bump `src/architect_tools/__init__.py` version during tagged releases.
+
 ## [0.3.2] - 2026-06-06
 
 ### Skill instructions

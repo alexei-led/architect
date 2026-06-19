@@ -41,6 +41,7 @@ files = [
     Path("pyproject.toml"),
     Path("uv.lock"),
     Path("src/plugins/architecture/plugin.yaml"),
+    Path("src/architect_tools/__init__.py"),
 ]
 
 for path in files:
@@ -54,6 +55,8 @@ for path in files:
             text,
             count=1,
         )
+    elif path.name == "__init__.py":
+        text = re.sub(r'(?m)^__version__ = "[^"]+"', f'__version__ = "{version}"', text, count=1)
     else:
         text = re.sub(r"(?m)^version: .+", f"version: {version}", text, count=1)
     path.write_text(text, encoding="utf-8")
@@ -90,6 +93,7 @@ git add \
 	pyproject.toml \
 	uv.lock \
 	src/plugins/architecture/plugin.yaml \
+	src/architect_tools/__init__.py \
 	CHANGELOG.md \
 	package.json \
 	.claude-plugin/ \

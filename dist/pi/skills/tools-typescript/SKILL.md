@@ -79,6 +79,10 @@ Record:
 - Tool not installed and `npx` blocked offline → dependency dimension
   `tools_missing` with install hint; fall back to ast-grep import scans + the
   code graph, recording reduced coverage.
+- Some analysis tools return nonzero when they find issues. For example,
+  `madge --circular` may exit nonzero when cycles exist. Inspect the output
+  before labeling the command `tools_failed`; finding output is evidence, not a
+  tool failure.
 - `tsc`/eslint failing because the project doesn't install → `tools_failed`
   (build state), not "no type errors." Note it and cap confidence.
 - Monorepo: run per-package or point configs at workspaces; a root-only run that

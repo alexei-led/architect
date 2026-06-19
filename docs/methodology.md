@@ -19,11 +19,17 @@ evaluates the **connection** between two components along three dimensions:
    integration).
 2. **Distance** — how far apart the components sit (the _cost_ of a cascading
    change): methods → objects → packages → services → systems. Relative to the
-   level analyzed, and socio-technical (different teams = further apart). Runtime
+   level analyzed, and socio-technical (different teams = further apart). In
+   reviews, record distance as separate signals when possible: **code** distance,
+   **ownership** distance, **runtime** distance, and **deploy** distance. Runtime
    coupling counts: synchronous calls bind lifecycles tighter than async.
 3. **Volatility** — how likely a component is to change at all. Estimated from the
    business domain (DDD subdomains), not commit history: **core** (competitive
    advantage) → high; **supporting** and **generic** → low functional volatility.
+   Commit churn and co-change support volatility claims, but they do not define
+   domain volatility. Provider swaps, SDK churn, or leaking vendor DTOs are a
+   separate **implementation/provider volatility** signal that can justify a
+   stronger boundary even when business volatility is low.
 
 **The balance rule:** modularity emerges when strength and distance
 _counterbalance_ (one high, one low); complexity emerges when they _match_. Use
@@ -51,6 +57,22 @@ distance), or confirm low volatility leaves it alone — never a rewrite. When t
 relationships look equally risky, use connascence as a tie-breaker: shared
 meaning, algorithm, timing, identity, or call order usually beats a mere shared
 name for priority.
+
+## How the review applies the model
+
+A full architecture review scores `coupling_balance` from **relationship records**,
+not prose impressions. For each important relationship, the review records:
+
+- relationship and abstraction level;
+- integration strength plus evidence;
+- distance split into code, ownership, runtime, and deploy signals plus evidence;
+- domain volatility first, with implementation/provider volatility and churn as
+  supporting evidence;
+- balance verdict, severity, and the cheapest balancing move.
+
+A quick sweep uses the same vocabulary, but returns **candidates and next checks**
+instead of final findings or scores. No evidence means no finding; no full review
+means no score.
 
 ### Attribution and licensing
 

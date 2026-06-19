@@ -87,6 +87,10 @@ Record:
 - Tool missing → record the operational (or security) dimension `tools_missing`
   with an install hint; fall back to reading the manifests directly and label
   the topology claims as un-validated hypotheses.
+- Some linters and scanners return nonzero when they find violations or
+  vulnerabilities. Inspect output before labeling the command `tools_failed`;
+  finding output is evidence. Reserve `tools_failed` for tool/runtime/config
+  failure.
 - `helm template` / `terraform validate` failing on missing values or
   uninitialized backend → `tools_failed` (config state), not "valid." Note what
   was missing. If initialization writes local state or cache, redirect it to

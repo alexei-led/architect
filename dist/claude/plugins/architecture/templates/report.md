@@ -186,9 +186,14 @@ finding include:
 
 ## Coupling review
 
-REPLACE: important integrations by strength, distance, volatility. State the
-abstraction level assessed and the balancing move: lower strength, lower
-distance, or accept due to low volatility.
+REPLACE: for each important relationship, record:
+
+- relationship and abstraction level assessed;
+- strength classification plus evidence;
+- distance split into code, ownership, runtime, and deploy distance plus evidence;
+- volatility from domain classification first, with implementation/provider volatility and churn/history as supporting evidence;
+- balance verdict and severity;
+- balancing move: lower strength, lower distance, or accept due to low volatility.
 
 ## Boundary violations
 
