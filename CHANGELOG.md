@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-20
+
 ### archfit integration and evidence calibration
 
 - Added the `tools-archfit` skill: consume archfit's deterministic facts (full/delta JSON, scorecard, tool coverage, findings, SARIF, `agent_tasks`) and return an `archfit_calibration` matrix (confirmed, severity-adjusted, false-positive/noise, missed-by-archfit, config changes, new fitness checks, labels to confirm) instead of passing tool scores through.
