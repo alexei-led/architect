@@ -56,7 +56,13 @@ patch = fixes and documentation updates.
 
 ### Skill instructions
 
-- Tightened architecture skill write-safety, runtime-tool, scoped validation, and package-runner guidance.
+- Made plan writing safer: with no confirmed destination, return the plan in the conversation and ask before creating `docs/plans/` or writing a file, instead of writing one automatically.
+- Hardened evidence gathering against polluting the target repo: redirect tool caches and local state to a temp dir (`RUFF_CACHE_DIR`, `TF_DATA_DIR`, Terraform `.terraform`) and ask before writing generated tool artifacts; check GitNexus index freshness via an exposed runtime capability or the CLI (`gitnexus status` / `gitnexus detect-changes`).
+- Scoped report tooling (`tools-report-markdown`) to the target report or plan instead of repo-wide link/spell/format sweeps, and switched format checks to the repo's detected package runner (`npm exec` / `pnpm exec` / `bunx`) rather than a hardcoded `npx prettier`.
+
+### Documentation cleanup
+
+- Slimmed the README and CONTRIBUTING for a tighter, less repetitive overview.
 
 ## [0.3.1] - 2026-05-24
 
