@@ -37,6 +37,8 @@ def test_report_template_parses():
     assert fm["artifact"] == "architecture-report"
     assert fm["schema_version"] == 2
     assert "scores" in fm
+    assert "module_volatility" in fm
+    assert "## Module volatility" in body
     assert "## Executive summary" in body
 
 
@@ -45,6 +47,14 @@ def test_scorecard_parses():
     assert scorecard["rubric_version"] == 1
     assert scorecard["dimensions"]
     assert scorecard["bands"]
+
+
+def test_scorecard_has_coverage_gap_rule():
+    scorecard = _load_scorecard(TEMPLATES / "scorecard.yaml")
+    gap = scorecard["rules"]["coverage_gap_caps_quality"]
+    assert gap["max_band"] == "mixed"
+    assert gap["max_value"] == 60
+    assert gap["confidence"] == "low"
 
 
 def test_plan_template_has_core_sections():
@@ -93,6 +103,7 @@ def test_plan_template_tasks_have_execution_metadata():
             "Files:",
             "Preconditions:",
             "Postconditions:",
+            "Fitness gate:",
             "Impact commands:",
             "Verification commands:",
             "Manual checks:",

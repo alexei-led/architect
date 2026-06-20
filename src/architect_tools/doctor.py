@@ -41,6 +41,12 @@ TOOLS: tuple[Tool, ...] = (
     Tool("rg", ("discovery",), ("rg", "--version"), "brew install ripgrep"),
     Tool("git", ("change",), ("git", "--version"), "install git"),
     Tool("gitnexus", ("change",), ("gitnexus", "--version"), "see GitNexus install docs"),
+    Tool(
+        "archfit",
+        ("dependency", "change", "report"),
+        ("archfit", "--version"),
+        "see archfit install docs",
+    ),
     Tool("ast-grep", ("structural",), ("ast-grep", "--version"), "brew install ast-grep"),
     Tool(
         "tree-sitter",

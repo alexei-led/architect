@@ -10,6 +10,8 @@ description: >-
   evidence; scores with the scorecard and writes cited findings. NOT for
   line-level code review, target architecture design (use architecture-design),
   or implementation sequencing (use architecture-plan after design approval).
+  When archfit is available, consumes and calibrates its deterministic facts
+  without replacing independent review judgment.
 ---
 
 # Architecture review
@@ -51,11 +53,13 @@ Maintain a visible task list for the review flow. Track at least:
 1. Context and scope confirmed.
 2. Working model validated.
 3. System map built.
-4. Evidence gathered by dimension.
-5. Findings triaged.
-6. Scores assigned.
-7. Report written and checked.
-8. Next skill recommendation made.
+4. Module volatility/change-rate judgments captured.
+5. Evidence gathered by dimension.
+6. Deterministic tool facts calibrated when available.
+7. Findings triaged.
+8. Scores assigned.
+9. Report written and checked.
+10. Next skill recommendation made.
 
 Keep task names outcome-based. Do not expose runtime-specific mechanics in the
 instructions or report.
@@ -88,14 +92,25 @@ instructions or report.
    frontmatter. Scoring before a map is forbidden. Scoring from directory shape
    alone is explicitly forbidden — a directory tree is not an architecture.
 
-4. **Gather evidence across applicable dimensions.** Use `tools-code-search` for
-   local search/read/grep first, then climb the narrowest evidence ladder that
-   can prove the claim: ast-grep/tree-sitter for syntactic presence, LSP for
-   resolved symbol truth, codegraph or language dependency tools for graph shape
-   and cycles, GitNexus or git history for co-change/churn, and operational
-   tools for deploy/runtime coupling. Cite tools and files you used. Record
-   coverage — used, skipped, missing, failed — per dimension, even where you
-   find nothing wrong. Summarize output; do not paste raw dumps.
+4. **Capture module volatility/change-rate judgments.** For every important
+   module or boundary, record reusable labels in `module_volatility`: module,
+   core/supporting/generic classification, high/medium/low volatility, source
+   (`interview`, `docs`, `architect-inferred`, `archfit-label`, `git-history`),
+   evidence refs, confidence, and notes. Domain role is primary; churn is
+   supporting evidence. Unconfirmed labels go to
+   `archfit_calibration.labels_to_confirm` when archfit could consume them.
+
+5. **Gather evidence across applicable dimensions.** Use `tools-code-search` for
+   local search/read/grep first. If the repo has `.archfit.yaml`/`archfit.yaml`
+   or `archfit` is available, run `tools-archfit` as a deterministic preflight:
+   full JSON/scorecard, delta when a base ref is known, tool coverage, findings,
+   and `agent_tasks`. Then climb the narrowest evidence ladder that can prove
+   each claim: ast-grep/tree-sitter for syntactic presence, LSP for resolved
+   symbol truth, codegraph or language dependency tools for graph shape and
+   cycles, GitNexus or git history for co-change/churn, and operational tools
+   for deploy/runtime coupling. Cite tools and files you used. Record coverage —
+   used, skipped, missing, failed — per dimension, even where you find nothing
+   wrong. Summarize output; do not paste raw dumps.
    - **Check persistent indexes for staleness first.** Before trusting codegraph
      or GitNexus, confirm the index matches the current commit. For GitNexus,
      prefer an exposed runtime status/freshness capability when available;
@@ -105,6 +120,12 @@ instructions or report.
    - **Use semantic evidence only for semantic claims.** A "no callers / no
      references" claim needs LSP resolution or a fresh code graph. ast-grep,
      tree-sitter, and `rg` prove syntactic presence or absence only.
+   - **Calibrate deterministic facts before using them.** For archfit output,
+     classify findings and metrics as `confirmed`, `severity_adjusted`,
+     `false_positive_or_noise`, or `missed_by_archfit`. Include config changes,
+     new fitness checks, and labels to confirm. Do not pass through archfit's
+     scores as architect scores; use them as evidence and coverage signals.
+     `archfit review` LLM narration is advisory only, never source-of-truth.
    - **For every important coupling relationship, write a small evidence
      matrix before scoring it.** Capture: relationship and abstraction level;
      strength classification plus evidence; distance split into code,
@@ -112,11 +133,13 @@ instructions or report.
      domain classification first, with implementation/provider volatility and
      churn/history as supporting evidence;
      balance verdict; severity; balancing move; confidence. Score
-     `coupling_balance` from these records, not from prose impressions.
+     `coupling_balance` from these records, not from prose impressions or a
+     deterministic tool score alone.
    - **No working tool for an applicable dimension** is recorded as
      `tools_missing` with explicit `confidence_impact`. Do not silently score a
      dimension (e.g. dependency health) from imports alone without flagging the
-     gap and capping confidence.
+     gap and capping confidence. Absence of findings is positive evidence only
+     when a current tool actually covered that finding class.
    - **Redirect tool caches and local state** to a writable temp dir when a tool
      would write generated data into the target repo (e.g.
      `RUFF_CACHE_DIR=$TMPDIR/...`, `TF_DATA_DIR=$TMPDIR/...`); a sandboxed or
@@ -126,22 +149,22 @@ instructions or report.
      git history across the old and new path, halving apparent churn. Scope churn
      to current paths or use `git log --follow` per file.
 
-5. **Triage before scoring.** Sort signal from noise: which observations are
+6. **Triage before scoring.** Sort signal from noise: which observations are
    facts, which are hypotheses, which actually bear on a score. See
    `references/triage.md`.
 
-6. **Score with the scorecard skill.** Use the architecture-scorecard skill for
+7. **Score with the scorecard skill.** Use the architecture-scorecard skill for
    every score. Read `../../templates/scorecard.yaml` for dimensions, bands,
    anchors, and rules — it is the source of truth. Each non-meta score needs at
    least one evidence ref. Low confidence caps the quality claim.
 
-7. **Write the report from the template.** Use `../../templates/report.md` as the
+8. **Write the report from the template.** Use `../../templates/report.md` as the
    skeleton. Fill frontmatter (interview context, system map, scores, findings,
    evidence, tool coverage) and the prose sections. Findings carry stable IDs
    and human-facing narratives: knowledge or boundary leakage, complexity impact,
    cascading-change scenarios, recommendation, and trade-offs.
 
-8. **Recommend the next primary skill.** If the user asks for review and
+9. **Recommend the next primary skill.** If the user asks for review and
    immediate refactoring, do not edit source or mix audit with implementation.
    Finish the report, then choose one next skill:
    - `architecture-design` when the target boundaries, contracts, tests, or
@@ -160,10 +183,14 @@ instructions or report.
 ## Output
 
 A completed review produces an architecture report using `../../templates/report.md`.
-The report must include `interview_context`, `system_map`, `scores`, `findings`,
-`evidence`, and `tool_coverage`. Each finding must include a human-facing
-narrative explaining the leak or drift, complexity impact, cascading-change
-scenarios, recommendation, and trade-offs. If remediation is requested, recommend
+The report must include `interview_context`, `system_map`, `module_volatility`,
+`scores`, `findings`, `evidence`, and `tool_coverage`. When archfit was used,
+include an `archfit_calibration` block or section with confirmed,
+severity-adjusted,
+false-positive/noise, missed-by-archfit, config-change, new-fitness-check, and
+label-to-confirm entries. Each finding must include a human-facing narrative
+explaining the leak or drift, complexity impact, cascading-change scenarios,
+recommendation, and trade-offs. If remediation is requested, recommend
 exactly one primary next skill unless the user asks for the full pipeline:
 `architecture-design` for target-state work, or `architecture-plan` only when an
 approved design already exists and implementation sequencing is requested.
@@ -179,8 +206,11 @@ For each target, use this compact shape:
 - `scope`: repo/path and review depth (`quick-sweep`).
 - `intent_evidence`: README/ADR/agent-doc refs that define purpose and intended units.
 - `system_map`: languages, package/deploy units, major directories, public interfaces.
+- `module_volatility`: reusable module/domain/volatility judgments and confidence.
 - `tool_coverage`: tools used, missing, failed, stale, and confidence impact.
 - `commands_run`: exact commands or scripts used, scoped to the repo.
+- `archfit_calibration`: when archfit was used, confirmed/severity-adjusted/
+  false-positive/missed/config/check/label summary.
 - `dependency_snapshot`: package/module counts, cycles if checked, fan-in/out hotspots if checked; summarize as bullets, not raw JSON.
 - `coupling_candidates`: relationship records only where evidence exists; otherwise label hypotheses.
 - `likely_findings`: confirmed findings only; no evidence means no finding.
@@ -240,7 +270,9 @@ main review flow:
 - No finding without cited evidence and a human-facing narrative.
 - No `coupling_balance` score without per-relationship strength, distance,
   volatility, and evidence records.
-- No high-quality band on low confidence.
+- No high-quality band on low confidence or missing/thin evidence.
+- No treating archfit, codegraph, GitNexus, or any single tool's green result as
+  complete architecture proof; calibrate coverage and verify important claims.
 - Read-only on source. Recommend exactly one primary next skill: route target
   definition through `architecture-design`, or route approved implementation
   sequencing to a mutator/engineer via `architecture-plan` with

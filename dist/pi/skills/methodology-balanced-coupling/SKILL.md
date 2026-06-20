@@ -139,6 +139,16 @@ the same label.
 - To fix unbalanced coupling, move on one dimension: lower strength (introduce a
   contract), lower distance (co-locate), or confirm low volatility leaves it
   alone. Recommend the cheapest balancing move, not a rewrite.
+- Deterministic tools such as archfit, codegraph, dependency-cruiser, madge,
+  or GitNexus can supply candidate edges, cycles, hubs, and churn. Use those as
+  evidence, not as the final Balanced Coupling judgment.
+- Import cycles, layer inversions, and runtime/deploy entanglement may be scored
+  primarily under dependency graph or boundary dimensions, but they still inform
+  the coupling narrative because they raise cascade cost and distance.
+- If the strength classifier is absent (no classified edges), you cannot assert
+  balance. Record low confidence and cap `coupling_balance` at `mixed` until you
+  establish the edges independently — a tool's "balanced, no classified edges"
+  default is a coverage gap, not evidence of balance.
 - This feeds the `coupling_balance` scorecard dimension. This skill judges
   balance; architecture-scorecard assigns the number.
 
@@ -160,6 +170,8 @@ When applying the model, report:
 - `strength`: intrusive, functional, model, or contract; cite evidence.
 - `distance`: abstraction, ownership, and runtime distance; cite evidence.
 - `volatility`: domain volatility first, git/churn as supporting evidence.
+- `deterministic_evidence`: tool IDs or commands that found the edge, cycle,
+  co-change, or metric, plus any coverage limits.
 - `severity`: mapped risk level.
 - `balancing_move`: lower strength, lower distance, or leave alone.
 

@@ -35,6 +35,7 @@ score dimension, design decision, contract, module responsibility, or risk.
 
 - `REPLACE whole-plan command, e.g. make check`
 - `REPLACE focused architecture-fitness, test, or lint command`
+- `REPLACE if configured: archfit check --config .archfit.yaml --base <ref>`
 
 ## Implementation Steps
 
@@ -51,6 +52,9 @@ Files:
 Preconditions: REPLACE.
 Postconditions: REPLACE.
 
+Fitness gate: REPLACE existing gate status, rule/config change, and
+before-fail/after-pass expectation, or `None`.
+
 Impact commands:
 
 If GitNexus is unavailable, replace these with fallback commands and note that gap.
@@ -61,6 +65,7 @@ If GitNexus is unavailable, replace these with fallback commands and note that g
 Verification commands:
 
 - `REPLACE concrete command, e.g. uv run pytest tests/test_boundary.py`
+- `REPLACE if configured: archfit check --config .archfit.yaml --base <ref>`
 
 Manual checks:
 
@@ -85,6 +90,9 @@ Files:
 Preconditions: REPLACE.
 Postconditions: REPLACE.
 
+Fitness gate: REPLACE existing gate status, rule/config change, and
+before-fail/after-pass expectation, or `None`.
+
 Impact commands:
 
 If GitNexus is unavailable, replace these with fallback commands and note that gap.
@@ -95,6 +103,7 @@ If GitNexus is unavailable, replace these with fallback commands and note that g
 Verification commands:
 
 - `REPLACE concrete command, e.g. uv run pytest tests/test_boundary.py`
+- `REPLACE if configured: archfit check --config .archfit.yaml --base <ref>`
 
 Manual checks:
 
@@ -116,6 +125,8 @@ Files:
 
 Preconditions: all prior task verification commands passed.
 Postconditions: whole-plan checks pass; docs and re-review scope are clear.
+
+Fitness gate: REPLACE final whole-plan gate status, or `None`.
 
 Impact commands:
 

@@ -33,6 +33,7 @@ Source templates and `src/templates/scorecard.yaml` are authoritative when prose
 
 - [Methodology](docs/methodology.md): Balanced Coupling and architecture fitness summaries with attribution.
 - [Tools and coverage](docs/tools.md): Evidence tool registry, `tools-code-search`, applicability, and confidence-impact rules.
+- [archfit tool skill](src/skills/tools-archfit/SKILL.md): Deterministic archfit evidence and calibration workflow.
 - [Balanced Coupling skill](src/skills/methodology-balanced-coupling/SKILL.md): Coupling analysis procedure.
 - [Architecture fitness skill](src/skills/methodology-architecture-fitness/SKILL.md): Fitness-function assessment procedure.
 

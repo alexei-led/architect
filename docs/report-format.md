@@ -28,8 +28,10 @@ comparability: # two reports compare only when all three match
 
 interview_context: { ... } # intended architecture and constraints from the interview
 system_map: { ... } # what exists, established before judging quality
+module_volatility: [...] # reusable domain/change-rate judgments per module
 scores: { ... } # one entry per dimension (see scoring.md)
 findings: [...] # stable IDs, severity, dimension, evidence refs, narrative, action
+archfit_calibration: { ... } # optional: how archfit facts were verified or corrected
 evidence: [...] # addressable refs a human/agent can re-check
 tool_coverage: [...] # used/skipped/missing/failed + confidence impact per dimension
 ```
@@ -50,6 +52,14 @@ graphs, imports, ownership, churn), `high_risk_entrypoints`, and
 `missing_evidence`. Declared vs observed are kept distinct so the report can flag
 where intent and reality diverge.
 
+### module_volatility
+
+Reusable module-level domain and change-rate judgments: module, classification
+(`core` / `supporting` / `generic` / `unknown`), volatility, source, evidence
+refs, confidence, and notes. Domain role is primary; churn supports the claim.
+Unconfirmed labels that deterministic tools may consume later also appear in
+`archfit_calibration.labels_to_confirm`.
+
 ### findings
 
 Each finding has a stable `id` (`F1`, `F2`, …) reused across repeat reports for
@@ -61,6 +71,15 @@ The narrative explains the issue in terms a maintainer can act on:
 `problem`, `knowledge_or_boundary_leakage`, `complexity_impact`,
 `cascading_change_scenarios`, `recommended_improvement`, and `tradeoffs`. The
 validator requires this narrative for schema version 2 reports.
+
+### archfit_calibration
+
+Optional. Present only when archfit evidence was used. It records source
+commands/artifacts plus `confirmed`, `severity_adjusted`,
+`false_positive_or_noise`, `missed_by_archfit`, `config_changes`,
+`new_fitness_checks`, `labels_to_confirm`, and `confidence_impact`. This keeps
+archfit's deterministic facts separate from the architect's judgment and makes
+false positives, missing tool coverage, and reusable labels explicit.
 
 ### evidence
 
@@ -82,10 +101,11 @@ when they find issues; that output is evidence, not a tool failure. See
 ## Report body sections
 
 In order: Executive summary, Interview context, System map, Intended
-architecture, Observed architecture, Score map, Key findings, Coupling review,
-Boundary violations, Change locality and hotspots, Recommendations, Plan summary
-(when a plan accompanies the report), Evidence appendix, Tool coverage and gaps.
-Key findings render the narrative fields above, not just severity labels.
+architecture, Module volatility, Observed architecture, Score map, Key findings,
+Coupling review, Archfit calibration (when used), Boundary violations, Change locality and
+hotspots, Recommendations, Plan summary (when a plan accompanies the report),
+Evidence appendix, Tool coverage and gaps. Key findings render the narrative
+fields above, not just severity labels.
 
 The **Coupling review** section is structured, not free-form. For each important
 relationship, record:
@@ -120,6 +140,7 @@ Per target, include:
 - `system_map`
 - `commands_run`
 - `tool_coverage`
+- `archfit_calibration` (when archfit was used)
 - `dependency_snapshot`
 - `coupling_candidates`
 - `likely_findings` (confirmed only; otherwise say none)
@@ -167,9 +188,11 @@ tasks or fewer before re-review.
   `### Iteration N:` headings. Each task carries a justification (finding ID +
   evidence ref), file list, preconditions, postconditions, concrete GitNexus
   `impact` / `detect-changes` commands or an explicit missing-tool fallback,
-  concrete per-task verification commands, manual checks as plain bullets, and
-  small independently-verifiable checkbox items. Checkboxes belong only inside
-  task or iteration sections.
+  a fitness-gate slot with existing gate status and before-fail/after-pass
+  expectation where applicable, concrete per-task verification commands, archfit
+  check/delta commands when configured, manual checks as plain bullets, and small
+  independently-verifiable checkbox items. Checkboxes belong only inside task or
+  iteration sections.
 - **Acceptance criteria** — conditions for accepting the whole plan; prefer
   characterization tests, seam creation, boundary repair, and fitness checks
   before cosmetic cleanup.

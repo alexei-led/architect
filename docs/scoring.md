@@ -48,19 +48,31 @@ quality value**:
 - **high** — applicable evidence dimensions covered with working tools and direct
   file/graph references.
 
-Missing or failed tools lower confidence (see [tools.md](tools.md)).
+Missing or failed tools lower confidence (see [tools.md](tools.md)). A clean or
+empty tool result is positive evidence only when the tool had current coverage
+for that class of problem. Missing classified edges, stale indexes, or disabled
+analysis cannot support a green score.
 
 ## Rules the rubric enforces
 
 - **Band matches value** — the band must contain the value.
 - **Evidence per score** — every non-meta score carries at least one evidence ref;
-  no evidence means no score (record a coverage gap instead).
+  no evidence means no score (record a coverage gap instead). If a numeric
+  placeholder is required, it must be low-confidence and non-green.
 - **Balanced Coupling needs relationship records** — `coupling_balance` is scored
   from relationship-level strength, distance, volatility, and evidence records,
   not from repo-level vibes.
 - **Low confidence caps high quality** — a `serviceable` or `strong` band requires
   at least `medium` confidence. A low-confidence review cannot present high
-  quality as settled; lower the band or raise coverage.
+  quality as settled; lower the band or raise coverage. This also applies to
+  high scores copied from deterministic tools before coverage calibration.
+- **Coverage gaps cap quality** — when a dimension's primary evidence is missing,
+  partial, or stale and not independently re-established, set confidence low and
+  cap the band at `mixed` (≤60), defaulting to the band midpoint. This makes
+  down-calibration of tool false-greens (e.g. archfit `coupling_balance` with no
+  classified edges when scip is absent) reproducible in magnitude, not only
+  direction. The `architecture-scorecard` skill lists primary evidence per
+  dimension.
 - **Never score from directory shape alone** — only observed, enforced behavior
   counts; a tidy folder tree is not evidence of boundary integrity.
 

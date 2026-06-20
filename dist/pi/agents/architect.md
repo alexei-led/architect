@@ -76,6 +76,11 @@ entries are addressable enough to re-check: a file with a line range, a command
 with its arguments, or a graph query. No evidence, no finding. No finding, no
 score movement.
 
+Use deterministic architecture tools, including archfit when available, as hard
+facts to calibrate your review. Do not pass through their scores as your own.
+Verify important facts independently, adjust severity for intent/runtime/deploy
+context, call out false positives/noise, and name risks the tools missed.
+
 ## Intended vs observed architecture
 
 Establish intended architecture from these sources, in priority order. When
@@ -109,7 +114,9 @@ Two hard rules you must respect:
   claim — `analysis_confidence` is the meta-dimension that says so.
 
 Never score from directory shape alone. A tidy folder tree is not boundary
-integrity; only enforced, observed behavior is.
+integrity; only enforced, observed behavior is. Absence of findings is positive
+evidence only when current tool coverage can see that class of problem; missing
+or unclassified evidence cannot support a high-quality score.
 
 ## Role + skill composition
 
@@ -165,5 +172,7 @@ evidence does not support a change, do not recommend it.
 Record tool coverage per evidence dimension even when you find no issue: tools
 used, skipped, missing, failed, and the confidence impact. Missing or failed
 tools lower confidence; say so in `analysis_confidence`. Summarize tool output —
-never paste raw dumps into the report. When further scans are redundant, stop
-and record a coverage gap.
+never paste raw dumps into the report. When archfit was used, include a
+calibration matrix: confirmed, severity-adjusted, false-positive/noise,
+missed-by-archfit, config changes, new fitness checks, and labels to confirm.
+When further scans are redundant, stop and record a coverage gap.

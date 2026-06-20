@@ -43,8 +43,8 @@ Keep these strictly separate — conflating them inflates the score.
 
 - **Existing check** — a check that actually runs and can fail the build today.
   Evidence: a CI step, a lint/dep-rule config, a test that asserts an
-  architectural property. Cite it. Only existing, enforced checks raise the
-  `architecture_fitness` score.
+  architectural property, or an archfit gate wired into CI. Cite it. Only
+  existing, enforced checks raise the `architecture_fitness` score.
 - **Recommended check** — a check you propose because intent is currently
   unenforced. It is a recommendation, not evidence of fitness. It belongs in
   the report's recommendations and the refactoring plan, and does **not** raise
@@ -72,10 +72,10 @@ recommended, not existing.
 When intent is unenforced, recommend the cheapest check that would catch the
 finding's class:
 
-- Layer or boundary bypassed: dependency-rule lint, e.g. dependency-cruiser,
-  import-linter, ESLint boundaries, or a `go list` rule.
-- Import cycles: cycle check, e.g. madge `--circular`, import-linter contract,
-  `go list`, or staticcheck.
+- Layer or boundary bypassed: dependency-rule lint, e.g. archfit rule,
+  dependency-cruiser, import-linter, ESLint boundaries, or a `go list` rule.
+- Import cycles: cycle check, e.g. archfit, madge `--circular`, import-linter
+  contract, `go list`, or staticcheck.
 - Direct DB or framework access from domain code: ast-grep absence rule.
 - God module or unbounded fan-in: dependency-count or graph-metric threshold in
   CI.
@@ -84,8 +84,10 @@ finding's class:
 - Boundary contract drift: contract/schema test.
 
 Recommend checks the team's existing tools can express — don't propose a new
-framework when a lint rule does it. Tie each recommendation to the finding ID it
-guards so the plan can sequence it.
+framework when a lint rule does it. If archfit already exists in the repo, prefer
+config/rule changes that turn the finding into a deterministic gate or advisory
+before adding another architecture-check framework. Tie each recommendation to
+the finding ID it guards so the plan can sequence it.
 
 ## How fitness affects the score and plan
 
@@ -112,3 +114,5 @@ When applying this methodology, report:
 - An existing check must be automated, able to fail, and architectural.
 - Recommended checks are recommendations — they live in the report/plan, never in
   the evidence for a high fitness score.
+- A green archfit pass proves only the configured checks under observed coverage;
+  it is not proof of all architecture quality, correctness, security, or speed.

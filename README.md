@@ -25,6 +25,7 @@ It does not edit production code during review.
 - **Evidence first** — findings cite files, commands, or graph queries.
 - **Balanced Coupling, not cargo-cult decoupling** — strength, distance, volatility.
 - **Repeatable outputs** — report, design, and plan templates with validation.
+- **Deterministic-tool calibration** — when archfit is available, use its hard facts without outsourcing judgment.
 - **Useful triage mode** — quick sweeps across several repos before deeper review.
 
 ## What you get
@@ -34,6 +35,7 @@ It does not edit production code during review.
 - skills for review, design, planning, scoring, methodology, and evidence gathering
 - report, design, and plan templates
 - helper CLIs: `architect-doctor`, `architect-validate-report`, `architect-compare-reports`
+- optional `tools-archfit` workflow for calibrated archfit scorecards, JSON findings, deltas, and agent tasks
 
 ## Install
 
@@ -120,6 +122,9 @@ architect-compare-reports base-report.md head-report.md
 ```
 
 `architect-doctor` reports which local analysis tools are available and where coverage is missing.
+If `archfit` and `.archfit.yaml` are present, architecture reviews can start from
+archfit's deterministic scorecard, JSON findings, delta output, and `agent_tasks`,
+then verify and calibrate them against code, intent, and runtime/deploy context.
 
 ## Read next
 

@@ -108,7 +108,9 @@ ownership, deployment, data ownership, or fitness checks.
    - subdomain classification and volatility;
    - public interface and private internals;
    - ownership/deployment expectations;
-   - changes expected to stay local.
+   - changes expected to stay local;
+   - deterministic-tool labels to confirm when archfit or similar gates will use
+     them (`subdomain`, `volatility`, public/private boundary, deploy unit).
 
 5. **Design integrations with Balanced Coupling.** For every important
    integration, evaluate integration strength, distance, and volatility. Use the
@@ -156,7 +158,8 @@ ownership, deployment, data ownership, or fitness checks.
 Return or write design artifacts shaped like `../../templates/design.md` with:
 
 - `source_inputs`: requirements, docs, reports, and code/doc drift notes used.
-- `domain_map`: core/supporting/generic areas and volatility.
+- `domain_map`: core/supporting/generic areas and volatility, plus labels that
+  deterministic tools should not consume until human-approved.
 - `module_map`: modules, responsibilities, owned knowledge, public interfaces,
   private internals, ownership/deployment expectations, change vectors.
 - `integration_contracts`: relationships, strength, distance, volatility,

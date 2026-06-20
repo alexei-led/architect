@@ -60,6 +60,7 @@ REQUIRED_SECTIONS = (
     "## Interview context",
     "## System map",
     "## Intended architecture",
+    "## Module volatility",
     "## Observed architecture",
     "## Score map",
     "## Key findings",

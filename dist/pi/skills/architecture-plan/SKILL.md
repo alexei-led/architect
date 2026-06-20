@@ -103,6 +103,11 @@ path or the plan must be copied/symlinked into the configured plans directory.
    - Impact commands: concrete `gitnexus impact <path-or-symbol>` and
      `gitnexus detect-changes` commands when GitNexus is available; otherwise an
      explicit fallback such as `git diff --name-only` and the missing-tool note.
+   - Deterministic architecture checks: if archfit is configured, name the
+     existing gate status, the rule/config change when needed, and the focused
+     `archfit check` or `archfit check --base <ref>` command. For a new gate,
+     state the violation should fail before the fix and pass after it. Otherwise
+     name the missing config/tool gap.
    - Verification commands: concrete test, lint, type, or fitness commands for
      this task, not only whole-plan commands.
    - Manual checks: plain bullets only, or `None`.
@@ -146,11 +151,11 @@ writing a file with no path provided, use the confirmed default path
   design decisions, contracts, or module responsibilities. Use plain bullets, no
   checkboxes.
 - `## Validation Commands`: concrete project-wide commands to run for the whole
-  plan.
+  plan, including archfit check/delta commands when configured.
 - `## Implementation Steps`: at most five executable `### Task N:` or
   `### Iteration N:` sections. Each task has justification, files,
-  preconditions, postconditions, impact commands, verification commands, manual
-  checks, and checkbox work items.
+  preconditions, postconditions, fitness gate, impact commands, verification
+  commands, manual checks, and checkbox work items.
 - A final `### Task N: Final verification and documentation` section.
 - `## Acceptance criteria`: checks that prove the plan is complete. Use plain
   bullets, no checkboxes.
@@ -168,7 +173,11 @@ writing a file with no path provided, use the confirmed default path
   under `docs/plans/<kebab-case-target>.md`.
 - If a generated plan is outside `docs/plans/`, the handoff must say how to run
   it by exact path or copy/symlink it into the configured plans directory.
-- Every task has a file list and concrete per-task verification command.
+- Every task has a file list, fitness-gate status, and concrete per-task
+  verification command.
+- When archfit is configured, every boundary/coupling task names the archfit
+  check or config/rule update that will make the improvement repeatable,
+  including before-fail/after-pass expectation for new gates.
 - Manual checks use plain bullets only.
 - Every plan includes concrete GitNexus impact/detect-changes commands or an
   explicit missing-tool fallback.

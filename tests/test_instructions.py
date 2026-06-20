@@ -14,6 +14,7 @@ TASK3_SKILLS = {
     "architecture-review",
     "architecture-scorecard",
     "architecture-plan",
+    "tools-archfit",
 }
 TEMPLATE_PATH_RE = re.compile(r"src/templates/[\w./-]+")
 TODO_RE = re.compile(r"\b(TODO|FIXME|XXX)\b")
@@ -102,6 +103,29 @@ def test_architecture_plan_requires_task_runner_contract():
     assert "gitnexus detect-changes" in text
     assert "Manual checks" in text
     assert "Every task has a file list" in text
+
+
+def test_archfit_calibration_instructions_exist():
+    review = (SKILLS_DIR / "architecture-review" / "SKILL.md").read_text()
+    agent = AGENT_FILE.read_text()
+    tool = (SKILLS_DIR / "tools-archfit" / "SKILL.md").read_text()
+
+    assert "archfit_calibration" in review
+    assert "module_volatility" in review
+    assert "confirmed" in review
+    assert "severity_adjusted" in tool
+    assert "false_positive_or_noise" in tool
+    assert "missed_by_archfit" in tool
+    assert "Do not pass through" in tool
+    assert "calibration matrix" in agent
+
+
+def test_coverage_gap_calibration_documented():
+    raw = (SKILLS_DIR / "architecture-scorecard" / "SKILL.md").read_text()
+    flat = " ".join(raw.split())
+    assert "Coverage-gap calibration" in raw
+    assert "primary" in raw.lower()
+    assert "cap the band at `mixed`" in flat
 
 
 def test_architecture_next_skill_routing_is_conditional():

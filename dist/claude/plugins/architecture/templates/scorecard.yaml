@@ -65,8 +65,18 @@ rules:
       - serviceable
       - strong
     min_confidence: medium
-  # Every non-meta score must carry at least one evidence reference.
+  # Every non-meta score must carry at least one evidence reference. Absence of
+  # findings is evidence only when a current tool covered that problem class.
   score_requires_evidence: true
+  # Coverage-gap calibration (advisory; applied by the scorecard skill, not the
+  # validator, because "independently re-established" needs agent judgment).
+  # Missing/partial/stale PRIMARY evidence for a dimension forces low confidence
+  # and caps the band at mixed (value <= 60); default to the band midpoint. This
+  # makes down-calibration of tool false-greens reproducible in magnitude.
+  coverage_gap_caps_quality:
+    max_band: mixed
+    max_value: 60
+    confidence: low
 # Two reports are comparable only when all of these match. compare-reports must
 # emit an explicit non-comparability reason otherwise.
 comparability:

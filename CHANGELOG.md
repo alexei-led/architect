@@ -9,6 +9,27 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### archfit integration and evidence calibration
+
+- Added the `tools-archfit` skill: consume archfit's deterministic facts (full/delta JSON, scorecard, tool coverage, findings, SARIF, `agent_tasks`) and return an `archfit_calibration` matrix (confirmed, severity-adjusted, false-positive/noise, missed-by-archfit, config changes, new fitness checks, labels to confirm) instead of passing tool scores through.
+- Updated `architecture-review` to run archfit as a deterministic preflight when a repo has `.archfit.yaml` or `archfit` is available, calibrate its facts with independent verification, and record `module_volatility` and `archfit_calibration` in full reports and quick sweeps.
+- Registered `tools-archfit` in the architecture plugin and added archfit detection to `architect-doctor`.
+
+### Scoring honesty
+
+- Added coverage-gap calibration: missing, partial, or stale primary evidence for a dimension forces low confidence and caps the band at `mixed` (default midpoint) until re-established, so down-calibration of tool false-greens (for example archfit `coupling_balance` with no classified edges when scip is absent) is reproducible in magnitude, not only direction.
+- Forbade green or high-quality scores derived from missing, unclassified, or uncalibrated tool evidence; absence of findings counts only when a current tool covered that class.
+
+### Reusable judgments and deterministic gates
+
+- Added reusable `module_volatility` judgments (domain role, volatility, source, evidence, confidence) to the report contract and required them in reviews.
+- Required architecture plans to tie boundary/coupling tasks to deterministic fitness gates with before-fail/after-pass expectations, and to include archfit check/delta validation commands when configured.
+- Updated report, design, and plan templates accordingly (`module_volatility`, `archfit_calibration`, design labels to confirm, per-task fitness-gate slot).
+
+### Documentation
+
+- Documented the combined archfit + architect loop and the coverage-gap rule across README, methodology, scoring, report-format, and tools docs, and added the enhancement plan under `docs/plans/`.
+
 ## [0.4.0] - 2026-06-19
 
 ### Architecture review workflow

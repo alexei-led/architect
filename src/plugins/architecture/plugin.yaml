@@ -32,6 +32,7 @@ skills:
   - architecture-scorecard
   - methodology-architecture-fitness
   - methodology-balanced-coupling
+  - tools-archfit
   - tools-ast-grep
   - tools-code-search
   - tools-codegraph

@@ -46,6 +46,16 @@ system_map:
   high_risk_entrypoints: []
   missing_evidence: []
 
+# Reusable domain/change-rate judgments. Domain role is primary; churn supports.
+module_volatility:
+  - module: REPLACE
+    classification: core # core | supporting | generic | unknown
+    volatility: high # high | medium | low | unknown
+    source: architect-inferred # interview | docs | architect-inferred | archfit-label | git-history
+    evidence_refs: []
+    confidence: low # low | medium | high
+    notes: REPLACE
+
 # Each score: value (0..100), band (must match value), confidence, evidence
 # refs, and known gaps. analysis_confidence scores the review itself.
 scores:
@@ -109,6 +119,20 @@ findings:
       tradeoffs: REPLACE cost, risk, or why not to over-decouple
     recommended_action: REPLACE one-line action used by comparison/planning tools
 
+# Optional calibration when deterministic archfit evidence was used.
+# Architect verifies these facts independently instead of passing through scores.
+archfit_calibration:
+  source_commands: []
+  artifacts: []
+  confirmed: []
+  severity_adjusted: []
+  false_positive_or_noise: []
+  missed_by_archfit: []
+  config_changes: []
+  new_fitness_checks: []
+  labels_to_confirm: []
+  confidence_impact: none # none | low | medium | high
+
 # Evidence refs are addressable enough for a human or agent to re-check.
 # The addressable field is type-dependent: file -> ref, command -> command,
 # graph-query -> query, interview -> (summary only). Using the wrong field fails
@@ -164,6 +188,12 @@ in text. For AI/agent-targeted reports, use plain text only.
 REPLACE: intended structure by source order (interview, docs, manifests,
 directories, inferred clusters). Report disagreements between sources.
 
+## Module volatility
+
+REPLACE: module-level core/supporting/generic and volatility judgments, evidence,
+confidence, and labels that need human confirmation before deterministic tools
+consume them.
+
 ## Observed architecture
 
 REPLACE: what the code and operational files actually do.
@@ -194,6 +224,12 @@ REPLACE: for each important relationship, record:
 - volatility from domain classification first, with implementation/provider volatility and churn/history as supporting evidence;
 - balance verdict and severity;
 - balancing move: lower strength, lower distance, or accept due to low volatility.
+
+## Archfit calibration
+
+REPLACE when archfit was used: confirmed findings, severity-adjusted findings,
+false positives/noise, risks missed by archfit, config changes, new fitness
+checks, labels to confirm, and confidence impact. Omit when archfit was not used.
 
 ## Boundary violations
 

@@ -39,7 +39,9 @@ report.
 
 2. **Per dimension, gather the evidence first.** A score with no evidence ref is
    invalid for every non-meta dimension. If you have no evidence, do not score —
-   record a coverage gap and let `analysis_confidence` absorb it.
+   record a coverage gap and let `analysis_confidence` absorb it. Absence of
+   findings counts as positive evidence only when a current tool actually covered
+   that finding class.
 
 3. **Pick the band, then the value.** Choose the band whose anchor best fits the
    evidence first. Then choose a 0..100 value within that band; default to the
@@ -54,7 +56,28 @@ report.
 5. **Apply the caps.** A high-quality band (per the rubric's
    `high_quality_requires_confidence` rule) cannot stand on low confidence. If
    evidence is thin, either lower the band or raise coverage — never present a
-   shaky high score as settled.
+   shaky high score as settled. Do not give `serviceable` or `strong` to a
+   dimension whose core evidence is missing, stale, unclassified, or based only
+   on another tool's green summary.
+
+   **Coverage-gap calibration (reproducible magnitude).** When the _primary_
+   evidence for a dimension is missing, partial, or stale and you did not
+   independently re-establish the claim, set `confidence: low` and cap the band
+   at `mixed` (value ≤ 60); default to the band midpoint (~50). Raise above
+   `mixed` only with direct evidence you gathered yourself. Primary evidence per
+   dimension:
+   - `coupling_balance`: classified edges (scip / codegraph / `go list` /
+     dependency-cruiser). No classified edges means a tool's "balanced, no
+     classified edges" default is not proof — low confidence, cap at `mixed`.
+   - `dependency_graph_health`: a real import/dependency graph with adequate
+     coverage.
+   - `change_locality`: git history / GitNexus covering most changed files;
+     partial file coverage caps at `mixed`.
+   - `cohesion_modularity`: size/complexity/duplication signals (LOC, lizard,
+     jscpd).
+   - `boundary_integrity`: classified cross-boundary edges or enforced rules.
+     This keeps down-calibration of tool false-greens reproducible in magnitude,
+     not only direction.
 
 6. **Score the meta-dimension.** `analysis_confidence` scores the review itself:
    how much of the applicable evidence you actually covered. It is where missing
@@ -65,7 +88,9 @@ report.
 - Missing or unreadable `src/templates/scorecard.yaml`: stop; do not recreate the
   rubric from memory.
 - Missing evidence for a non-meta dimension: do not score it. Record a coverage
-  gap and lower `analysis_confidence`.
+  gap and lower `analysis_confidence`. If the report format requires a numeric
+  placeholder, use a low-confidence provisional value and make the gap explicit;
+  never use a green placeholder.
 - Band/value mismatch, missing evidence refs, or low-confidence high-quality
   claim: fix the score before reporting.
 
@@ -87,6 +112,10 @@ For each scored dimension, return:
 - Every non-meta score carries at least one evidence ref.
 - Low confidence caps high-quality claims.
 - Never score from directory shape alone — only observed, enforced behavior.
+- Never infer high quality from missing evidence, missing classified edges, or a
+  deterministic tool score that has not been calibrated against coverage.
+- Missing, partial, or stale primary evidence forces low confidence and a band
+  no higher than `mixed` until you re-establish the claim with your own evidence.
 
 These are also enforced mechanically by `architect-validate-report`; failing
 them in a draft means the report will not validate.

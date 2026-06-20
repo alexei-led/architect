@@ -27,6 +27,12 @@ possible provider/implementation volatility.
 | ------- | ----------------------- | --------------- | --------- | -------------- |
 | REPLACE | core/supporting/generic | high/medium/low | REPLACE   | REPLACE        |
 
+Labels for deterministic tools are proposals until a human approves them.
+
+| Module  | Subdomain label | Volatility label | Public/private boundary | Deploy unit | Approval status |
+| ------- | --------------- | ---------------- | ----------------------- | ----------- | --------------- |
+| REPLACE | REPLACE         | REPLACE          | REPLACE                 | REPLACE     | draft/approved  |
+
 ## Module map
 
 | Module  | Responsibility | Owned knowledge | Public interface | Private internals | Owner/deploy expectation | Change vectors |
