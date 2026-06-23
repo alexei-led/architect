@@ -95,9 +95,10 @@ instructions or report.
 4. **Capture module volatility/change-rate judgments.** For every important
    module or boundary, record reusable labels in `module_volatility`: module,
    core/supporting/generic classification, high/medium/low volatility, source
-   (`interview`, `docs`, `architect-inferred`, `archfit-label`, `git-history`),
-   evidence refs, confidence, and notes. Domain role is primary; churn is
-   supporting evidence. Unconfirmed labels go to
+   (`interview`, `docs`, `architect-inferred`, `archfit-label`, or
+   `git-history` as corroboration only), evidence refs, confidence, and notes.
+   Domain role is primary; churn is supporting evidence, never the source that
+   sets volatility. Unconfirmed labels go to
    `archfit_calibration.labels_to_confirm` when archfit could consume them.
 
 5. **Gather evidence across applicable dimensions.** Use `tools-code-search` for

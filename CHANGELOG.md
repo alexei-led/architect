@@ -15,6 +15,13 @@ patch = fixes and documentation updates.
 - Reframed connascence from a tie-breaker to the model's degree axis within each strength level (static connascence grades contract/model; dynamic connascence plus symmetric functional grades functional), and named symmetric functional coupling — a DRY violation with no dependency edge.
 - Added inferred volatility (a stable component coupled to a volatile upstream is effectively volatile) and reconciled the severity mapping with the graded BALANCE.
 - Updated `docs/methodology.md` and `docs/scoring.md` to match.
+- Tightened volatility sourcing across `tools-gitnexus`, `architecture-review`, and the report template so git churn/change-history only corroborates domain-led volatility and never sets it (the book's essential-vs-accidental volatility rule).
+
+### archfit consumption
+
+- Updated `tools-archfit` to consume archfit's book-aligned coupling output: the book balance equation (`balance = max(|strength - distance|, 10 - volatility) + 1`, scorer `bc_score.v3`) with the `bc/imbalanced_coupling` advisory fields (`score_value`, `score_band`, `cheapest_move`, `distance_basis`) and the `classified_edges` distribution (`mean_balance`, `scored`, `abstained`, per-dimension breakdowns), plus the `archfit score` scorecard command.
+- Documented the `.archfit-labels.yaml` strength-label artifact (only `status: approved` overrides the SCIP hint; labelable strengths are contract/model/functional/intrusive; `symmetric` is clone-derived) and that heavy LLM-provenance labeling lowers `coupling_balance` confidence.
+- Sharpened calibration: archfit's SCIP strength tops out at `functional` without labels, its volatility is config/heuristic (never churn), `runtime_async` never moves distance, and abstained unknown-strength/distance edges cap `coupling_balance` coverage.
 
 ## [0.5.0] - 2026-06-20
 

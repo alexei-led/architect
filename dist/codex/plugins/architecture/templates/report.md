@@ -51,7 +51,7 @@ module_volatility:
   - module: REPLACE
     classification: core # core | supporting | generic | unknown
     volatility: high # high | medium | low | unknown
-    source: architect-inferred # interview | docs | architect-inferred | archfit-label | git-history
+    source: architect-inferred # interview | docs | architect-inferred | archfit-label | git-history (corroborating only — record a domain source as primary)
     evidence_refs: []
     confidence: low # low | medium | high
     notes: REPLACE

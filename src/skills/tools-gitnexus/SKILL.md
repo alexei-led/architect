@@ -3,9 +3,9 @@ name: tools-gitnexus
 description: >-
   Gather change-coupling and volatility evidence with GitNexus git-history
   graphs: files that change together, churn hotspots, historical blast radius,
-  and impact over time. Use when scoring change_locality, assessing Balanced
-  Coupling volatility, or checking whether changes stay inside intended module
-  boundaries. Index staleness is a coverage gap, not evidence. NOT for static
+  and impact over time. Use when scoring change_locality, corroborating Balanced
+  Coupling volatility (domain role sets it; churn only supports it), or checking
+  whether changes stay inside intended module boundaries. Index staleness is a coverage gap, not evidence. NOT for static
   call/dependency graphs (use tools-codegraph), exact text discovery (use
   tools-code-search), or syntactic pattern search (use tools-ast-grep).
 ---
@@ -15,7 +15,8 @@ description: >-
 `gitnexus` turns git history into a queryable graph: co-change relationships,
 per-file change frequency, and the historical blast radius of a path. It is the
 evidence source for "do changes actually stay inside the intended boundary?" and
-for the volatility axis of Balanced Coupling.
+a corroborating signal for the volatility axis of Balanced Coupling — domain role
+sets volatility; churn only supports it, it never sets it.
 
 Evidence dimension: **change**.
 

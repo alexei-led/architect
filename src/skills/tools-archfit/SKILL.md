@@ -26,8 +26,9 @@ so hard facts can reduce sampling bias.
 Do not use this skill for:
 
 - `archfit review` LLM narration as primary evidence;
-- `archfit init`, `update --apply`, `baseline`, `enrich --pin`, or config writes
-  unless the user explicitly asks for config work;
+- `archfit init`, `update --apply`, `baseline`, `enrich`/`autopilot` LLM
+  drafting, `enrich --pin`, or config writes unless the user explicitly asks for
+  config work;
 - applying fixes from `agent_tasks`;
 - replacing the architect's independent evidence gathering and Balanced Coupling
   judgment.
@@ -75,6 +76,9 @@ $ARCHFIT doctor
 $ARCHFIT check --config .archfit.yaml --full --advisory --report --format json
 $ARCHFIT check --config .archfit.yaml --full --advisory --report --format scorecard
 
+# Banded 7-dimension scorecard, off-gate; coupling_balance is the book balance mean.
+$ARCHFIT score --config .archfit.yaml --full
+
 # Human-readable deterministic audit, when useful.
 $ARCHFIT scan --config .archfit.yaml
 
@@ -99,8 +103,15 @@ From JSON/scorecard/scan output, extract and summarize:
   rule/metric, files, modules, and whether each is gate or advisory.
 - `agent_tasks`: machine-readable repair tasks and validation commands.
 - dependency facts: cycles, hubs, instability, propagation/blast-radius signals.
-- coupling facts: classified edges, strength labels, distance, volatility labels,
-  unbalanced-edge advisories, and missing/unclassified edge coverage.
+- coupling facts: archfit scores each classified cross-boundary edge with the
+  book equation (`balance = max(|strength - distance|, 10 - volatility) + 1`,
+  1–10, scorer `bc_score.v3`). Extract the `bc/imbalanced_coupling` advisories
+  (`score_value`, `score_band`, `cheapest_move`, `distance_basis`) and the
+  `classified_edges` summary (`mean_balance`, `scored`, `abstained`,
+  `by_strength`/`by_distance`/`by_volatility`, `llm_approved`). Strength includes
+  `symmetric` (clone-derived, ordinal 9); volatility may be `undeclared`/`unknown`
+  (scored worst-case); abstained edges (unknown strength or distance) are excluded
+  from `mean_balance`.
 - config quality signals: generated or under-specified modules, missing owner,
   deploy unit, subdomain, volatility, public/private boundary, or weak warn-only
   rules.
@@ -149,25 +160,44 @@ Classify with independent evidence:
   facts more honest, especially module ownership, deploy units, public/private
   boundaries, subdomain, volatility, and stronger gates.
 - `new_fitness_checks`: executable checks to add after design/repair.
-- `labels_to_confirm`: architect-inferred subdomain/volatility/strength labels
-  that a human should approve before deterministic gating uses them.
+- `labels_to_confirm`: architect-inferred subdomain/volatility/strength labels a
+  human should approve before deterministic gating uses them. Strength labels
+  live in `.archfit-labels.yaml` (`from`/`to`/`strength`/`status`/`provenance`/
+  `confidence`); only `status: approved` entries override the SCIP hint, and the
+  labelable strengths are contract/model/functional/intrusive (`symmetric` is
+  clone-derived, not labelable). Flag heavy `provenance: llm` labeling — archfit
+  drops `coupling_balance` confidence a band when ≥20% of scored edges rest on
+  non-high-confidence LLM labels.
 
 ## Balanced Coupling handling
 
-archfit can enumerate candidate relationships and classify many edges, but it
-cannot own the business truth. For every important coupling claim, still apply
-`methodology-balanced-coupling`:
+archfit now scores edges with the book's own equation (scorer `bc_score.v3`,
+ordinals matching the book: contract 1, model 3, functional 8, symmetric 9,
+intrusive 10), so its `coupling_balance` is book-aligned in math. It still cannot
+own the business truth behind the inputs. For every important coupling claim,
+apply `methodology-balanced-coupling` and confirm what archfit could only declare
+or infer:
 
-- classify strength from evidence;
-- split distance into code, ownership, runtime, and deploy distance;
-- prefer domain volatility from human/docs/domain role, using churn as support;
-- treat generic/supporting code with provider-switch or SDK churn as possible
-  implementation volatility;
-- choose a balancing move: lower strength, lower distance, or accept due to low
-  volatility.
+- strength: archfit's SCIP-based strength tops out at `functional` (contract and
+  intrusive are deterministic; model-vs-functional is heuristic; `symmetric`
+  comes only from clone detection). Confirm the model/functional/contract
+  distinction by reading the crossing types; promote it with an approved
+  `.archfit-labels.yaml` entry, not a prose guess.
+- distance: archfit reports a `distance_basis` (code_structure / ownership /
+  deploy_unit). `runtime_async` is report-only and never moves distance — fold
+  runtime/deploy distance in yourself.
+- volatility: archfit derives it from config `volatility:`/`subdomain:` plus a
+  path heuristic and an inferred-volatility cascade — never from churn, and it
+  cannot see provider-switch (implementation) volatility in generic/supporting
+  code. Confirm declarations against the business domain; `undeclared`/`unknown`
+  volatility scores worst-case and is a config gap to flag, not a finding.
+- balancing move: archfit suggests a `cheapest_move` (reduce_strength /
+  reduce_distance / lower_volatility / declare_volatility); treat it as a
+  hypothesis and confirm it against the relationship record.
 
 Do not pass through archfit's `coupling_balance` score as the architect score.
-Use it as evidence input, then score from relationship records and coverage.
+Use the per-edge `score_value`/`score_band` and the `classified_edges`
+distribution as evidence, then score from relationship records and coverage.
 
 Apply coverage-gap calibration consistently so the magnitude is reproducible,
 not just the direction:
@@ -176,6 +206,9 @@ not just the direction:
   cross-boundary edges"), set `coupling_balance` confidence `low` and cap the
   band at `mixed` (≤ 60, default ~50) unless you classify the edges yourself with
   codegraph, `go list`, or dependency-cruiser.
+- When `classified_edges.scored` is a low fraction of `total` (many `abstained`
+  unknown-strength/distance edges), `mean_balance` rests on thin coverage — treat
+  it like absent classification: low confidence, cap at `mixed`.
 - When GitNexus covered only part of the changed files, apply the same cap to
   `change_locality`.
 - A clean archfit dimension with `confidence: medium` and an `n/a` sub-metric is
