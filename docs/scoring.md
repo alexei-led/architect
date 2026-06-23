@@ -60,8 +60,9 @@ analysis cannot support a green score.
   no evidence means no score (record a coverage gap instead). If a numeric
   placeholder is required, it must be low-confidence and non-green.
 - **Balanced Coupling needs relationship records** — `coupling_balance` is scored
-  from relationship-level strength, distance, volatility, and evidence records,
-  not from repo-level vibes.
+  from relationship-level strength, distance, and volatility (each estimated 1–10
+  from evidence), the computed BALANCE, and evidence records, not from repo-level
+  vibes.
 - **Low confidence caps high quality** — a `serviceable` or `strong` band requires
   at least `medium` confidence. A low-confidence review cannot present high
   quality as settled; lower the band or raise coverage. This also applies to

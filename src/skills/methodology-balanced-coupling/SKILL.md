@@ -79,6 +79,11 @@ dimensions, each answering a different question.
    - **Generic** subdomain (solved problem, off-the-shelf) → low functional
      volatility, but watch implementation volatility (swapping a provider).
 
+   Volatility is a property of the upstream component. A stable component that
+   must change alongside a volatile one inherits **inferred volatility** — score
+   it by the most volatile thing it changes with, not by its own subdomain
+   alone. Propagate inferred volatility along dependency edges.
+
 Explain DDD terms in plain language on first use — do not assume the user knows
 "core subdomain."
 
@@ -96,15 +101,43 @@ other low. Complexity emerges when they match — both high or both low.
 - High strength + high distance = tight coupling. Frequent cascades that are
   expensive to make. A step toward a distributed monolith.
 
-Use the compact decision rule as a mnemonic, not fake math:
+Read it two ways. The quick read is a binary rule:
 
 ```text
 BALANCE = (STRENGTH XOR DISTANCE) OR NOT VOLATILITY
 ```
 
-That means a relationship is acceptable when strength and distance counterbalance
-or when the relationship is unlikely to change. The worst case — the thing to
-flag first — is high strength + high distance + high volatility.
+Acceptable when strength and distance counterbalance, or when the relationship
+won't change. The graded read scores each dimension 1–10 from evidence:
+
+```text
+BALANCE = max( |STRENGTH - DISTANCE|, 10 - VOLATILITY ) + 1
+```
+
+Low BALANCE is what to fix first; low volatility pulls it up even when strength
+and distance both run high (it won't change, so it won't cascade). The worst
+case is high strength + high distance + high volatility. These are
+evidence-anchored estimates — reproducible and comparable, not objective; use
+them to rank relationships and compare options, not as a precise metric. The
+book's author wished a tool could derive the three inputs from a codebase; until
+then, ground them in tool evidence where you can and read the code where you
+can't:
+
+- **Strength** (type sets the band, connascence degree nudges ±1): contract ~1,
+  model ~3, functional ~8, symmetric functional ~9, intrusive ~10. Dependency,
+  call-graph, and structural-pattern tools find the edge and the symbols
+  crossing it; classifying the _kind_ of knowledge — domain model vs.
+  encapsulating contract, same-rule duplication — is LLM judgment.
+- **Distance**: closest common ancestor in the module hierarchy (same object ~1
+  → separate vendors ~10), raised by cross-team ownership and synchronous
+  runtime binding. Mostly tool-derivable from paths, package graph, deploy
+  units, and ownership.
+- **Volatility**: subdomain sets the band (legacy ~1, supporting/generic ~3,
+  core ~10) — domain judgment, no tool knows competitive strategy. Change
+  history corroborates; the dependency graph propagates inferred volatility.
+
+See `references/details.md` for the full evidence→band rubric and worked
+equation.
 
 Keep the level of abstraction explicit. A public class method can be a contract
 inside one module and still be private implementation detail across a service
@@ -154,22 +187,34 @@ the same label.
 
 ## Severity mapping
 
-- High strength + high distance + high volatility: critical — fix first.
-- High strength + high distance + low volatility: medium — note and defer;
-  volatility may rise.
-- High strength + low distance: low — high cohesion, usually fine.
-- Low strength + high distance: low — loose coupling, usually fine.
-- Low strength + low distance + high volatility: medium — low cohesion in a
-  churning area.
+Start from BALANCE, then apply two adjustments the raw number can't see: distant
+cascades cost more than co-located clutter at equal BALANCE, and a relationship
+that is balanced _only_ because volatility is currently low is a latent risk, not
+a clean pass.
+
+- High strength + high distance + high volatility (BALANCE ≈ 1): critical — fix
+  first. Frequent cascades, wide blast radius, expensive to make.
+- Low strength + low distance + high volatility (BALANCE ≈ 1): high — a churning
+  low-cohesion area; genuinely bad, but cheaper to fix because it is co-located.
+- High strength + high distance + low volatility (BALANCE high by the formula):
+  medium — balanced only by current low volatility; if it rises this becomes
+  critical, a distributed-monolith seam in waiting.
+- High strength + low distance, or low strength + high distance (BALANCE ≈
+  8–10): low — genuinely balanced; don't recommend breaking it.
 
 ## Output
 
 When applying the model, report:
 
 - `relationship`: components and abstraction level assessed.
-- `strength`: intrusive, functional, model, or contract; cite evidence.
-- `distance`: abstraction, ownership, and runtime distance; cite evidence.
-- `volatility`: domain volatility first, git/churn as supporting evidence.
+- `strength`: intrusive, functional, model, or contract; cite evidence. Add the
+  1–10 estimate and connascence degree when you scored the graded read.
+- `distance`: abstraction, ownership, and runtime distance; cite evidence. Add
+  the 1–10 estimate.
+- `volatility`: domain volatility first, git/churn as supporting evidence,
+  inferred volatility from upstream. Add the 1–10 estimate.
+- `balance`: the computed BALANCE (1–10) when scored, with the inputs that
+  produced it.
 - `deterministic_evidence`: tool IDs or commands that found the edge, cycle,
   co-change, or metric, plus any coverage limits.
 - `severity`: mapped risk level.

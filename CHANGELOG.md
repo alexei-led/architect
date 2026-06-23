@@ -9,6 +9,13 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Balanced Coupling fidelity
+
+- Added a graded read to `methodology-balanced-coupling`: the book's numeric balance equation (`BALANCE = max(|strength - distance|, 10 - volatility) + 1`) with its 1–10 scale anchors, alongside the existing binary rule, plus a per-dimension evidence→band rubric (tools first, LLM where no tool can decide) so the inputs are anchored to observable evidence rather than eyeballed.
+- Reframed connascence from a tie-breaker to the model's degree axis within each strength level (static connascence grades contract/model; dynamic connascence plus symmetric functional grades functional), and named symmetric functional coupling — a DRY violation with no dependency edge.
+- Added inferred volatility (a stable component coupled to a volatile upstream is effectively volatile) and reconciled the severity mapping with the graded BALANCE.
+- Updated `docs/methodology.md` and `docs/scoring.md` to match.
+
 ## [0.5.0] - 2026-06-20
 
 ### archfit integration and evidence calibration

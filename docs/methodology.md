@@ -27,16 +27,20 @@ evaluates the **connection** between two components along three dimensions:
    business domain (DDD subdomains), not commit history: **core** (competitive
    advantage) → high; **supporting** and **generic** → low functional volatility.
    Commit churn and co-change support volatility claims, but they do not define
-   domain volatility. Provider swaps, SDK churn, or leaking vendor DTOs are a
+   domain volatility. A stable component coupled to a volatile one inherits
+   **inferred volatility** — score it by what it must change with, not its own
+   subdomain alone. Provider swaps, SDK churn, or leaking vendor DTOs are a
    separate **implementation/provider volatility** signal that can justify a
    stronger boundary even when business volatility is low.
 
 **The balance rule:** modularity emerges when strength and distance
-_counterbalance_ (one high, one low); complexity emerges when they _match_. Use
-this compact mnemonic:
+_counterbalance_ (one high, one low); complexity emerges when they _match_. Read
+it two ways — a quick binary rule, and a graded equation that scores each
+dimension 1–10 from evidence:
 
 ```text
 BALANCE = (STRENGTH XOR DISTANCE) OR NOT VOLATILITY
+BALANCE = max( |STRENGTH - DISTANCE|, 10 - VOLATILITY ) + 1
 ```
 
 High strength + low distance = healthy cohesion; low strength + high distance =
@@ -44,6 +48,15 @@ healthy loose coupling. **High strength + high distance = tight coupling** — t
 step toward a distributed monolith. Volatility is the override: unbalanced
 coupling on something that never changes is tolerable. The worst case, flagged
 first, is **high strength + high distance + high volatility**.
+
+The graded read keeps the numbers honest by anchoring each input to evidence —
+distance is mostly tool-derivable (paths, package graph, deploy units, ownership);
+strength is a tool-found edge whose _kind_ of knowledge (model vs. contract,
+same-rule duplication) is classified by reading the code; volatility is a domain
+judgment corroborated by change history and propagated as inferred volatility
+along dependency edges. The scores are reproducible estimates for ranking
+relationships, not objective measurements. The skill carries the full
+evidence→band rubric and the book's scale anchors.
 
 Generic subdomains need extra suspicion. Their business function may be stable,
 but their implementation can be volatile if provider swaps, dual-provider runs,
@@ -53,10 +66,13 @@ into core code is still a coupling risk.
 The skill does not recommend generic "decouple everything" advice — breaking
 balanced (high-cohesion, low-distance) coupling adds distance and _unbalances_ it.
 Fixes move one dimension: introduce a contract (lower strength), co-locate (lower
-distance), or confirm low volatility leaves it alone — never a rewrite. When two
-relationships look equally risky, use connascence as a tie-breaker: shared
-meaning, algorithm, timing, identity, or call order usually beats a mere shared
-name for priority.
+distance), or confirm low volatility leaves it alone — never a rewrite. Connascence is the
+model's _degree_ axis within a strength type: static connascence (name → type →
+meaning → algorithm → position) grades contract and model coupling; dynamic
+connascence (execution → timing → value → identity), with symmetric functional
+coupling on top, grades functional coupling. Use it to place the 1–10 strength
+value and to break ties — shared meaning, algorithm, timing, or identity beats a
+mere shared name for priority.
 
 ## How the review applies the model
 
@@ -64,11 +80,12 @@ A full architecture review scores `coupling_balance` from **relationship records
 not prose impressions. For each important relationship, the review records:
 
 - relationship and abstraction level;
-- integration strength plus evidence;
-- distance split into code, ownership, runtime, and deploy signals plus evidence;
-- domain volatility first, with implementation/provider volatility and churn as
-  supporting evidence;
-- balance verdict, severity, and the cheapest balancing move.
+- integration strength (type, connascence degree, and 1–10 estimate) plus evidence;
+- distance split into code, ownership, runtime, and deploy signals, with a 1–10
+  estimate, plus evidence;
+- domain volatility first (1–10), with inferred, implementation/provider
+  volatility and churn as supporting evidence;
+- the computed BALANCE, balance verdict, severity, and the cheapest balancing move.
 
 A quick sweep uses the same vocabulary, but returns **candidates and next checks**
 instead of final findings or scores. No evidence means no finding; no full review
