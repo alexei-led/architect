@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-06-23
+
 ### Balanced Coupling fidelity
 
 - Added a graded read to `methodology-balanced-coupling`: the book's numeric balance equation (`BALANCE = max(|strength - distance|, 10 - volatility) + 1`) with its 1–10 scale anchors, alongside the existing binary rule, plus a per-dimension evidence→band rubric (tools first, LLM where no tool can decide) so the inputs are anchored to observable evidence rather than eyeballed.
