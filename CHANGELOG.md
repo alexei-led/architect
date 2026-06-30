@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-30
+
 ### codebase-memory-mcp tool skill
 
 - Added `tools-codebase-memory` to the architecture plugin: it gathers persistent code-knowledge-graph evidence (architecture overview, type-resolved call edges, cycles, blast radius, module clusters, dead code, and cross-session ADRs) from the `codebase-memory-mcp` MCP server when its `mcp__codebase-memory-mcp__*` tools are installed, and falls back to `tools-codegraph` when the server is absent. Wired it into the `docs/tools.md` evidence ladder and the `architecture-review` evidence step.
