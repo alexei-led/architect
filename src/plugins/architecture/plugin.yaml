@@ -35,6 +35,7 @@ skills:
   - tools-archfit
   - tools-ast-grep
   - tools-code-search
+  - tools-codebase-memory
   - tools-codegraph
   - tools-gitnexus
   - tools-go

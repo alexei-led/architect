@@ -35,7 +35,7 @@ score dimension, design decision, contract, module responsibility, or risk.
 
 - `REPLACE whole-plan command, e.g. make check`
 - `REPLACE focused architecture-fitness, test, or lint command`
-- `REPLACE if configured: archfit check --config .archfit.yaml --base <ref>`
+- `REPLACE if configured: archfit analyze --gate --config .archfit.yaml --base <ref>`
 
 ## Implementation Steps
 
@@ -65,7 +65,7 @@ If GitNexus is unavailable, replace these with fallback commands and note that g
 Verification commands:
 
 - `REPLACE concrete command, e.g. uv run pytest tests/test_boundary.py`
-- `REPLACE if configured: archfit check --config .archfit.yaml --base <ref>`
+- `REPLACE if configured: archfit analyze --gate --config .archfit.yaml --base <ref>`
 
 Manual checks:
 
@@ -103,7 +103,7 @@ If GitNexus is unavailable, replace these with fallback commands and note that g
 Verification commands:
 
 - `REPLACE concrete command, e.g. uv run pytest tests/test_boundary.py`
-- `REPLACE if configured: archfit check --config .archfit.yaml --base <ref>`
+- `REPLACE if configured: archfit analyze --gate --config .archfit.yaml --base <ref>`
 
 Manual checks:
 

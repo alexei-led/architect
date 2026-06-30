@@ -84,8 +84,8 @@ Use the narrowest tool that can prove the claim, in this order:
    `agent_tasks` for calibration.
 3. `ast-grep` or `tree-sitter` — prove syntactic presence or absence of a pattern.
 4. LSP — prove resolved definitions, references, implementations, and diagnostics.
-5. `codegraph` or language dependency tools — prove graph shape: cycles, hubs,
-   blast radius, dependency direction.
+5. `codegraph` (or `codebase-memory-mcp` when installed) or language dependency
+   tools — prove graph shape: cycles, hubs, blast radius, dependency direction.
 6. `GitNexus` or `git log` fallbacks — prove co-change, churn, and change locality.
 7. Operational/security tools — prove deploy topology, runtime coupling, and
    supply-chain facts.
@@ -100,8 +100,8 @@ The current split uses tool-family skills by language or operational surface,
 plus one deterministic aggregate for archfit because it has a distinct
 review-calibration workflow and machine-readable output contract.
 
-- `tools-archfit` — archfit deterministic check/scorecard/delta/SARIF/JSON
-  facts, tool coverage, and `agent_tasks`.
+- `tools-archfit` — archfit deterministic `analyze` output (JSON/scorecard/SARIF),
+  delta (`--base`), tool coverage, and `agent_tasks`.
 - `tools-lsp-tree-sitter` — LSP, tree-sitter.
 - `tools-typescript` — dependency-cruiser, madge, knip, tsc, ESLint.
 - `tools-python` — import-linter, pydeps, pyright/basedpyright, ruff,

@@ -9,6 +9,16 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### codebase-memory-mcp tool skill
+
+- Added `tools-codebase-memory` to the architecture plugin: it gathers persistent code-knowledge-graph evidence (architecture overview, type-resolved call edges, cycles, blast radius, module clusters, dead code, and cross-session ADRs) from the `codebase-memory-mcp` MCP server when its `mcp__codebase-memory-mcp__*` tools are installed, and falls back to `tools-codegraph` when the server is absent. Wired it into the `docs/tools.md` evidence ladder and the `architecture-review` evidence step.
+
+### archfit v1.1.0 alignment
+
+- Aligned every archfit invocation to the v1.1.0 CLI: the single `archfit analyze` command replaces `check`/`score`/`scan`/`review`/`diff`, with `--gate` for CI exit codes, `--json`/`--format scorecard`/`--sarif` for output, and `--base <ref>` for deltas (the `--report` flag is gone; `--full`/`--advisory` are now defaults). Updated `tools-archfit`, `architecture-review`, `architecture-plan`, `src/templates/plan.md`, `docs/methodology.md`, and `docs/tools.md`.
+- Moved the config/LLM commands in `tools-archfit`'s do-not-use list to their v1.1.0 spellings: `config init`, `config update --apply`, `config enrich {labels,owner,volatility,subdomain}`, `config init --llm`, and `config enrich ... --apply` (renamed from `init`/`update`/`enrich`/`autopilot`/`--pin`); LLM narrative is now `analyze --llm` / `explain`.
+- Corrected the archfit output contract in `tools-archfit`: the scorecard now synthesizes a single `coupling_balance` dimension (not seven), finding status values are `new`/`baseline`/`fixed`/`waived`/`expired_waiver` (not `excepted`), `bc/imbalanced_coupling` fields live in each finding's `matched_by`, `symmetric` is a labelable strength, volatility is config + inferred cascade only (no path heuristic), and `cycle`/`blast_radius` are metrics (archfit emits no hub/instability metric).
+
 ## [0.6.0] - 2026-06-23
 
 ### Balanced Coupling fidelity
