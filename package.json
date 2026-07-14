@@ -1,21 +1,27 @@
 {
-  "name": "architect",
+  "name": "@alexei-led/architect",
   "version": "0.7.0",
-  "description": "Instruction-first architecture design and review: one read-only architect role, evidence-based design/review/scorecard/plan skills, methodology and tool skills, and report/design/plan templates.",
+  "description": "Instruction-first architecture design and review role, skills, templates, and helper tools.",
+  "license": "MIT",
+  "repository": "https://github.com/alexei-led/architect",
   "keywords": [
     "pi-package",
+    "claude-code",
+    "codex",
     "architecture",
     "code-review"
   ],
-  "license": "MIT",
-  "homepage": "https://github.com/alexei-led/architect",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/alexei-led/architect.git"
+  "dependencies": {
+    "pi-subagents": "0.34.0"
   },
   "pi": {
     "skills": [
       "./dist/pi/skills"
-    ]
+    ],
+    "subagents": {
+      "agents": [
+        "./dist/pi/agents"
+      ]
+    }
   }
 }

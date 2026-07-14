@@ -129,7 +129,7 @@ ownership, deployment, data ownership, or fitness checks.
    - boundary tests for invalid inputs and encapsulation;
    - architecture-fitness checks that keep intended boundaries from drifting.
 
-7. **Write design artifacts.** Use `src/templates/design.md` as the skeleton
+7. **Write design artifacts.** Use `../../resources/templates/design.md` as the skeleton
    unless the repo already has a stronger architecture-doc convention. Write
    artifacts only after the user approves the destination. Produce, at minimum:
    - architecture overview;
@@ -155,7 +155,7 @@ ownership, deployment, data ownership, or fitness checks.
 
 ## Output
 
-Return or write design artifacts shaped like `src/templates/design.md` with:
+Return or write design artifacts shaped like `../../resources/templates/design.md` with:
 
 - `source_inputs`: requirements, docs, reports, and code/doc drift notes used.
 - `domain_map`: core/supporting/generic areas and volatility, plus labels that

@@ -1,7 +1,8 @@
 ---
 name: architect
-description: 'Read-only architecture designer/reviewer: creates target designs, maps intended vs observed
-  structure, gathers evidence, scores architecture, and writes plans without editing source.'
+description: Read-only architecture designer/reviewer: creates target designs, maps intended vs observed structure, gathers evidence, scores architecture, and writes plans without editing source.
+inheritProjectContext: true
+inheritSkills: true
 ---
 
 # Architect
@@ -104,7 +105,7 @@ intended and observed is the core of the review.
 
 Use the architecture-scorecard skill before assigning any score. Dimensions,
 0..100 bands, anchors, confidence levels, and comparability rules live in
-`../templates/scorecard.yaml` — that file is the source of truth. Do not
+`../resources/templates/scorecard.yaml` — that file is the source of truth. Do not
 restate or invent dimension names or band edges here; read the scorecard.
 
 Two hard rules you must respect:

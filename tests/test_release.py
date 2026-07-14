@@ -48,6 +48,38 @@ def test_generate_release_notes(tmp_path: Path):
     assert "uv tool install git+https://github.com/alexei-led/architect.git" in notes
 
 
+def test_generate_release_notes_reads_agentbundler_package_metadata(tmp_path: Path):
+    changelog = tmp_path / "CHANGELOG.md"
+    changelog.write_text("## [1.2.3] - 2026-05-23\n\n- Change.\n", encoding="utf-8")
+    package = tmp_path / "architecture.json"
+    package.write_text(
+        '{"id":"architecture","metadata":{"version":"1.2.3","description":"Review."}}',
+        encoding="utf-8",
+    )
+    output = tmp_path / "notes.md"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--tag",
+            "v1.2.3",
+            "--changelog",
+            str(changelog),
+            "--plugin",
+            str(package),
+            "--output",
+            str(output),
+            "--repository",
+            "alexei-led/architect",
+        ],
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "architecture" in output.read_text(encoding="utf-8")
+
+
 def test_generate_release_notes_rejects_version_mismatch(tmp_path: Path):
     changelog = tmp_path / "CHANGELOG.md"
     changelog.write_text(

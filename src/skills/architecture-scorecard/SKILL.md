@@ -11,7 +11,7 @@ description: >-
 # Architecture scorecard
 
 How to score, honestly and reproducibly. The rubric itself lives in
-`src/templates/scorecard.yaml` — read it; do not restate or invent values here.
+`../../resources/templates/scorecard.yaml` — read it; do not restate or invent values here.
 
 ## When to use
 
@@ -32,7 +32,7 @@ report.
 
 ## Procedure
 
-1. **Read the rubric.** `src/templates/scorecard.yaml` is the source of truth for
+1. **Read the rubric.** `../../resources/templates/scorecard.yaml` is the source of truth for
    dimension names, 0..100 bands and their anchors, confidence levels, and the
    enforced rules. If you find yourself typing a dimension name or band edge from
    memory, stop and read the file — drift from the scorecard is a bug.
@@ -85,7 +85,7 @@ report.
 
 ## Failure handling
 
-- Missing or unreadable `src/templates/scorecard.yaml`: stop; do not recreate the
+- Missing or unreadable `../../resources/templates/scorecard.yaml`: stop; do not recreate the
   rubric from memory.
 - Missing evidence for a non-meta dimension: do not score it. Record a coverage
   gap and lower `analysis_confidence`. If the report format requires a numeric

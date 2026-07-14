@@ -4,7 +4,7 @@ from architect_tools._contract import load_scorecard as _load_scorecard
 from architect_tools._contract import split_frontmatter
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-TEMPLATES = REPO_ROOT / "src" / "templates"
+TEMPLATES = REPO_ROOT / "src" / "resources" / "templates"
 
 
 def task_sections(body: str) -> list[str]:

@@ -31,6 +31,7 @@ fi
 python3 - "$VERSION" <<'PY'
 from __future__ import annotations
 
+import json
 import re
 import sys
 from datetime import date
@@ -40,9 +41,15 @@ version = sys.argv[1]
 files = [
     Path("pyproject.toml"),
     Path("uv.lock"),
-    Path("src/plugins/architecture/plugin.yaml"),
+    Path("src/packages/architecture.json"),
     Path("src/architect_tools/__init__.py"),
 ]
+marketplaces = [
+    Path(".claude-plugin/marketplace.json"),
+    Path(".github/plugin/marketplace.json"),
+    Path(".cursor-plugin/marketplace.json"),
+]
+root_package = Path("package.json")
 
 for path in files:
     text = path.read_text(encoding="utf-8")
@@ -57,9 +64,22 @@ for path in files:
         )
     elif path.name == "__init__.py":
         text = re.sub(r'(?m)^__version__ = "[^"]+"', f'__version__ = "{version}"', text, count=1)
+    elif path.name == "architecture.json":
+        text = re.sub(r'(?m)^(\s+"version":\s+")[^"]+(")', rf"\g<1>{version}\2", text, count=1)
     else:
         text = re.sub(r"(?m)^version: .+", f"version: {version}", text, count=1)
     path.write_text(text, encoding="utf-8")
+
+for path in [root_package, *marketplaces]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["version"] = version
+    metadata = data.get("metadata")
+    if isinstance(metadata, dict) and "version" in metadata:
+        metadata["version"] = version
+    for plugin in data.get("plugins", []):
+        if "version" in plugin:
+            plugin["version"] = version
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 changelog = Path("CHANGELOG.md")
 text = changelog.read_text(encoding="utf-8")
@@ -90,14 +110,19 @@ command -v gitleaks >/dev/null 2>&1 || { echo "gitleaks not installed"; exit 1; 
 gitleaks git --redact --no-banner
 
 git add \
+	agentbundle.json \
 	pyproject.toml \
 	uv.lock \
-	src/plugins/architecture/plugin.yaml \
+	src/agents/ \
+	src/packages/ \
+	src/resources/ \
 	src/architect_tools/__init__.py \
 	CHANGELOG.md \
-	package.json \
 	.claude-plugin/ \
 	.agents/ \
+	.github/plugin/ \
+	.cursor-plugin/ \
+	package.json \
 	dist/
 
 if ! git diff --cached --quiet; then

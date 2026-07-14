@@ -21,8 +21,9 @@ Installs dev dependencies and sets Git hooks from `scripts/git-hooks/`.
 ## Checks
 
 ```sh
-make build        # generate runtime artifacts into dist/
-make check        # build + drift check + ruff + pytest
+make build        # generate target-native package roots into dist/
+make check        # read-only **Agent Bundler** drift check + ruff + pytest
+# Optional: AGBUN_REF=<released-version-or-commit> make check
 make evals        # paid Agent Skills evals
 make evals FAST=1 # faster advisory eval loop
 ```
@@ -79,19 +80,29 @@ Push branch and tag to publish through GitHub Actions.
 
 ## Packaging
 
-Source of truth is under `src/`. Generated artifacts in `dist/` are committed.
+Source of truth is `agentbundle.json` plus the declared files under `src/`.
+Generated artifacts in `dist/` are committed. The Makefile runs **Agent Bundler** from
+its pinned ref override; use a released version or commit in CI/release jobs.
 
 Main outputs:
 
 ```text
-.claude-plugin/marketplace.json
-.agents/plugins/marketplace.json
-package.json
-dist/claude/plugins/architecture/
-dist/codex/plugins/architecture/
-dist/codex/agents/architect.toml
-dist/pi/{skills,agents,templates}/
+agentbundle.json
+src/packages/architecture.json
+dist/claude/{.claude-plugin,skills,agents,resources}/
+dist/codex/{.codex-plugin,skills,agents,resources}/
+dist/pi/{package.json,skills,agents,resources}/
+dist/copilot/{plugin.json,skills,agents,resources}/
+dist/grok/.grok/{skills,resources}/
+dist/cursor/{.cursor-plugin,skills,agents,resources}/
 ```
+
+Repository marketplace files remain integration metadata and point at the
+corresponding `dist/claude`, `dist/codex`, `dist/copilot`, and `dist/cursor`
+package roots. The repository-root `package.json` registers the generated Pi
+skills and Architect role through `pi.subagents.agents`, with `pi-subagents` as
+a declared dependency. Grok keeps a project tree; its installable route is the
+Claude-compatible `dist/claude` package.
 
 When changing prompts, skills, templates, or plugin metadata:
 
@@ -99,7 +110,7 @@ When changing prompts, skills, templates, or plugin metadata:
 2. run `make build`
 3. commit source and generated output together
 
-`make check` fails on generated-artifact drift.
+`agbun check` is read-only and fails on generated-artifact drift.
 
 ## Docs
 

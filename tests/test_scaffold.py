@@ -9,9 +9,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 EXPECTED_SOURCE_DIRS = [
     "src/agents",
     "src/skills",
-    "src/templates",
+    "src/resources/templates",
     "src/architect_tools",
-    "src/plugins",
+    "src/packages",
     "tests",
 ]
 

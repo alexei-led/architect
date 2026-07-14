@@ -1,0 +1,6 @@
+{
+  "frontmatterPatch": {
+    "inheritProjectContext": true,
+    "inheritSkills": true
+  }
+}

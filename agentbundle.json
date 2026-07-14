@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "kind": "bundle",
+  "root": "src",
+  "targets": [
+    "claude",
+    "codex",
+    "pi",
+    "copilot",
+    "grok",
+    "cursor"
+  ],
+  "output": "dist",
+  "composition": [
+    {
+      "target": "claude",
+      "profile": "package"
+    },
+    {
+      "target": "codex",
+      "profile": "package"
+    },
+    {
+      "target": "pi",
+      "profile": "package"
+    },
+    {
+      "target": "copilot",
+      "profile": "package"
+    },
+    {
+      "target": "grok",
+      "profile": "project"
+    },
+    {
+      "target": "cursor",
+      "profile": "package"
+    }
+  ],
+  "bundle": {
+    "packages": [
+      "packages/architecture.json"
+    ]
+  }
+}

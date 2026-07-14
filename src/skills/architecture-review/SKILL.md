@@ -157,11 +157,11 @@ instructions or report.
    `references/triage.md`.
 
 7. **Score with the scorecard skill.** Use the architecture-scorecard skill for
-   every score. Read `src/templates/scorecard.yaml` for dimensions, bands,
+   every score. Read `../../resources/templates/scorecard.yaml` for dimensions, bands,
    anchors, and rules — it is the source of truth. Each non-meta score needs at
    least one evidence ref. Low confidence caps the quality claim.
 
-8. **Write the report from the template.** Use `src/templates/report.md` as the
+8. **Write the report from the template.** Use `../../resources/templates/report.md` as the
    skeleton. Fill frontmatter (interview context, system map, scores, findings,
    evidence, tool coverage) and the prose sections. Findings carry stable IDs
    and human-facing narratives: knowledge or boundary leakage, complexity impact,
@@ -185,7 +185,7 @@ instructions or report.
 
 ## Output
 
-A completed review produces an architecture report using `src/templates/report.md`.
+A completed review produces an architecture report using `../../resources/templates/report.md`.
 The report must include `interview_context`, `system_map`, `module_volatility`,
 `scores`, `findings`, `evidence`, and `tool_coverage`. When archfit was used,
 include an `archfit_calibration` block or section with confirmed,

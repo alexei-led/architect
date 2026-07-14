@@ -27,7 +27,7 @@ drift risks. If the user cannot confirm it, record the uncertainty in
 
 ## Fields to capture
 
-Maps directly to `interview_context` in `../../../templates/report.md`:
+Maps directly to `interview_context` in `../../../resources/templates/report.md`:
 
 - `system_goal` — what the system is for.
 - `quality_goals` — e.g. maintainability, change locality, deploy independence.

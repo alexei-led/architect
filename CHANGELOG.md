@@ -9,6 +9,17 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Distribution
+
+- Migrated generated Claude Code, Codex, Pi, GitHub Copilot, Grok Build, and Cursor
+  packages to **Agent Bundler**.
+- Added installable GitHub Copilot and Cursor plugin outputs with the Architect role,
+  repository marketplace manifests, and generated package READMEs.
+- Added a repository-root Pi package that registers generated skills and the Architect
+  subagent, including `pi-subagents` as a runtime dependency.
+- Kept Grok Build on the Claude-compatible package for role installation; retained
+  Codex’s documented manual custom-agent installation.
+
 ## [0.7.0] - 2026-06-30
 
 ### codebase-memory-mcp tool skill

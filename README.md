@@ -3,13 +3,15 @@
 [![CI](https://github.com/alexei-led/architect/actions/workflows/ci.yml/badge.svg)](https://github.com/alexei-led/architect/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/github/v/tag/alexei-led/architect?label=version&sort=semver)](https://github.com/alexei-led/architect/tags)
 [![License](https://img.shields.io/github/license/alexei-led/architect)](LICENSE)
-[![AI agents](https://img.shields.io/badge/AI%20agents-Claude%20Code%20%C2%B7%20Codex%20CLI%20%C2%B7%20Pi-111827)](#install)
+[![AI agents](https://img.shields.io/badge/AI%20agents-6%20targets-111827)](#install)
 [![Method](https://img.shields.io/badge/method-Balanced%20Coupling-0f766e)](docs/methodology.md)
 [![Mode](https://img.shields.io/badge/reviews-read--only-2563eb)](docs/methodology.md)
 
 Read-only architecture review and design for AI coding agents.
 
-`architect` gives Claude Code, Codex CLI, and Pi a disciplined Architect role for:
+`architect` packages its architecture skills for Claude Code, Codex CLI, Pi,
+GitHub Copilot, Grok Build, and Cursor. Claude, Codex, Pi, GitHub Copilot, and Cursor also get the disciplined
+Architect role for:
 
 - comparing intended vs observed architecture
 - judging coupling with **Balanced Coupling**
@@ -53,25 +55,56 @@ codex plugin marketplace add alexei-led/architect
 codex plugin add architecture@alexei-led-architect
 ```
 
-Optional custom agent file:
-
-```text
-dist/codex/agents/architect.toml
-```
-
-Copy or symlink it into `~/.codex/agents/` or `.codex/agents/` if you want subagent spawning.
+The generated Codex package includes `agents/architect.toml`. Copy it into
+`~/.codex/agents/` or `.codex/agents/` if you want subagent spawning.
 
 ### Pi
+
+The Architect role is a [`pi-subagents`](https://github.com/nicobailon/pi-subagents)
+agent. This repository declares that runtime dependency. Install directly from the
+repository:
 
 ```sh
 pi install git:github.com/alexei-led/architect
 ```
 
-Project-local install:
+For local development:
 
 ```sh
-pi install -l git:github.com/alexei-led/architect
+make build
+pi install -l .
 ```
+
+Pi discovers the registered `architect` subagent. Ask it to design or review
+architecture, or run it directly with `/run architect <task>`.
+
+### GitHub Copilot
+
+```sh
+copilot plugin marketplace add alexei-led/architect
+copilot plugin install architecture@alexei-led-architect
+```
+
+For local development, build then install `dist/copilot` as a local Copilot plugin.
+
+### Grok Build
+
+Grok Build accepts the Claude-compatible package, including the Architect role:
+
+```sh
+grok --plugin-dir dist/claude
+```
+
+For project-local skills only, copy `dist/grok/.grok/` into the consumer project.
+
+### Cursor
+
+Install from the repository marketplace or add `dist/cursor` through Cursor's
+local plugin workflow. The generated package includes the Architect agent, all
+skills, templates, and a `README.md`.
+
+Grok receives all architecture skills and shared templates through its project
+tree; use the Claude-compatible package when the Architect role is required.
 
 ### Helper CLIs
 

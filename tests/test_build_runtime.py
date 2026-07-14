@@ -1,12 +1,33 @@
 import json
+import re
 import tomllib
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+TEMPLATE_REFERENCE_RE = re.compile(r"`([^`]*resources/templates/[\w./-]+)`")
 
 
 def read_json(path: str):
     return json.loads((REPO_ROOT / path).read_text(encoding="utf-8"))
+
+
+def test_bundle_declares_every_agentbundler_target():
+    manifest = read_json("agentbundle.json")
+    assert manifest["targets"] == ["claude", "codex", "pi", "copilot", "grok", "cursor"]
+    assert {entry["target"]: entry["profile"] for entry in manifest["composition"]} == {
+        "claude": "package",
+        "codex": "package",
+        "pi": "package",
+        "copilot": "package",
+        "grok": "project",
+        "cursor": "package",
+    }
+
+    assets = read_json("src/packages/architecture.json")["assets"]
+    resources = next(asset for asset in assets if asset["path"] == "resources/templates")
+    assert resources["targets"] == manifest["targets"]
+    agent = next(asset for asset in assets if asset["path"] == "agents/architect.md")
+    assert agent["targets"] == ["claude", "codex", "pi", "copilot", "cursor"]
 
 
 def test_runtime_discovery_manifests_point_to_generated_artifacts():
@@ -15,21 +36,32 @@ def test_runtime_discovery_manifests_point_to_generated_artifacts():
         claude_marketplace["$schema"] == "https://json.schemastore.org/claude-code-marketplace.json"
     )
     assert claude_marketplace["owner"] == {"name": "Alexei Ledenev"}
-    assert claude_marketplace["plugins"][0]["source"] == "./dist/claude/plugins/architecture"
+    assert claude_marketplace["plugins"][0]["source"] == "./dist/claude"
     assert claude_marketplace["plugins"][0]["author"] == {"name": "Alexei Ledenev"}
     codex_marketplace_plugin = read_json(".agents/plugins/marketplace.json")["plugins"][0]
     assert codex_marketplace_plugin["source"] == {
         "source": "local",
-        "path": "./dist/codex/plugins/architecture",
+        "path": "./dist/codex",
     }
     assert codex_marketplace_plugin["policy"] == {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL",
     }
     assert codex_marketplace_plugin["category"] == "Productivity"
-    assert read_json("package.json")["pi"] == {"skills": ["./dist/pi/skills"]}
 
-    claude_plugin = read_json("dist/claude/plugins/architecture/.claude-plugin/plugin.json")
+    copilot_marketplace = read_json(".github/plugin/marketplace.json")
+    assert copilot_marketplace["plugins"][0]["source"] == "./dist/copilot"
+    cursor_marketplace = read_json(".cursor-plugin/marketplace.json")
+    assert cursor_marketplace["plugins"][0]["source"] == "dist/cursor"
+
+    root_pi_package = read_json("package.json")
+    assert root_pi_package["dependencies"] == {"pi-subagents": "0.34.0"}
+    assert root_pi_package["pi"] == {
+        "skills": ["./dist/pi/skills"],
+        "subagents": {"agents": ["./dist/pi/agents"]},
+    }
+
+    claude_plugin = read_json("dist/claude/.claude-plugin/plugin.json")
     assert (
         claude_plugin["$schema"] == "https://json.schemastore.org/claude-code-plugin-manifest.json"
     )
@@ -37,7 +69,7 @@ def test_runtime_discovery_manifests_point_to_generated_artifacts():
     assert claude_plugin["homepage"] == "https://github.com/alexei-led/architect"
     assert claude_plugin["keywords"] == ["architecture", "code-review", "modularity"]
 
-    codex_plugin = read_json("dist/codex/plugins/architecture/.codex-plugin/plugin.json")
+    codex_plugin = read_json("dist/codex/.codex-plugin/plugin.json")
     assert codex_plugin["author"] == {"name": "Alexei Ledenev"}
     assert codex_plugin["homepage"] == "https://github.com/alexei-led/architect"
     assert codex_plugin["interface"]["displayName"] == "Architect"
@@ -46,25 +78,58 @@ def test_runtime_discovery_manifests_point_to_generated_artifacts():
     assert codex_plugin["skills"] == "./skills"
     assert "agents" not in codex_plugin
 
+    copilot_plugin = read_json("dist/copilot/plugin.json")
+    assert copilot_plugin["skills"] == ["skills/"]
+    assert copilot_plugin["agents"] == "agents/"
+
 
 def test_compiled_runtime_artifacts_exist_and_use_compiled_template_paths():
-    roots = [
-        REPO_ROOT / "dist/claude/plugins/architecture",
-        REPO_ROOT / "dist/codex/plugins/architecture",
+    package_roots = [
+        REPO_ROOT / "dist/claude",
+        REPO_ROOT / "dist/codex",
         REPO_ROOT / "dist/pi",
+        REPO_ROOT / "dist/copilot",
+        REPO_ROOT / "dist/cursor",
     ]
-    for root in roots:
-        assert (root / "templates/scorecard.yaml").is_file()
+    project_roots = [REPO_ROOT / "dist/grok/.grok"]
+    assert (REPO_ROOT / "dist/copilot/plugin.json").is_file()
+    assert (REPO_ROOT / "dist/cursor/.cursor-plugin/plugin.json").is_file()
+    pi_package = read_json("dist/pi/package.json")
+    assert pi_package["dependencies"] == {"pi-subagents": "0.34.0"}
+    assert pi_package["pi"] == {
+        "skills": ["./skills"],
+        "subagents": {"agents": ["./agents"]},
+    }
+    for root in package_roots + project_roots:
+        assert (root / "resources/templates/scorecard.yaml").is_file()
         skill = root / "skills/architecture-review/SKILL.md"
         assert skill.is_file()
         assert (root / "skills/architecture-design/SKILL.md").is_file()
-        assert (root / "templates/design.md").is_file()
+        assert (root / "resources/templates/design.md").is_file()
         text = skill.read_text(encoding="utf-8")
         assert "src/templates/" not in text
-        assert "../../templates/report.md" in text
+        assert "../../resources/templates/report.md" in text
 
-    assert (REPO_ROOT / "dist/claude/plugins/architecture/agents/architect.md").is_file()
-    assert (REPO_ROOT / "dist/pi/agents/architect.md").is_file()
+    assert (REPO_ROOT / "dist/copilot/agents/architect.agent.md").is_file()
+    assert not (REPO_ROOT / "dist/grok/.grok/agents").exists()
+    assert (REPO_ROOT / "dist/claude/agents/architect.md").is_file()
+    assert (REPO_ROOT / "dist/cursor/agents/architect.md").is_file()
+    assert (REPO_ROOT / "dist/codex/agents/architect.toml").is_file()
+    pi_agent = REPO_ROOT / "dist/pi/agents/architect.md"
+    assert pi_agent.is_file()
+    assert "name: architect" in pi_agent.read_text(encoding="utf-8")
+    assert "inheritProjectContext: true" in pi_agent.read_text(encoding="utf-8")
+    assert "inheritSkills: true" in pi_agent.read_text(encoding="utf-8")
+    for target in ("claude", "codex", "pi", "copilot", "cursor"):
+        assert (REPO_ROOT / "dist" / target / "README.md").is_file()
+
+
+def test_generated_template_references_resolve_for_every_target():
+    for target in ("claude", "codex", "pi", "copilot", "grok", "cursor"):
+        root = REPO_ROOT / "dist" / target
+        for path in sorted([*root.rglob("*.md"), *root.rglob("*.toml")]):
+            for ref in TEMPLATE_REFERENCE_RE.findall(path.read_text(encoding="utf-8")):
+                assert (path.parent / ref).is_file(), f"{path} references missing {ref}"
 
 
 def test_codex_custom_agent_is_standalone_toml():
@@ -72,4 +137,4 @@ def test_codex_custom_agent_is_standalone_toml():
     assert agent["name"] == "architect"
     assert agent["sandbox_mode"] == "read-only"
     assert "You design and review software architecture" in agent["developer_instructions"]
-    assert "../templates/scorecard.yaml" in agent["developer_instructions"]
+    assert "../resources/templates/scorecard.yaml" in agent["developer_instructions"]

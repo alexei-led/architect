@@ -1,0 +1,17 @@
+{
+  "name": "alexei-led-architect",
+  "owner": {
+    "name": "Alexei Ledenev"
+  },
+  "metadata": {
+    "description": "Instruction-first architecture design and review for coding agents.",
+    "version": "0.7.0"
+  },
+  "plugins": [
+    {
+      "name": "architecture",
+      "source": "dist/cursor",
+      "description": "Instruction-first architecture design and review: evidence-based design, review, scoring, and planning."
+    }
+  ]
+}

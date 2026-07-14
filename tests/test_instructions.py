@@ -6,7 +6,7 @@ from architect_tools._contract import split_frontmatter
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SRC = REPO_ROOT / "src"
 AGENTS_DIR = SRC / "agents"
-AGENT_FILE = AGENTS_DIR / "architect" / "AGENT.md"
+AGENT_FILE = AGENTS_DIR / "architect.md"
 SKILLS_DIR = SRC / "skills"
 
 TASK3_SKILLS = {
@@ -16,7 +16,10 @@ TASK3_SKILLS = {
     "architecture-plan",
     "tools-archfit",
 }
-TEMPLATE_PATH_RE = re.compile(r"src/templates/[\w./-]+")
+TEMPLATE_PATH_RE = re.compile(
+    r"(?:src/templates|\.\./resources/templates|\.\./\.\./resources/templates|"
+    r"\.\./\.\./\.\./resources/templates)/[\w./-]+"
+)
 TODO_RE = re.compile(r"\b(TODO|FIXME|XXX)\b")
 
 
@@ -28,17 +31,21 @@ def instruction_markdown_files() -> list[Path]:
     return [AGENT_FILE, *skill_files()]
 
 
+def template_reference_files() -> list[Path]:
+    return sorted([*AGENTS_DIR.rglob("*.md"), *SKILLS_DIR.rglob("*.md")])
+
+
 def test_task3_skills_exist():
     present = {p.parent.name for p in skill_files()}
     assert present >= TASK3_SKILLS, f"missing skills: {TASK3_SKILLS - present}"
 
 
 def test_single_plain_architect_role_exists():
-    agent_files = sorted(AGENTS_DIR.glob("*/AGENT.md"))
+    agent_files = sorted(AGENTS_DIR.glob("*.md"))
     assert agent_files == [AGENT_FILE]
     text = AGENT_FILE.read_text()
-    assert text.startswith("# Architect\n")
-    assert not text.startswith("---\n"), "source role prompt must not carry runtime frontmatter"
+    assert text.startswith("---\n")
+    assert "# Architect\n" in text
 
 
 def test_skill_frontmatter_has_name_and_description():
@@ -73,9 +80,10 @@ def test_no_todo_markers():
 
 
 def test_template_references_resolve():
-    for path in instruction_markdown_files():
+    for path in template_reference_files():
         for ref in TEMPLATE_PATH_RE.findall(path.read_text()):
-            assert (REPO_ROOT / ref).is_file(), f"{path} references missing {ref}"
+            referenced = REPO_ROOT / ref if ref.startswith("src/") else path.parent / ref
+            assert referenced.is_file(), f"{path} references missing {ref}"
 
 
 def test_structured_questions_do_not_depend_on_agent_overlays():

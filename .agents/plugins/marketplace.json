@@ -8,7 +8,7 @@
       "name": "architecture",
       "source": {
         "source": "local",
-        "path": "./dist/codex/plugins/architecture"
+        "path": "./dist/codex"
       },
       "policy": {
         "installation": "AVAILABLE",

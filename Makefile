@@ -13,9 +13,9 @@ SKILL_EVAL_HTML_REPORT ?= 1
 SKILL_EVAL_BASELINE ?= 1
 SKILL_EVAL_CONCURRENCY ?= 4
 SKILL_EVAL_STRICT ?= 1
+AGBUN_REF ?= dcc7a9cb0599d5e8d4e9f2e7e3a00d50a5626607
+AGBUN ?= go run github.com/alexei-led/agentbundler/cmd/agbun@$(AGBUN_REF)
 SKILL_EVAL_CLI ?= $(shell if command -v agent-skills-eval >/dev/null 2>&1; then printf 'agent-skills-eval'; elif command -v bunx >/dev/null 2>&1; then printf 'bunx agent-skills-eval'; elif command -v fnm >/dev/null 2>&1; then printf 'fnm exec --using $(NODE_VERSION) -- npx --yes agent-skills-eval'; else printf 'npx --yes agent-skills-eval'; fi)
-GENERATED_PATHS := dist .claude-plugin .agents package.json
-
 ifeq ($(FAST),1)
 SKILL_EVAL_BASELINE := 0
 SKILL_EVAL_HTML_REPORT := 0
@@ -29,21 +29,11 @@ setup: ## Install repo git hooks and dev deps
 	git config core.hooksPath scripts/git-hooks
 	uv sync
 
-build: ## Compile runtime artifacts from src/ into dist/
-	uv run python scripts/build/compile.py
+build: ## Compile installable runtime packages from the canonical bundle
+	$(AGBUN) build
 
-check: build ## Build, verify generated artifacts, lint, and test
-	@if ! git diff --quiet -- $(GENERATED_PATHS); then \
-		echo "ERROR: generated artifacts drifted; run 'make build' and commit the output."; \
-		git --no-pager diff --stat -- $(GENERATED_PATHS); \
-		exit 1; \
-	fi
-	@untracked=$$(git ls-files --others --exclude-standard -- $(GENERATED_PATHS)); \
-	if [ -n "$$untracked" ]; then \
-		echo "ERROR: build produced untracked generated artifacts:"; \
-		echo "$$untracked" | sed 's/^/  /'; \
-		exit 1; \
-	fi
+check: ## Verify generated runtime packages without writing, lint, and test
+	$(AGBUN) check
 	uv run ruff check .
 	uv run ruff format --check .
 	uv run pytest

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from collections.abc import Sequence
@@ -45,11 +46,23 @@ def has_body_content(section: str) -> bool:
 
 
 def read_plugin_metadata(path: Path) -> tuple[str, str, str]:
+    if path.suffix == ".json":
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            metadata = data.get("metadata", data)
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ReleaseNotesError(f"cannot read {path}: {exc}") from exc
+        name = data.get("id", data.get("name", ""))
+        version = metadata.get("version", "")
+        description = metadata.get("description", "")
+        if not all(isinstance(value, str) and value for value in (name, version, description)):
+            raise ReleaseNotesError(f"{path} missing name, version, or description")
+        return name, version, description
+
     name = ""
     version = ""
     description_lines: list[str] = []
     in_description = False
-
     for raw_line in path.read_text(encoding="utf-8").splitlines():
         line = raw_line.rstrip()
         if line.startswith("name:"):
@@ -121,7 +134,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tag", required=True, help="Release tag, for example v0.2.0")
     parser.add_argument("--changelog", type=Path, default=Path("CHANGELOG.md"))
-    parser.add_argument("--plugin", type=Path, default=Path("src/plugins/architecture/plugin.yaml"))
+    parser.add_argument("--plugin", type=Path, default=Path("src/packages/architecture.json"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument(
         "--repository", required=True, help="GitHub repository, for example owner/repo"

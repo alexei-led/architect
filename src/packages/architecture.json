@@ -1,0 +1,112 @@
+{
+  "id": "architecture",
+  "metadata": {
+    "version": "0.7.0",
+    "description": "Instruction-first architecture design and review: one read-only architect role, evidence-based design/review/scorecard/plan skills, methodology and tool skills, and report/design/plan templates.",
+    "author": "Alexei Ledenev",
+    "license": "MIT",
+    "homepage": "https://github.com/alexei-led/architect",
+    "repository": "https://github.com/alexei-led/architect",
+    "keywords": [
+      "architecture",
+      "code-review",
+      "modularity"
+    ],
+    "dependencies": {
+      "pi-subagents": "0.34.0"
+    },
+    "interface": {
+      "displayName": "Architect",
+      "shortDescription": "Evidence-based architecture design, review, scoring, and planning.",
+      "longDescription": "Use an evidence-based architect role and skills to design target architecture, review observed structure, score modularity and coupling risks, and produce incremental refactoring plans.",
+      "developerName": "Alexei Ledenev",
+      "category": "Productivity",
+      "capabilities": [
+        "Read"
+      ],
+      "websiteURL": "https://github.com/alexei-led/architect",
+      "defaultPrompt": [
+        "Review this repo's architecture and score the risks.",
+        "Design target architecture for this requirement.",
+        "Plan an incremental architecture refactor."
+      ]
+    }
+  },
+  "assets": [
+    {
+      "path": "skills/architecture-design"
+    },
+    {
+      "path": "skills/architecture-plan"
+    },
+    {
+      "path": "skills/architecture-review"
+    },
+    {
+      "path": "skills/architecture-scorecard"
+    },
+    {
+      "path": "skills/methodology-architecture-fitness"
+    },
+    {
+      "path": "skills/methodology-balanced-coupling"
+    },
+    {
+      "path": "skills/tools-archfit"
+    },
+    {
+      "path": "skills/tools-ast-grep"
+    },
+    {
+      "path": "skills/tools-code-search"
+    },
+    {
+      "path": "skills/tools-codebase-memory"
+    },
+    {
+      "path": "skills/tools-codegraph"
+    },
+    {
+      "path": "skills/tools-gitnexus"
+    },
+    {
+      "path": "skills/tools-go"
+    },
+    {
+      "path": "skills/tools-infra-operational"
+    },
+    {
+      "path": "skills/tools-lsp-tree-sitter"
+    },
+    {
+      "path": "skills/tools-python"
+    },
+    {
+      "path": "skills/tools-report-markdown"
+    },
+    {
+      "path": "skills/tools-typescript"
+    },
+    {
+      "path": "agents/architect.md",
+      "targets": [
+        "claude",
+        "codex",
+        "pi",
+        "copilot",
+        "cursor"
+      ]
+    },
+    {
+      "path": "resources/templates",
+      "targets": [
+        "claude",
+        "codex",
+        "pi",
+        "copilot",
+        "grok",
+        "cursor"
+      ]
+    }
+  ]
+}

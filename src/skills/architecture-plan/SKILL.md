@@ -75,7 +75,7 @@ path or the plan must be copied/symlinked into the configured plans directory.
    report finding/evidence IDs when the design came from a review. A task with no
    source rationale does not belong in the plan.
 
-2. **Use the plan template.** `src/templates/plan.md` is the skeleton: Overview,
+2. **Use the plan template.** `../../resources/templates/plan.md` is the skeleton: Overview,
    Source artifact, Success criteria, Validation Commands, Implementation Steps
    with executable `### Task N:` sections, Acceptance criteria, Safety notes,
    Re-review. Put checkboxes only inside `### Task N:` or `### Iteration N:`
@@ -132,7 +132,7 @@ path or the plan must be copied/symlinked into the configured plans directory.
 - Missing approved design, unreadable artifact, or absent finding/evidence/
   decision/contract refs: stop and ask for the missing source or run
   `architecture-design`. Do not invent refs.
-- Missing `src/templates/plan.md`: report the missing template and ask before
+- Missing `../../resources/templates/plan.md`: report the missing template and ask before
   using an inline fallback.
 - Requested rewrite with no cited finding, design decision, or risk behind it:
   decline that task and name the missing rationale.
@@ -141,7 +141,7 @@ path or the plan must be copied/symlinked into the configured plans directory.
 
 ## Output
 
-Return or write a Markdown plan shaped like `src/templates/plan.md`. When
+Return or write a Markdown plan shaped like `../../resources/templates/plan.md`. When
 writing a file with no path provided, use the confirmed default path
 `docs/plans/<kebab-case-target>.md`. Include:
 
