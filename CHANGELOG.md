@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-07-14
+
 ### Fixed
 
 - Scoped Architect's `sandbox_mode` metadata to the Codex package so generated
