@@ -92,7 +92,8 @@ For local development, build then install `dist/copilot` as a local Copilot plug
 Grok Build accepts the Claude-compatible package, including the Architect role:
 
 ```sh
-grok --plugin-dir dist/claude
+make build
+grok plugin install --trust ./dist/claude
 ```
 
 For project-local skills only, copy `dist/grok/.grok/` into the consumer project.
