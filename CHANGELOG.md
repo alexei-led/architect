@@ -9,6 +9,15 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Packaging maintenance
+
+- Made system `agbun` the shared build prerequisite for local, CI, and release
+  package generation.
+- Added isolated native package smoke tests for Claude Code, Codex, Pi, GitHub
+  Copilot, Grok Build, and Cursor.
+- Added release-safe version propagation, generated-provenance checks, complete skill
+  inventory checks, and Grok/Claude compatibility checks.
+
 ## [0.8.0] - 2026-07-14
 
 ### Distribution

@@ -41,6 +41,9 @@ It does not edit production code during review.
 
 ## Install
 
+Local package development requires `agbun` on `PATH`. It is not installed by
+this repository; verify it with `agbun --version` before running `make build`.
+
 ### Claude Code
 
 ```sh
@@ -100,9 +103,15 @@ For project-local skills only, copy `dist/grok/.grok/` into the consumer project
 
 ### Cursor
 
-Install from the repository marketplace or add `dist/cursor` through Cursor's
-local plugin workflow. The generated package includes the Architect agent, all
-skills, templates, and a `README.md`.
+Install from the repository marketplace or load the generated local package:
+
+```sh
+make build
+cursor-agent --plugin-dir "$PWD/dist/cursor"
+```
+
+The generated package includes the Architect agent, all skills, templates, and
+a `README.md`.
 
 Grok receives all architecture skills and shared templates through its project
 tree; use the Claude-compatible package when the Architect role is required.

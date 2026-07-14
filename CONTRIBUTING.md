@@ -8,6 +8,8 @@ Maintainer notes for `architect`. User-facing install and usage stay in [README.
 - `uv`
 - `make`
 - `gitleaks`
+- `agbun` on `PATH`
+- optional: vendor CLIs for package smoke tests
 - optional: `markdownlint-cli2`
 
 ## Setup
@@ -21,10 +23,10 @@ Installs dev dependencies and sets Git hooks from `scripts/git-hooks/`.
 ## Checks
 
 ```sh
-make build        # generate target-native package roots into dist/
-make check        # read-only **Agent Bundler** drift check + ruff + pytest
-# Optional: AGBUN_REF=<released-version-or-commit> make check
-make evals        # paid Agent Skills evals
+make build         # generate every target tree into dist/
+make check         # read-only `agbun` drift check + ruff + pytest
+make package-smoke # build, then load/install all six targets with vendor CLIs
+make evals         # paid Agent Skills evals
 make evals FAST=1 # faster advisory eval loop
 ```
 
@@ -71,7 +73,7 @@ uv tool install --editable .
 ## Release
 
 ```sh
-make release V=0.2.0
+make release V=X.Y.Z
 ```
 
 Requires a clean tree. Updates versioned files, rebuilds generated artifacts, runs checks, scans with Gitleaks, commits the release, and creates tag `vX.Y.Z`.
@@ -81,8 +83,10 @@ Push branch and tag to publish through GitHub Actions.
 ## Packaging
 
 Source of truth is `agentbundle.json` plus the declared files under `src/`.
-Generated artifacts in `dist/` are committed. The Makefile runs **Agent Bundler** from
-its pinned ref override; use a released version or commit in CI/release jobs.
+Generated artifacts in `dist/` are committed. **Agent Bundler** is a system
+prerequisite: the Makefile, hooks, CI, and release workflow invoke `agbun` from
+`PATH`. Check the installed version with `agbun --version`; its value is recorded
+in `dist/.agentbundler/build.json` after each build.
 
 Main outputs:
 
@@ -106,11 +110,17 @@ Claude-compatible `dist/claude` package.
 
 When changing prompts, skills, templates, or plugin metadata:
 
-1. edit `src/`
+1. edit `src/` or the repository-owned marketplace/package metadata
 2. run `make build`
-3. commit source and generated output together
+3. run `make check`
+4. run `make package-smoke` before a release when all vendor CLIs are available
+5. commit source and generated output together
 
-`agbun check` is read-only and fails on generated-artifact drift.
+`agbun check` is read-only and fails on generated-artifact drift. Package tests
+also require version/dependency coherence and equal Grok/Claude skill and template
+inventories. `make package-smoke` isolates vendor homes where supported and uses
+temporary workspaces; its Cursor check uses the current login for one authenticated
+read-only model request.
 
 ## Docs
 

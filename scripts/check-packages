@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+tmp_root=$(mktemp -d "${TMPDIR:-/tmp}/architect-package-smoke.XXXXXX")
+trap 'rm -rf -- "$tmp_root"' EXIT
+
+missing=()
+
+have() {
+	if command -v "$1" >/dev/null 2>&1; then
+		return 0
+	fi
+	missing+=("$1")
+	printf 'SKIP: %s is not installed\n' "$1" >&2
+	return 1
+}
+
+assert_contains() {
+	local needle=$1
+	local output=$2
+	printf '%s\n' "$output"
+	if [[ "$output" != *"$needle"* ]]; then
+		printf 'Expected command output to contain: %s\n' "$needle" >&2
+		return 1
+	fi
+}
+
+printf '=== Claude Code ===\n'
+if have claude; then
+	mkdir -p "$tmp_root/claude"
+	claude plugin validate "$repo_root/dist/claude"
+	CLAUDE_CONFIG_DIR="$tmp_root/claude" claude plugin marketplace add "$repo_root"
+	CLAUDE_CONFIG_DIR="$tmp_root/claude" claude plugin install architecture@alexei-led-architect
+	output=$(CLAUDE_CONFIG_DIR="$tmp_root/claude" claude plugin list --json)
+	assert_contains architecture "$output"
+fi
+
+printf '=== Codex ===\n'
+if have codex; then
+	mkdir -p "$tmp_root/codex"
+	CODEX_HOME="$tmp_root/codex" codex plugin marketplace add "$repo_root" --json >/dev/null
+	CODEX_HOME="$tmp_root/codex" codex plugin add architecture@alexei-led-architect --json >/dev/null
+	output=$(CODEX_HOME="$tmp_root/codex" codex plugin list --json)
+	assert_contains architecture "$output"
+fi
+
+printf '=== Pi ===\n'
+if have pi; then
+	mkdir -p "$tmp_root/pi-home" "$tmp_root/pi-workspace"
+	(
+		cd "$tmp_root/pi-workspace"
+		HOME="$tmp_root/pi-home" pi install -l "$repo_root" --approve
+		output=$(HOME="$tmp_root/pi-home" pi list --approve)
+		assert_contains architect "$output"
+	)
+fi
+
+printf '=== GitHub Copilot ===\n'
+if have copilot; then
+	mkdir -p "$tmp_root/copilot/home" "$tmp_root/copilot/config" "$tmp_root/copilot/data"
+	env HOME="$tmp_root/copilot/home" XDG_CONFIG_HOME="$tmp_root/copilot/config" XDG_DATA_HOME="$tmp_root/copilot/data" \
+		copilot plugin marketplace add "$repo_root"
+	env HOME="$tmp_root/copilot/home" XDG_CONFIG_HOME="$tmp_root/copilot/config" XDG_DATA_HOME="$tmp_root/copilot/data" \
+		copilot plugin install architecture@alexei-led-architect
+	output=$(env HOME="$tmp_root/copilot/home" XDG_CONFIG_HOME="$tmp_root/copilot/config" XDG_DATA_HOME="$tmp_root/copilot/data" \
+		copilot plugin list)
+	assert_contains architecture "$output"
+fi
+
+printf '=== Grok Build ===\n'
+if have grok; then
+	mkdir -p "$tmp_root/grok/home" "$tmp_root/grok/config" "$tmp_root/grok/data"
+	grok plugin validate "$repo_root/dist/claude"
+	env HOME="$tmp_root/grok/home" XDG_CONFIG_HOME="$tmp_root/grok/config" XDG_DATA_HOME="$tmp_root/grok/data" \
+		grok plugin install --trust "$repo_root/dist/claude"
+	output=$(env HOME="$tmp_root/grok/home" XDG_CONFIG_HOME="$tmp_root/grok/config" XDG_DATA_HOME="$tmp_root/grok/data" \
+		grok plugin details architecture)
+	assert_contains architecture "$output"
+fi
+
+printf '=== Cursor ===\n'
+if have cursor-agent; then
+	mkdir -p "$tmp_root/cursor-workspace"
+	output=$(cursor-agent --plugin-dir "$repo_root/dist/cursor" \
+		--workspace "$tmp_root/cursor-workspace" --print --mode ask --trust \
+		'Which loaded skill designs modular target architecture from requirements? State its name only.')
+	assert_contains architecture-design "$output"
+fi
+
+if [ "${REQUIRE_VENDOR_CLIS:-0}" = "1" ] && [ ${#missing[@]} -ne 0 ]; then
+	printf 'Missing required vendor CLIs: %s\n' "${missing[*]}" >&2
+	exit 1
+fi
+
+printf 'package smoke tests: passed\n'

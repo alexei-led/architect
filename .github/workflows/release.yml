@@ -16,16 +16,12 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v6
-        with:
-          go-version: "1.26.x"
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: uv.lock
+      - run: agbun --version
       - run: make check
-        env:
-          AGBUN_REF: dcc7a9cb0599d5e8d4e9f2e7e3a00d50a5626607
   release:
     name: Create release
     needs: validate

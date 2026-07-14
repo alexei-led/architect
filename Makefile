@@ -13,8 +13,6 @@ SKILL_EVAL_HTML_REPORT ?= 1
 SKILL_EVAL_BASELINE ?= 1
 SKILL_EVAL_CONCURRENCY ?= 4
 SKILL_EVAL_STRICT ?= 1
-AGBUN_REF ?= dcc7a9cb0599d5e8d4e9f2e7e3a00d50a5626607
-AGBUN ?= go run github.com/alexei-led/agentbundler/cmd/agbun@$(AGBUN_REF)
 SKILL_EVAL_CLI ?= $(shell if command -v agent-skills-eval >/dev/null 2>&1; then printf 'agent-skills-eval'; elif command -v bunx >/dev/null 2>&1; then printf 'bunx agent-skills-eval'; elif command -v fnm >/dev/null 2>&1; then printf 'fnm exec --using $(NODE_VERSION) -- npx --yes agent-skills-eval'; else printf 'npx --yes agent-skills-eval'; fi)
 ifeq ($(FAST),1)
 SKILL_EVAL_BASELINE := 0
@@ -23,20 +21,23 @@ SKILL_EVAL_CONCURRENCY := 8
 SKILL_EVAL_STRICT := 0
 endif
 
-.PHONY: setup build check evals release help
+.PHONY: setup build check package-smoke evals release help
 
 setup: ## Install repo git hooks and dev deps
 	git config core.hooksPath scripts/git-hooks
 	uv sync
 
 build: ## Compile installable runtime packages from the canonical bundle
-	$(AGBUN) build
+	agbun build
 
 check: ## Verify generated runtime packages without writing, lint, and test
-	$(AGBUN) check
+	agbun check
 	uv run ruff check .
 	uv run ruff format --check .
 	uv run pytest
+
+package-smoke: build ## Install or load every generated package with available vendor CLIs
+	REQUIRE_VENDOR_CLIS=1 scripts/check-packages
 
 evals: ## Run paid skill evals (use FAST=1 for advisory fast mode)
 	@set -u; \
@@ -67,9 +68,9 @@ evals: ## Run paid skill evals (use FAST=1 for advisory fast mode)
 	if [ "$(SKILL_EVAL_STRICT)" = "0" ]; then exit 0; fi; \
 	exit $$status
 
-release: ## Bump version, update changelog, commit, and tag (usage: make release V=0.2.0)
+release: ## Bump version, update changelog, commit, and tag (usage: make release V=X.Y.Z)
 ifndef V
-	$(error Usage: make release V=0.2.0)
+	$(error Usage: make release V=X.Y.Z)
 endif
 	scripts/release/release-tag v$(V)
 

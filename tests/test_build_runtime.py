@@ -11,6 +11,15 @@ def read_json(path: str):
     return json.loads((REPO_ROOT / path).read_text(encoding="utf-8"))
 
 
+def file_inventory(root: Path, directories: tuple[str, ...]) -> set[str]:
+    return {
+        path.relative_to(root).as_posix()
+        for directory in directories
+        for path in (root / directory).rglob("*")
+        if path.is_file()
+    }
+
+
 def test_bundle_declares_every_agentbundler_target():
     manifest = read_json("agentbundle.json")
     assert manifest["targets"] == ["claude", "codex", "pi", "copilot", "grok", "cursor"]
@@ -24,10 +33,56 @@ def test_bundle_declares_every_agentbundler_target():
     }
 
     assets = read_json("src/packages/architecture.json")["assets"]
+    declared_skills = {asset["path"] for asset in assets if asset["path"].startswith("skills/")}
+    source_skills = {
+        path.parent.relative_to(REPO_ROOT / "src").as_posix()
+        for path in (REPO_ROOT / "src/skills").glob("*/SKILL.md")
+    }
+    assert declared_skills == source_skills
+
     resources = next(asset for asset in assets if asset["path"] == "resources/templates")
     assert resources["targets"] == manifest["targets"]
     agent = next(asset for asset in assets if asset["path"] == "agents/architect.md")
     assert agent["targets"] == ["claude", "codex", "pi", "copilot", "cursor"]
+
+
+def test_runtime_versions_and_dependencies_match_canonical_package():
+    source_package = read_json("src/packages/architecture.json")
+    version = source_package["metadata"]["version"]
+    dependencies = source_package["metadata"]["dependencies"]
+
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
+    assert pyproject["project"]["version"] == version
+    lock = tomllib.loads((REPO_ROOT / "uv.lock").read_text())
+    architect_lock = next(package for package in lock["package"] if package["name"] == "architect")
+    assert architect_lock["version"] == version
+    init = (REPO_ROOT / "src/architect_tools/__init__.py").read_text()
+    assert re.search(rf'^__version__ = "{re.escape(version)}"$', init, re.MULTILINE)
+
+    root_pi = read_json("package.json")
+    assert root_pi["version"] == version
+    assert root_pi["dependencies"] == dependencies
+
+    claude_marketplace = read_json(".claude-plugin/marketplace.json")
+    assert claude_marketplace["version"] == version
+    assert claude_marketplace["plugins"][0]["version"] == version
+    for path in (".github/plugin/marketplace.json", ".cursor-plugin/marketplace.json"):
+        marketplace = read_json(path)
+        assert marketplace["version"] == version
+        assert marketplace["metadata"]["version"] == version
+    assert read_json(".github/plugin/marketplace.json")["plugins"][0]["version"] == version
+
+    generated_manifests = (
+        "dist/claude/.claude-plugin/plugin.json",
+        "dist/codex/.codex-plugin/plugin.json",
+        "dist/pi/package.json",
+        "dist/copilot/plugin.json",
+        "dist/cursor/.cursor-plugin/plugin.json",
+    )
+    for path in generated_manifests:
+        assert read_json(path)["version"] == version
+    assert read_json("dist/pi/package.json")["dependencies"] == dependencies
+    assert read_json("dist/.agentbundler/build.json")["compiler"]["version"]
 
 
 def test_runtime_discovery_manifests_point_to_generated_artifacts():
@@ -100,7 +155,10 @@ def test_compiled_runtime_artifacts_exist_and_use_compiled_template_paths():
         "skills": ["./skills"],
         "subagents": {"agents": ["./agents"]},
     }
+    expected_skills = {path.parent.name for path in (REPO_ROOT / "src/skills").glob("*/SKILL.md")}
     for root in package_roots + project_roots:
+        generated_skills = {path.parent.name for path in (root / "skills").glob("*/SKILL.md")}
+        assert generated_skills == expected_skills
         assert (root / "resources/templates/scorecard.yaml").is_file()
         skill = root / "skills/architecture-review/SKILL.md"
         assert skill.is_file()
@@ -122,6 +180,16 @@ def test_compiled_runtime_artifacts_exist_and_use_compiled_template_paths():
     assert "inheritSkills: true" in pi_agent.read_text(encoding="utf-8")
     for target in ("claude", "codex", "pi", "copilot", "cursor"):
         assert (REPO_ROOT / "dist" / target / "README.md").is_file()
+
+
+def test_grok_project_tree_matches_claude_package_content():
+    claude_root = REPO_ROOT / "dist/claude"
+    grok_root = REPO_ROOT / "dist/grok/.grok"
+    assert file_inventory(grok_root, ("skills", "resources")) == file_inventory(
+        claude_root, ("skills", "resources")
+    )
+    assert (claude_root / "agents/architect.md").is_file()
+    assert not (grok_root / "agents").exists()
 
 
 def test_generated_template_references_resolve_for_every_target():

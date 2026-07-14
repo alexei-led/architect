@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Create a release tag with version bump and generated runtime artifacts.
 #
-# Usage: scripts/release/release-tag v0.2.0
+# Usage: scripts/release/release-tag vX.Y.Z
 set -euo pipefail
 
 if [ $# -ne 1 ]; then
 	echo "Usage: scripts/release/release-tag <version>"
-	echo "Example: scripts/release/release-tag v0.2.0"
+	echo "Example: scripts/release/release-tag vX.Y.Z"
 	exit 1
 fi
 
@@ -51,24 +51,35 @@ marketplaces = [
 ]
 root_package = Path("package.json")
 
-for path in files:
+def replace_one(path: Path, pattern: str, replacement: str) -> None:
     text = path.read_text(encoding="utf-8")
+    updated, count = re.subn(pattern, replacement, text, count=1)
+    if count != 1:
+        raise SystemExit(f"{path} version field did not match exactly once")
+    path.write_text(updated, encoding="utf-8")
+
+
+for path in files:
     if path.name == "pyproject.toml":
-        text = re.sub(r'(?m)^version = "[^"]+"', f'version = "{version}"', text, count=1)
+        replace_one(path, r'(?m)^version = "[^"]+"', f'version = "{version}"')
     elif path.name == "uv.lock":
-        text = re.sub(
+        replace_one(
+            path,
             r'(?m)^(name = "architect"\nversion = ")[^"]+("\n)',
             rf"\g<1>{version}\2",
-            text,
-            count=1,
         )
     elif path.name == "__init__.py":
-        text = re.sub(r'(?m)^__version__ = "[^"]+"', f'__version__ = "{version}"', text, count=1)
+        replace_one(
+            path,
+            r'(?m)^__version__ = "[^"]+"',
+            f'__version__ = "{version}"',
+        )
     elif path.name == "architecture.json":
-        text = re.sub(r'(?m)^(\s+"version":\s+")[^"]+(")', rf"\g<1>{version}\2", text, count=1)
-    else:
-        text = re.sub(r"(?m)^version: .+", f"version: {version}", text, count=1)
-    path.write_text(text, encoding="utf-8")
+        replace_one(
+            path,
+            r'(?m)^(\s+"version":\s+")[^"]+(")',
+            rf"\g<1>{version}\2",
+        )
 
 for path in [root_package, *marketplaces]:
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -103,10 +114,11 @@ PY
 
 uv lock
 make build
-uv run ruff check .
-uv run ruff format --check .
-uv run pytest
-command -v gitleaks >/dev/null 2>&1 || { echo "gitleaks not installed"; exit 1; }
+make check
+command -v gitleaks >/dev/null 2>&1 || {
+	echo "gitleaks not installed"
+	exit 1
+}
 gitleaks git --redact --no-banner
 
 git add \
