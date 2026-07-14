@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-07-14
+
 ### Packaging maintenance
 
 - Kept system `agbun` as the local build, generated-artifact drift, package-smoke,

@@ -6,4 +6,4 @@ as ast-grep, codegraph, GitNexus, LSP, or tree-sitter; agents call those
 directly.
 """
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
