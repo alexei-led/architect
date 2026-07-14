@@ -9,6 +9,11 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Fixed
+
+- Scoped Architect's `sandbox_mode` metadata to the Codex package so generated
+  Claude, Copilot, Cursor, and Pi agents remain compatible with `agbun` v0.3.0.
+
 ## [0.8.1] - 2026-07-14
 
 ### Packaging maintenance

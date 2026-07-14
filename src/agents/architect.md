@@ -3,7 +3,6 @@ name: architect
 description: >-
   Read-only architecture designer/reviewer: creates target designs, maps intended vs observed structure,
   gathers evidence, scores architecture, and writes plans without editing source.
-sandbox_mode: read-only
 ---
 
 # Architect

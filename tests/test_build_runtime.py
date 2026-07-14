@@ -200,9 +200,20 @@ def test_generated_template_references_resolve_for_every_target():
                 assert (path.parent / ref).is_file(), f"{path} references missing {ref}"
 
 
-def test_codex_custom_agent_is_standalone_toml():
-    agent = tomllib.loads((REPO_ROOT / "dist/codex/agents/architect.toml").read_text())
-    assert agent["name"] == "architect"
-    assert agent["sandbox_mode"] == "read-only"
-    assert "You design and review software architecture" in agent["developer_instructions"]
-    assert "../resources/templates/scorecard.yaml" in agent["developer_instructions"]
+def test_architect_sandbox_mode_is_codex_only():
+    codex_agent = tomllib.loads(
+        (REPO_ROOT / "dist/codex/agents/architect.toml").read_text(encoding="utf-8")
+    )
+    assert codex_agent["name"] == "architect"
+    assert codex_agent["sandbox_mode"] == "read-only"
+    assert "You design and review software architecture" in codex_agent["developer_instructions"]
+    assert "../resources/templates/scorecard.yaml" in codex_agent["developer_instructions"]
+
+    for target, path in {
+        "claude": "dist/claude/agents/architect.md",
+        "pi": "dist/pi/agents/architect.md",
+        "copilot": "dist/copilot/agents/architect.agent.md",
+        "cursor": "dist/cursor/agents/architect.md",
+    }.items():
+        agent = (REPO_ROOT / path).read_text(encoding="utf-8")
+        assert "sandbox_mode" not in agent, target
