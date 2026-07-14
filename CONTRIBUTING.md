@@ -8,7 +8,7 @@ Maintainer notes for `architect`. User-facing install and usage stay in [README.
 - `uv`
 - `make`
 - `gitleaks`
-- `agbun` on `PATH`
+- `agbun` on `PATH` for local generated-package work
 - optional: vendor CLIs for package smoke tests
 - optional: `markdownlint-cli2`
 
@@ -23,9 +23,10 @@ Installs dev dependencies and sets Git hooks from `scripts/git-hooks/`.
 ## Checks
 
 ```sh
-make build         # generate every target tree into dist/
-make check         # read-only `agbun` drift check + ruff + pytest
-make package-smoke # build, then load/install all six targets with vendor CLIs
+make check           # CI-safe Ruff lint/format checks and pytest
+make build           # generate every target tree into dist/ (local `agbun`)
+make generated-check # read-only local `agbun` generated-artifact drift check
+make package-smoke   # build, then load/install all six targets with vendor CLIs
 make evals         # paid Agent Skills evals
 make evals FAST=1 # faster advisory eval loop
 ```
@@ -76,17 +77,19 @@ uv tool install --editable .
 make release V=X.Y.Z
 ```
 
-Requires a clean tree. Updates versioned files, rebuilds generated artifacts, runs checks, scans with Gitleaks, commits the release, and creates tag `vX.Y.Z`.
+Requires a clean tree. Updates versioned files, then runs the local preflight: `make build`, `make generated-check`, and `make check`. It scans with Gitleaks, commits the release, and creates tag `vX.Y.Z`.
 
 Push branch and tag to publish through GitHub Actions.
 
 ## Packaging
 
 Source of truth is `agentbundle.json` plus the declared files under `src/`.
-Generated artifacts in `dist/` are committed. **Agent Bundler** is a system
-prerequisite: the Makefile, hooks, CI, and release workflow invoke `agbun` from
-`PATH`. Check the installed version with `agbun --version`; its value is recorded
-in `dist/.agentbundler/build.json` after each build.
+Generated artifacts in `dist/` are committed. **Agent Bundler** is a local
+system prerequisite: `make build`, `make generated-check`, `make package-smoke`,
+and the release script invoke it from `PATH`. GitHub workflows run only the
+CI-safe `make check` target and do not require `agbun`. Check the installed version
+with `agbun --version`; its value is recorded in `dist/.agentbundler/build.json`
+after each build.
 
 Main outputs:
 
@@ -112,11 +115,13 @@ When changing prompts, skills, templates, or plugin metadata:
 
 1. edit `src/` or the repository-owned marketplace/package metadata
 2. run `make build`
-3. run `make check`
-4. run `make package-smoke` before a release when all vendor CLIs are available
-5. commit source and generated output together
+3. run `make generated-check`
+4. run `make check`
+5. run `make package-smoke` before a release when all vendor CLIs are available
+6. commit source and generated output together
 
-`agbun check` is read-only and fails on generated-artifact drift. Package tests
+`agbun check` is read-only and fails on generated-artifact drift. It stays local;
+GitHub validates only Ruff and pytest through `make check`. Package tests
 also require version/dependency coherence and equal Grok/Claude skill and template
 inventories. `make package-smoke` isolates vendor homes where supported and uses
 temporary workspaces; its Cursor check uses the current login for one authenticated

@@ -21,7 +21,7 @@ SKILL_EVAL_CONCURRENCY := 8
 SKILL_EVAL_STRICT := 0
 endif
 
-.PHONY: setup build check package-smoke evals release help
+.PHONY: setup build check generated-check package-smoke evals release help
 
 setup: ## Install repo git hooks and dev deps
 	git config core.hooksPath scripts/git-hooks
@@ -30,11 +30,13 @@ setup: ## Install repo git hooks and dev deps
 build: ## Compile installable runtime packages from the canonical bundle
 	agbun build
 
-check: ## Verify generated runtime packages without writing, lint, and test
-	agbun check
+check: ## Run CI-safe lint, format, and tests
 	uv run ruff check .
 	uv run ruff format --check .
 	uv run pytest
+
+generated-check: ## Verify generated runtime packages without writing
+	agbun check
 
 package-smoke: build ## Install or load every generated package with available vendor CLIs
 	REQUIRE_VENDOR_CLIS=1 scripts/check-packages

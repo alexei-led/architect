@@ -114,6 +114,7 @@ PY
 
 uv lock
 make build
+make generated-check
 make check
 command -v gitleaks >/dev/null 2>&1 || {
 	echo "gitleaks not installed"

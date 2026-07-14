@@ -23,5 +23,4 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: uv.lock
-      - run: agbun --version
       - run: make check

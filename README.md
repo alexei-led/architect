@@ -42,7 +42,9 @@ It does not edit production code during review.
 ## Install
 
 Local package development requires `agbun` on `PATH`. It is not installed by
-this repository; verify it with `agbun --version` before running `make build`.
+this repository; verify it with `agbun --version` before running `make build` or
+`make generated-check`. GitHub Actions runs only the CI-safe Ruff and pytest
+checks; generated-package builds and drift checks stay local.
 
 ### Claude Code
 

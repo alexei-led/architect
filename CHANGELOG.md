@@ -11,8 +11,10 @@ patch = fixes and documentation updates.
 
 ### Packaging maintenance
 
-- Made system `agbun` the shared build prerequisite for local, CI, and release
-  package generation.
+- Kept system `agbun` as the local build, generated-artifact drift, package-smoke,
+  and release prerequisite while removing it from GitHub CI and release validation.
+- Split CI-safe `make check` (Ruff and pytest) from local `make generated-check`
+  so GitHub does not invoke or check `agbun`.
 - Added isolated native package smoke tests for Claude Code, Codex, Pi, GitHub
   Copilot, Grok Build, and Cursor.
 - Added release-safe version propagation, generated-provenance checks, complete skill
