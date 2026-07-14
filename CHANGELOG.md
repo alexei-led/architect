@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-14
+
 ### Distribution
 
 - Migrated generated Claude Code, Codex, Pi, GitHub Copilot, Grok Build, and Cursor
