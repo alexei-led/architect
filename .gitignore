@@ -24,6 +24,7 @@ __pycache__/
 
 # Build artifacts
 /build/
+/pkg/
 dist/*.whl
 dist/*.tar.gz
 *.egg-info/
