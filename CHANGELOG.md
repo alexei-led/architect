@@ -9,6 +9,16 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### npm extension distribution
+
+- Added lean, native npm extension packages for Pi, Claude Code, and Codex;
+  excluded source, test, media, and temporary files from published tarballs.
+- Changed the Claude Code and Codex marketplace entries to install their plugin
+  payloads from npm.
+- Added an Architect extension card for Pi package metadata and npm package READMEs.
+- Added GitHub Actions release publishing through npm Trusted Publishing with
+  GitHub OIDC and package-content verification.
+
 ## [0.9.1] - 2026-07-15
 
 ### Archfit 1.6 compatibility
