@@ -5,15 +5,15 @@
   },
   "metadata": {
     "description": "Instruction-first architecture design and review for coding agents.",
-    "version": "0.9.1"
+    "version": "0.9.2"
   },
   "plugins": [
     {
       "name": "architecture",
       "description": "Instruction-first architecture design and review: evidence-based design, review, scoring, and planning.",
-      "version": "0.9.1",
+      "version": "0.9.2",
       "source": "./dist/copilot"
     }
   ],
-  "version": "0.9.1"
+  "version": "0.9.2"
 }

@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-07-15
+
 ### npm extension distribution
 
 - Added lean, native npm extension packages for Pi, Claude Code, and Codex;

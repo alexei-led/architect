@@ -1,6 +1,6 @@
 {
   "name": "@alexeiled/architect",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Instruction-first architecture design and review role, skills, templates, and helper tools.",
   "private": true,
   "license": "MIT",
