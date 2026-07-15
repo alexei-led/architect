@@ -1,0 +1,41 @@
+{
+  "skill_name": "tools-typescript",
+  "evals": [
+    {
+      "id": "missing-local-analysis-tool",
+      "name": "missing local analysis tool",
+      "prompt": "A TypeScript repository has package.json and package-lock.json but no node_modules directory. You need cycle evidence and network access is unavailable. Describe what the tools-typescript skill should do.",
+      "expected_output": "The response does not install or download a graph tool. It records the missing local tool, uses a bounded fallback such as ast-grep import scans plus a code graph when available, and reports reduced dependency coverage.",
+      "assertions": [
+        "The output does not use npm exec, npx, bunx, pnpm dlx, or yarn dlx to acquire a missing package.",
+        "The output records the dependency tool as tools_missing rather than clean or tools_failed.",
+        "The output names a fallback using structural import evidence and a code graph when available.",
+        "The output reports reduced coverage or confidence from the missing graph tool."
+      ]
+    },
+    {
+      "id": "conflicting-package-manager-signals",
+      "name": "conflicting package manager signals",
+      "prompt": "A monorepo package.json declares packageManager pnpm@10, but the checkout contains pnpm-lock.yaml and a recently modified package-lock.json. No analysis command has run yet. Describe the safe runner-selection workflow.",
+      "expected_output": "The response reads package and workspace metadata, treats the lockfiles as conflicting signals, narrows to the owning package root, and uses only a confirmed configured script or proven local executable without changing dependency state.",
+      "assertions": [
+        "The output checks packageManager, scripts, workspaces, workspace manifests, and lockfiles before choosing a runner.",
+        "The output explicitly records or resolves the conflicting package-manager signals instead of guessing from one lockfile.",
+        "The output scopes the command to a confirmed package or workspace root.",
+        "The output uses a configured script or an already-installed local binary and does not install dependencies."
+      ]
+    },
+    {
+      "id": "knip-dynamic-import-calibration",
+      "name": "Knip dynamic import calibration",
+      "prompt": "Knip reports src/plugins/payments.ts and its exports as unused, but the repository loads plugins from configuration with dynamic import(). Explain how this evidence should affect an architecture finding and score.",
+      "expected_output": "The response treats Knip output as a hypothesis, checks dynamic entrypoints, generated code, workspace and build configuration, and promotes it to a finding only after confirmation. Unconfirmed output does not lower an architecture score.",
+      "assertions": [
+        "The output labels the Knip unused result as a hypothesis rather than a settled finding.",
+        "The output checks dynamic imports or configured entrypoints before deciding the file is unused.",
+        "The output also considers generated code, workspace boundaries, or build and test scripts as relevant limits.",
+        "The output does not move an architecture score unless the unused surface is independently confirmed."
+      ]
+    }
+  ]
+}

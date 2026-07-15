@@ -53,6 +53,10 @@ checks; generated-package builds and drift checks stay local.
 /plugin install architecture@architect
 ```
 
+The generated Architect agent requests Claude Fable 5 at `xhigh` effort. Claude
+Code uses the inherited model instead when an organization allowlist excludes
+the requested model.
+
 ### Codex CLI
 
 ```sh
@@ -89,6 +93,9 @@ architecture, or run it directly with `/run architect <task>`.
 copilot plugin marketplace add alexei-led/architect
 copilot plugin install architecture@alexei-led-architect
 ```
+
+The generated Architect agent requests `MAI-Code-1-Flash`; availability depends
+on the organization's Copilot model policy.
 
 For local development, build then install `dist/copilot` as a local Copilot plugin.
 

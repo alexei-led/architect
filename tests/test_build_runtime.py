@@ -3,6 +3,8 @@ import re
 import tomllib
 from pathlib import Path
 
+from architect_tools._contract import split_frontmatter
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_REFERENCE_RE = re.compile(r"`([^`]*resources/templates/[\w./-]+)`")
 
@@ -198,6 +200,41 @@ def test_generated_template_references_resolve_for_every_target():
         for path in sorted([*root.rglob("*.md"), *root.rglob("*.toml")]):
             for ref in TEMPLATE_REFERENCE_RE.findall(path.read_text(encoding="utf-8")):
                 assert (path.parent / ref).is_file(), f"{path} references missing {ref}"
+
+
+def test_architect_target_models_are_rendered():
+    claude_overlay = read_json("src/agents/.agentbundler/targets/claude.json")
+    assert claude_overlay["frontmatterPatch"] == {
+        "model": "fable",
+        "effort": "xhigh",
+    }
+    copilot_overlay = read_json("src/agents/.agentbundler/targets/copilot.json")
+    assert copilot_overlay["frontmatterPatch"] == {"model": "MAI-Code-1-Flash"}
+
+    claude_frontmatter, _ = split_frontmatter(
+        (REPO_ROOT / "dist/claude/agents/architect.md").read_text(encoding="utf-8")
+    )
+    assert claude_frontmatter["model"] == "fable"
+    assert claude_frontmatter["effort"] == "xhigh"
+
+    copilot_frontmatter, _ = split_frontmatter(
+        (REPO_ROOT / "dist/copilot/agents/architect.agent.md").read_text(encoding="utf-8")
+    )
+    assert copilot_frontmatter["model"] == "MAI-Code-1-Flash"
+
+    for path in (
+        "dist/pi/agents/architect.md",
+        "dist/cursor/agents/architect.md",
+    ):
+        frontmatter = (REPO_ROOT / path).read_text(encoding="utf-8").split("---", 2)[1]
+        assert '"model"' not in frontmatter and "\nmodel:" not in frontmatter, path
+        assert '"effort"' not in frontmatter and "\neffort:" not in frontmatter, path
+
+    codex_agent = tomllib.loads(
+        (REPO_ROOT / "dist/codex/agents/architect.toml").read_text(encoding="utf-8")
+    )
+    assert "model" not in codex_agent
+    assert "effort" not in codex_agent
 
 
 def test_architect_sandbox_mode_is_codex_only():

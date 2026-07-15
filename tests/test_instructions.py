@@ -95,6 +95,25 @@ def test_structured_questions_do_not_depend_on_agent_overlays():
     assert "ask exactly one plain prose question" in text
 
 
+def test_typescript_tool_guidance_is_local_and_deterministic():
+    text = (SKILLS_DIR / "tools-typescript" / "SKILL.md").read_text()
+    flat = " ".join(text.split())
+
+    assert "packageManager" in text
+    assert "bun.lock" in text
+    assert "conflicting" in text.lower()
+    assert "Do not install or download" in text
+    assert "npx" in text
+    assert "pnpm dlx" in text
+    assert "tools_missing" in text
+    assert "dynamic imports" in text
+    assert "hypotheses" in text
+    assert "configured scripts" in flat
+    assert "<detected-runner> run <configured-script>" in text
+    assert "\nnpm run <configured-script>" not in text
+    assert "test -x node_modules/.bin/eslint" in text
+
+
 def test_architecture_plan_requires_confirmed_file_destination():
     text = (SKILLS_DIR / "architecture-plan" / "SKILL.md").read_text()
     assert "docs/plans/<kebab-case-target>.md" in text

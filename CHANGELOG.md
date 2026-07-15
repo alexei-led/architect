@@ -9,6 +9,19 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Architecture agent profiles
+
+- Added Claude Fable 5 (`xhigh`) and Copilot MAI-Code-1-Flash target metadata for
+  the generated Architect agents, with source and emitted-output regression checks.
+- Added TypeScript skill-evaluation scenarios for offline tools, package-manager
+  ambiguity, and dynamic-import Knip false positives.
+
+### TypeScript evidence hardening
+
+- Hardened TypeScript architecture evidence gathering: use inspected configured
+  scripts or existing local binaries only, avoid implicit package downloads, and
+  treat unverified Knip output as a hypothesis.
+
 ## [0.8.2] - 2026-07-14
 
 ### Fixed
