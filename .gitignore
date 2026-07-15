@@ -30,4 +30,5 @@ dist/*.tar.gz
 *.egg-info/
 
 # Tool outputs
+.archfit-cache/
 .gitleaks-report.*

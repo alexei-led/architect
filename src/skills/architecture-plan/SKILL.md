@@ -105,7 +105,7 @@ path or the plan must be copied/symlinked into the configured plans directory.
      explicit fallback such as `git diff --name-only` and the missing-tool note.
    - Deterministic architecture checks: if archfit is configured, name the
      existing gate status, the rule/config change when needed, and the focused
-     `archfit analyze --gate` or `archfit analyze --gate --base <ref>` command.
+     `archfit check` or `archfit check --base <ref>` command.
      For a new gate,
      state the violation should fail before the fix and pass after it. Otherwise
      name the missing config/tool gap.
@@ -152,7 +152,7 @@ writing a file with no path provided, use the confirmed default path
   design decisions, contracts, or module responsibilities. Use plain bullets, no
   checkboxes.
 - `## Validation Commands`: concrete project-wide commands to run for the whole
-  plan, including archfit analyze gate commands (`--base` for deltas) when
+  plan, including `archfit check` commands (`--base` for deltas) when
   configured.
 - `## Implementation Steps`: at most five executable `### Task N:` or
   `### Iteration N:` sections. Each task has justification, files,

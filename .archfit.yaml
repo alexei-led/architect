@@ -1,0 +1,88 @@
+# Architecture-fitness configuration for the Architect plugin.
+#
+# Architect is a single-owner package. Ownership therefore does not reduce
+# coupling distance; module role and volatility are the useful calibration
+# inputs. Skills are the product core. Agents and Python validators are adapters,
+# while package manifests are distribution metadata.
+version: 1
+coupling:
+  min_severity: medium
+  duplicated_knowledge: score
+  volatility_cascade: true
+languages:
+  go:
+    enabled: false
+  python:
+    enabled: true
+    package: architect_tools
+  typescript:
+    enabled: false
+  rust:
+    enabled: false
+exclude:
+  - dist/**
+  - .pi-subagents/**
+analyzers:
+  scip:
+    enabled: true
+  syntax:
+    enabled: true
+  clones:
+    enabled: true
+# Innermost to outermost. The generated packages are composition metadata; they
+# must not become dependencies of the product skills or their support resources.
+layers:
+  - core
+  - adapter
+  - distribution
+modules:
+  skills:
+    paths:
+      - src/skills/**
+    public:
+      - src/skills/**
+    layer: core
+    owner: alexei-led
+    subdomain: core
+    volatility: high
+  resources:
+    paths:
+      - src/resources/**
+    public:
+      - src/resources/**
+    layer: core
+    owner: alexei-led
+    subdomain: supporting
+    volatility: low
+  architect_tools:
+    paths:
+      - architect_tools
+      - architect_tools.*
+    public:
+      - architect_tools
+    layer: adapter
+    owner: alexei-led
+    subdomain: supporting
+    volatility: medium
+  agents:
+    paths:
+      - src/agents/**
+    public:
+      - src/agents/**
+    layer: adapter
+    owner: alexei-led
+    subdomain: core
+    volatility: medium
+  packages:
+    paths:
+      - src/packages/**
+    public:
+      - src/packages/**
+    layer: distribution
+    owner: alexei-led
+    subdomain: generic
+    volatility: low
+rules:
+  - id: no-layer-violations
+    type: forbidden_layer_direction
+    gate: warn

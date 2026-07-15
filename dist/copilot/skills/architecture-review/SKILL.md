@@ -115,8 +115,9 @@ instructions or report.
      `false_positive_or_noise`, or `missed_by_archfit`. Include config changes,
      new fitness checks, and labels to confirm. Do not pass through archfit's
      scores as architect scores; use them as evidence and coverage signals.
-     archfit's LLM narrative (`analyze --llm` or `explain`) is advisory only,
-     never source-of-truth.
+     archfit's optional AI narrative (`analyze --ai-summary` or `explain
+<fingerprint> --ai-summary`) is advisory only, never source-of-truth.
+     Plain `explain <fingerprint>` output is deterministic finding detail.
    - **For every important coupling relationship, write a small evidence
      matrix before scoring it.** Capture: relationship and abstraction level;
      strength classification plus evidence; distance split into code,

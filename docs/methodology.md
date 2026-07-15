@@ -92,9 +92,10 @@ instead of final findings or scores. No evidence means no finding; no full revie
 means no score.
 
 When archfit is available, use it as the deterministic measurement layer:
-`archfit analyze` (with `--gate`, and `--base <ref>` for deltas) supplies
-classified edges, findings,
-tool coverage, and agent tasks. The architect then calibrates those facts against
+`archfit analyze` supplies report-only classified edges, findings, tool coverage,
+and agent tasks; add `--base <ref>` for delta evidence. Use `archfit check` (also
+with `--base <ref>` for deltas) only when enforcing configured gates. The
+architect then calibrates those facts against
 intent, runtime/deploy context, and domain volatility. The combined loop is:
 archfit facts → independent architect judgment → human-confirmed volatility and
 labels → executable fitness checks → re-review. Do not chain archfit's LLM

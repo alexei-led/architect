@@ -147,6 +147,21 @@ def test_archfit_calibration_instructions_exist():
     assert "calibration matrix" in agent
 
 
+def test_archfit_guidance_uses_v1_6_cli():
+    tool = (SKILLS_DIR / "tools-archfit" / "SKILL.md").read_text()
+    plan = (SKILLS_DIR / "architecture-plan" / "SKILL.md").read_text()
+    review = (SKILLS_DIR / "architecture-review" / "SKILL.md").read_text()
+    template = (REPO_ROOT / "src/resources/templates/plan.md").read_text()
+
+    assert "$ARCHFIT analyze --config .archfit.yaml --json" in tool
+    assert "$ARCHFIT check --config .archfit.yaml --json" in tool
+    assert "$ARCHFIT check --config .archfit.yaml --base <base-ref> --json" in tool
+    assert "--ai-summary" in tool
+    assert "archfit check --base <ref>" in plan
+    assert "archfit check --config .archfit.yaml --base <ref>" in template
+    assert "analyze --ai-summary" in review
+
+
 def test_coverage_gap_calibration_documented():
     raw = (SKILLS_DIR / "architecture-scorecard" / "SKILL.md").read_text()
     flat = " ".join(raw.split())

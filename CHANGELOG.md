@@ -9,6 +9,12 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Archfit 1.6 compatibility
+
+- Updated Architect skills, plan templates, and methodology guidance to use the
+  report-only `archfit analyze` command, the enforcing `archfit check` command,
+  and current `--ai-summary` options.
+
 ## [0.9.0] - 2026-07-15
 
 ### Architecture agent profiles

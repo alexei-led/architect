@@ -17,9 +17,10 @@ so hard facts can reduce sampling bias.
 
 Do not use this skill for:
 
-- `archfit analyze --llm` or `archfit explain` LLM narration as primary evidence;
+- `archfit analyze --ai-summary` or `archfit explain <fingerprint>
+--ai-summary` AI narration as primary evidence;
 - `archfit config init`, `config update --apply`, `baseline`, `config enrich`
-  (labels/owner/volatility/subdomain) or `config init --llm` LLM drafting,
+  (labels/owner/volatility/subdomain), `config init --ai-classify`,
   `config enrich ... --apply`, or config writes unless the user explicitly asks
   for config work;
 - applying fixes from `agent_tasks`;
@@ -57,37 +58,45 @@ if [ -x ./archfit ]; then ARCHFIT=./archfit; fi
 if [ -x ./.bin/archfit ]; then ARCHFIT=./.bin/archfit; fi
 ```
 
-Run only commands that fit the repo and time budget. Exit codes require `--gate`:
-treat `1` as gate findings and `2` as warnings — evidence, not command failures.
-Without `--gate`, `analyze` exits `0` on success; read `verdict` and `findings`
-from the JSON instead. Exit code `3` or invalid JSON is a tool failure.
+Run only commands that fit the repo and time budget. `analyze` is report-only:
+it exits `0` when analysis completes even when findings exist; read `verdict` and
+`findings` from its output. `check` enforces configured gates: `0` pass, `1`
+violation, `2` warning or strict-tool failure, and `3` config/runtime error.
+Treat `check` exits `1` and `2` as evidence, not command failures. Invalid JSON or
+exit `3` from either command is a tool failure.
 
 ```sh
 # Tool/config health.
 $ARCHFIT doctor
 
 # Full deterministic facts as JSON: findings, metrics, classified_edges,
-# agent_tasks, and the coupling_balance score. analyze is the only analysis
-# command; --full and --advisory are on by default; --gate turns on CI exit codes.
-$ARCHFIT analyze --gate --config .archfit.yaml --json
+# agent_tasks, and the coupling_balance score.
+$ARCHFIT analyze --config .archfit.yaml --json
 
-# Same analysis rendered as the coupling_balance scorecard.
+# Same report rendered as the coupling_balance scorecard.
 $ARCHFIT analyze --config .archfit.yaml --format scorecard
 
 # Human-readable deterministic audit (text is the default format).
 $ARCHFIT analyze --config .archfit.yaml
 
-# Delta facts, only when a meaningful base ref is known.
-$ARCHFIT analyze --gate --config .archfit.yaml --base <base-ref> --json
+# Report-only delta facts, only when a meaningful base ref is known.
+$ARCHFIT analyze --config .archfit.yaml --base <base-ref> --json
+
+# Enforce current configured gates.
+$ARCHFIT check --config .archfit.yaml --json
+
+# Enforce only the delta against a meaningful base ref.
+$ARCHFIT check --config .archfit.yaml --base <base-ref> --json
 
 # Optional CI annotation artifact (SARIF to stdout).
-$ARCHFIT analyze --gate --config .archfit.yaml --sarif
+$ARCHFIT check --config .archfit.yaml --sarif
 ```
 
-Do not run `archfit analyze --llm` (whole-repo narrative) or `archfit explain
-<fingerprint>` (single-finding narrative) unless the user specifically wants
-archfit's LLM output. If you do, label it `advisory_llm`, capture parse/runtime
-failures, and never cite it as deterministic evidence.
+Plain `archfit explain <fingerprint>` is deterministic finding detail and may be
+used as evidence. Do not run `archfit analyze --ai-summary` or `archfit explain
+<fingerprint> --ai-summary` unless the user specifically wants Archfit's AI
+narrative. If you do, label it `advisory_ai`, capture parse/runtime failures, and
+never cite it as deterministic evidence.
 
 ## Extract these facts
 
@@ -236,8 +245,9 @@ Return a concise evidence summary:
   verification or user/domain context.
 - No high-quality architecture claim from missing or unclassified evidence.
 - No source or config writes without explicit approval.
-- No treating `archfit analyze --llm` / `archfit explain` narration as
-  source-of-truth.
+- No treating `archfit analyze --ai-summary` / `archfit explain <fingerprint>
+--ai-summary` narration as source-of-truth; plain `explain` remains
+  deterministic finding detail.
 - No counting an archfit pass as proof of correctness, security, performance, or
   all architecture quality; it only says configured checks and measured metrics
   passed under the observed coverage.
