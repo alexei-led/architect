@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-07-15
+
 ### Architecture agent profiles
 
 - Added Claude Fable 5 (`xhigh`) and Copilot MAI-Code-1-Flash target metadata for
