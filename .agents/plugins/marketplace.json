@@ -7,8 +7,9 @@
     {
       "name": "architecture",
       "source": {
-        "source": "local",
-        "path": "./dist/codex"
+        "source": "npm",
+        "package": "@alexeiled/architect-codex",
+        "version": "0.9.1"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -1,3 +1,4 @@
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -14,6 +15,10 @@ def test_github_workflows_do_not_use_agbun(name: str):
 
     assert "agbun" not in workflow
     assert "- run: make check" in workflow
+    assert "- run: make npm-packages-check" in workflow
+
+    for action in re.findall(r"uses:\s+([^\s#]+)", workflow):
+        assert re.search(r"@[0-9a-f]{40}$", action), action
 
 
 def test_local_generated_check_is_separate_from_ci_check_and_release_preflight():
@@ -35,13 +40,18 @@ def test_local_generated_check_is_separate_from_ci_check_and_release_preflight()
     assert "agbun build" in build
     assert "package-smoke: build" in makefile
     assert "scripts/check-packages" in package_smoke
+    assert "npm-packages-check:" in makefile
+    assert "stage_npm_packages.py --check" in makefile
 
     release_script = (REPO_ROOT / "scripts" / "release" / "release-tag").read_text(encoding="utf-8")
     assert (
         release_script.index("make build")
         < release_script.index("make generated-check")
         < release_script.index("make check")
+        < release_script.index("make npm-packages-check")
     )
+    assert 'Path(".agents/plugins/marketplace.json")' in release_script
+    assert 'source["version"] = version' in release_script
 
 
 def test_generate_release_notes(tmp_path: Path):
@@ -82,7 +92,9 @@ def test_generate_release_notes(tmp_path: Path):
     notes = output.read_text(encoding="utf-8")
     assert "Useful change." in notes
     assert "architecture" in notes
-    assert "pi install git:github.com/alexei-led/architect" in notes
+    assert "pi install npm:@alexeiled/architect" in notes
+    assert "claude plugin install architecture@alexei-led-architect" in notes
+    assert "codex plugin add architecture@alexei-led-architect" in notes
     assert "uv tool install git+https://github.com/alexei-led/architect.git" in notes
 
 

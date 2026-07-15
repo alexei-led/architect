@@ -68,6 +68,9 @@ def test_runtime_versions_and_dependencies_match_canonical_package():
     claude_marketplace = read_json(".claude-plugin/marketplace.json")
     assert claude_marketplace["version"] == version
     assert claude_marketplace["plugins"][0]["version"] == version
+    assert claude_marketplace["plugins"][0]["source"]["version"] == version
+    codex_marketplace = read_json(".agents/plugins/marketplace.json")
+    assert codex_marketplace["plugins"][0]["source"]["version"] == version
     for path in (".github/plugin/marketplace.json", ".cursor-plugin/marketplace.json"):
         marketplace = read_json(path)
         assert marketplace["version"] == version
@@ -93,12 +96,17 @@ def test_runtime_discovery_manifests_point_to_generated_artifacts():
         claude_marketplace["$schema"] == "https://json.schemastore.org/claude-code-marketplace.json"
     )
     assert claude_marketplace["owner"] == {"name": "Alexei Ledenev"}
-    assert claude_marketplace["plugins"][0]["source"] == "./dist/claude"
+    assert claude_marketplace["plugins"][0]["source"] == {
+        "source": "npm",
+        "package": "@alexeiled/architect-claude",
+        "version": read_json("package.json")["version"],
+    }
     assert claude_marketplace["plugins"][0]["author"] == {"name": "Alexei Ledenev"}
     codex_marketplace_plugin = read_json(".agents/plugins/marketplace.json")["plugins"][0]
     assert codex_marketplace_plugin["source"] == {
-        "source": "local",
-        "path": "./dist/codex",
+        "source": "npm",
+        "package": "@alexeiled/architect-codex",
+        "version": read_json("package.json")["version"],
     }
     assert codex_marketplace_plugin["policy"] == {
         "installation": "AVAILABLE",
@@ -116,6 +124,10 @@ def test_runtime_discovery_manifests_point_to_generated_artifacts():
     assert root_pi_package["pi"] == {
         "skills": ["./dist/pi/skills"],
         "subagents": {"agents": ["./dist/pi/agents"]},
+        "image": (
+            "https://raw.githubusercontent.com/alexei-led/architect/master/"
+            "assets/architect-card.png"
+        ),
     }
 
     claude_plugin = read_json("dist/claude/.claude-plugin/plugin.json")

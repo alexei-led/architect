@@ -4,7 +4,7 @@ on:
     tags:
       - v*.*.*
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -12,23 +12,60 @@ jobs:
   validate:
     name: Validate
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          fetch-depth: 0
-      - uses: astral-sh/setup-uv@v7
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          enable-cache: true
-          cache-dependency-glob: uv.lock
+          node-version: 24.15.0
+          package-manager-cache: false
+      - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          enable-cache: false
       - run: make check
+      - run: make npm-packages-check
   release:
-    name: Create release
+    name: Publish packages and create release
     needs: validate
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write # Create or update the GitHub release for this tag.
+      id-token: write # Exchange GitHub OIDC identity for npm publish credentials.
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.15.0
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Stage and inspect npm packages
+        run: make npm-packages-check
+      - name: Verify release tag
+        run: |
+          set -euo pipefail
+          version=$(node -p 'require("./package.json").version')
+          test "$GITHUB_REF_NAME" = "v$version" || {
+            printf 'Tag %s does not match package version v%s\n' "$GITHUB_REF_NAME" "$version" >&2
+            exit 1
+          }
+      - name: Publish npm packages
+        run: |
+          set -euo pipefail
+          version=$(node -p 'require("./package.json").version')
+          for package_dir in build/npm/pi build/npm/claude build/npm/codex; do
+            package_name=$(node -p "require('./$package_dir/package.json').name")
+            if npm view "$package_name@$version" version >/dev/null 2>&1; then
+              printf '%s@%s is already published; skipping\n' "$package_name" "$version"
+              continue
+            fi
+            npm publish "$package_dir" --access public --provenance
+          done
       - name: Generate release notes
         run: |
           python3 scripts/release/generate-release-notes.py \
@@ -37,7 +74,17 @@ jobs:
             --plugin src/packages/architecture.json \
             --output "$RUNNER_TEMP/release-notes.md" \
             --repository "$GITHUB_REPOSITORY"
-      - uses: softprops/action-gh-release@v3
-        with:
-          body_path: ${{ runner.temp }}/release-notes.md
-          generate_release_notes: false
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --notes-file "$RUNNER_TEMP/release-notes.md"
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --notes-file "$RUNNER_TEMP/release-notes.md"
+          fi

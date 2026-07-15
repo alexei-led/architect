@@ -1,9 +1,17 @@
 {
-  "name": "@alexei-led/architect",
+  "name": "@alexeiled/architect",
   "version": "0.9.1",
   "description": "Instruction-first architecture design and review role, skills, templates, and helper tools.",
+  "private": true,
   "license": "MIT",
-  "repository": "https://github.com/alexei-led/architect",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexei-led/architect.git"
+  },
+  "homepage": "https://github.com/alexei-led/architect#readme",
+  "bugs": {
+    "url": "https://github.com/alexei-led/architect/issues"
+  },
   "keywords": [
     "pi-package",
     "claude-code",
@@ -11,6 +19,10 @@
     "architecture",
     "code-review"
   ],
+  "scripts": {
+    "packages:stage": "python3 scripts/release/stage_npm_packages.py",
+    "packages:check": "python3 scripts/release/stage_npm_packages.py --check"
+  },
   "dependencies": {
     "pi-subagents": "0.34.0"
   },
@@ -22,6 +34,7 @@
       "agents": [
         "./dist/pi/agents"
       ]
-    }
+    },
+    "image": "https://raw.githubusercontent.com/alexei-led/architect/master/assets/architect-card.png"
   }
 }

@@ -7,6 +7,10 @@
 [![Method](https://img.shields.io/badge/method-Balanced%20Coupling-0f766e)](docs/methodology.md)
 [![Mode](https://img.shields.io/badge/reviews-read--only-2563eb)](docs/methodology.md)
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/alexei-led/architect/master/assets/architect-card.png" alt="Architect extension card" width="160" height="100">
+</p>
+
 Read-only architecture review and design for AI coding agents.
 
 `architect` packages its architecture skills for Claude Code, Codex CLI, Pi,
@@ -43,14 +47,16 @@ It does not edit production code during review.
 
 Local package development requires `agbun` on `PATH`. It is not installed by
 this repository; verify it with `agbun --version` before running `make build` or
-`make generated-check`. GitHub Actions runs only the CI-safe Ruff and pytest
+`make generated-check`. GitHub Actions runs CI-safe Ruff, pytest, and npm tarball
 checks; generated-package builds and drift checks stay local.
 
 ### Claude Code
 
+The repository marketplace installs the lean npm plugin payload.
+
 ```sh
-/plugin marketplace add alexei-led/architect
-/plugin install architecture@architect
+claude plugin marketplace add alexei-led/architect
+claude plugin install architecture@alexei-led-architect
 ```
 
 The generated Architect agent requests Claude Fable 5 at `xhigh` effort. Claude
@@ -70,11 +76,10 @@ The generated Codex package includes `agents/architect.toml`. Copy it into
 ### Pi
 
 The Architect role is a [`pi-subagents`](https://github.com/nicobailon/pi-subagents)
-agent. This repository declares that runtime dependency. Install directly from the
-repository:
+agent. The npm package declares that runtime dependency.
 
 ```sh
-pi install git:github.com/alexei-led/architect
+pi install npm:@alexeiled/architect
 ```
 
 For local development:
@@ -104,8 +109,7 @@ For local development, build then install `dist/copilot` as a local Copilot plug
 Grok Build accepts the Claude-compatible package, including the Architect role:
 
 ```sh
-make build
-grok plugin install --trust ./dist/claude
+grok plugin install --trust alexei-led/architect#dist/claude
 ```
 
 For project-local skills only, copy `dist/grok/.grok/` into the consumer project.

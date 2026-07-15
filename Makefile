@@ -21,7 +21,7 @@ SKILL_EVAL_CONCURRENCY := 8
 SKILL_EVAL_STRICT := 0
 endif
 
-.PHONY: setup build check generated-check package-smoke evals release help
+.PHONY: setup build check generated-check npm-packages npm-packages-check package-smoke evals release help
 
 setup: ## Install repo git hooks and dev deps
 	git config core.hooksPath scripts/git-hooks
@@ -38,7 +38,13 @@ check: ## Run CI-safe lint, format, and tests
 generated-check: ## Verify generated runtime packages without writing
 	agbun check
 
-package-smoke: build ## Install or load every generated package with available vendor CLIs
+npm-packages: ## Stage lean npm packages from generated runtime files
+	python3 scripts/release/stage_npm_packages.py
+
+npm-packages-check: ## Stage and inspect every npm tarball
+	python3 scripts/release/stage_npm_packages.py --check
+
+package-smoke: build npm-packages ## Install or load every generated package with available vendor CLIs
 	REQUIRE_VENDOR_CLIS=1 scripts/check-packages
 
 evals: ## Run paid skill evals (use FAST=1 for advisory fast mode)

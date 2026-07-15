@@ -28,9 +28,18 @@ assert_contains() {
 
 printf '=== Claude Code ===\n'
 if have claude; then
-	mkdir -p "$tmp_root/claude"
-	claude plugin validate "$repo_root/dist/claude"
-	CLAUDE_CONFIG_DIR="$tmp_root/claude" claude plugin marketplace add "$repo_root"
+	claude_marketplace="$tmp_root/claude-marketplace"
+	mkdir -p "$tmp_root/claude" "$claude_marketplace/.claude-plugin"
+	cp -R "$repo_root/build/npm/claude" "$claude_marketplace/plugin"
+	cat >"$claude_marketplace/.claude-plugin/marketplace.json" <<'JSON'
+{
+  "name": "alexei-led-architect",
+  "owner": {"name": "Alexei Ledenev"},
+  "plugins": [{"name": "architecture", "source": "./plugin", "version": "local"}]
+}
+JSON
+	claude plugin validate "$repo_root/build/npm/claude"
+	CLAUDE_CONFIG_DIR="$tmp_root/claude" claude plugin marketplace add "$claude_marketplace"
 	CLAUDE_CONFIG_DIR="$tmp_root/claude" claude plugin install architecture@alexei-led-architect
 	output=$(CLAUDE_CONFIG_DIR="$tmp_root/claude" claude plugin list --json)
 	assert_contains architecture "$output"
@@ -38,8 +47,22 @@ fi
 
 printf '=== Codex ===\n'
 if have codex; then
-	mkdir -p "$tmp_root/codex"
-	CODEX_HOME="$tmp_root/codex" codex plugin marketplace add "$repo_root" --json >/dev/null
+	codex_marketplace="$tmp_root/codex-marketplace"
+	mkdir -p "$tmp_root/codex" "$codex_marketplace/.agents/plugins"
+	cp -R "$repo_root/build/npm/codex" "$codex_marketplace/plugin"
+	cat >"$codex_marketplace/.agents/plugins/marketplace.json" <<'JSON'
+{
+  "name": "alexei-led-architect",
+  "interface": {"displayName": "architect"},
+  "plugins": [{
+    "name": "architecture",
+    "source": {"source": "local", "path": "./plugin"},
+    "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+    "category": "Productivity"
+  }]
+}
+JSON
+	CODEX_HOME="$tmp_root/codex" codex plugin marketplace add "$codex_marketplace" --json >/dev/null
 	CODEX_HOME="$tmp_root/codex" codex plugin add architecture@alexei-led-architect --json >/dev/null
 	output=$(CODEX_HOME="$tmp_root/codex" codex plugin list --json)
 	assert_contains architecture "$output"
@@ -50,7 +73,7 @@ if have pi; then
 	mkdir -p "$tmp_root/pi-home" "$tmp_root/pi-workspace"
 	(
 		cd "$tmp_root/pi-workspace"
-		HOME="$tmp_root/pi-home" pi install -l "$repo_root" --approve
+		HOME="$tmp_root/pi-home" pi install -l "$repo_root/build/npm/pi" --approve
 		output=$(HOME="$tmp_root/pi-home" pi list --approve)
 		assert_contains architect "$output"
 	)
@@ -71,9 +94,9 @@ fi
 printf '=== Grok Build ===\n'
 if have grok; then
 	mkdir -p "$tmp_root/grok/home" "$tmp_root/grok/config" "$tmp_root/grok/data"
-	grok plugin validate "$repo_root/dist/claude"
+	grok plugin validate "$repo_root/build/npm/claude"
 	env HOME="$tmp_root/grok/home" XDG_CONFIG_HOME="$tmp_root/grok/config" XDG_DATA_HOME="$tmp_root/grok/data" \
-		grok plugin install --trust "$repo_root/dist/claude"
+		grok plugin install --trust "$repo_root/build/npm/claude"
 	output=$(env HOME="$tmp_root/grok/home" XDG_CONFIG_HOME="$tmp_root/grok/config" XDG_DATA_HOME="$tmp_root/grok/data" \
 		grok plugin details architecture)
 	assert_contains architecture "$output"

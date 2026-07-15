@@ -46,6 +46,7 @@ files = [
 ]
 marketplaces = [
     Path(".claude-plugin/marketplace.json"),
+    Path(".agents/plugins/marketplace.json"),
     Path(".github/plugin/marketplace.json"),
     Path(".cursor-plugin/marketplace.json"),
 ]
@@ -90,6 +91,9 @@ for path in [root_package, *marketplaces]:
     for plugin in data.get("plugins", []):
         if "version" in plugin:
             plugin["version"] = version
+        source = plugin.get("source")
+        if isinstance(source, dict) and source.get("source") == "npm":
+            source["version"] = version
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 changelog = Path("CHANGELOG.md")
@@ -116,6 +120,7 @@ uv lock
 make build
 make generated-check
 make check
+make npm-packages-check
 command -v gitleaks >/dev/null 2>&1 || {
 	echo "gitleaks not installed"
 	exit 1
