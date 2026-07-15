@@ -9,6 +9,8 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-07-15
+
 ### Archfit 1.6 compatibility
 
 - Updated Architect skills, plan templates, and methodology guidance to use the
