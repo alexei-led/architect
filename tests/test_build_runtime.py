@@ -7,6 +7,9 @@ from architect_tools._contract import split_frontmatter
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_REFERENCE_RE = re.compile(r"`([^`]*resources/templates/[\w./-]+)`")
+# Users copy this agent into ~/.codex/agents, so its relative template paths
+# cannot resolve inside the package.
+CODEX_COPY_ONLY_AGENTS = REPO_ROOT / "dist/codex/.codex/agents"
 
 
 def read_json(path: str):
@@ -144,7 +147,7 @@ def test_runtime_discovery_manifests_point_to_generated_artifacts():
     assert codex_plugin["interface"]["displayName"] == "Architect"
     assert codex_plugin["interface"]["category"] == "Productivity"
     assert codex_plugin["interface"]["capabilities"] == ["Read"]
-    assert codex_plugin["skills"] == "./skills"
+    assert codex_plugin["skills"] == "./skills/"
     assert "agents" not in codex_plugin
 
     copilot_plugin = read_json("dist/copilot/plugin.json")
@@ -186,7 +189,7 @@ def test_compiled_runtime_artifacts_exist_and_use_compiled_template_paths():
     assert not (REPO_ROOT / "dist/grok/.grok/agents").exists()
     assert (REPO_ROOT / "dist/claude/agents/architect.md").is_file()
     assert (REPO_ROOT / "dist/cursor/agents/architect.md").is_file()
-    assert (REPO_ROOT / "dist/codex/agents/architect.toml").is_file()
+    assert (REPO_ROOT / "dist/codex/.codex/agents/architect.toml").is_file()
     pi_agent = REPO_ROOT / "dist/pi/agents/architect.md"
     assert pi_agent.is_file()
     assert "name: architect" in pi_agent.read_text(encoding="utf-8")
@@ -210,17 +213,19 @@ def test_generated_template_references_resolve_for_every_target():
     for target in ("claude", "codex", "pi", "copilot", "grok", "cursor"):
         root = REPO_ROOT / "dist" / target
         for path in sorted([*root.rglob("*.md"), *root.rglob("*.toml")]):
+            if path.is_relative_to(CODEX_COPY_ONLY_AGENTS):
+                continue
             for ref in TEMPLATE_REFERENCE_RE.findall(path.read_text(encoding="utf-8")):
                 assert (path.parent / ref).is_file(), f"{path} references missing {ref}"
 
 
 def test_architect_target_models_are_rendered():
-    claude_overlay = read_json("src/agents/.agentbundler/targets/claude.json")
+    claude_overlay = read_json("src/agents/architect.md.agentbundler/targets/claude.json")
     assert claude_overlay["frontmatterPatch"] == {
         "model": "fable",
         "effort": "xhigh",
     }
-    copilot_overlay = read_json("src/agents/.agentbundler/targets/copilot.json")
+    copilot_overlay = read_json("src/agents/architect.md.agentbundler/targets/copilot.json")
     assert copilot_overlay["frontmatterPatch"] == {"model": "MAI-Code-1-Flash"}
 
     claude_frontmatter, _ = split_frontmatter(
@@ -243,7 +248,7 @@ def test_architect_target_models_are_rendered():
         assert '"effort"' not in frontmatter and "\neffort:" not in frontmatter, path
 
     codex_agent = tomllib.loads(
-        (REPO_ROOT / "dist/codex/agents/architect.toml").read_text(encoding="utf-8")
+        (REPO_ROOT / "dist/codex/.codex/agents/architect.toml").read_text(encoding="utf-8")
     )
     assert "model" not in codex_agent
     assert "effort" not in codex_agent
@@ -251,7 +256,7 @@ def test_architect_target_models_are_rendered():
 
 def test_architect_sandbox_mode_is_codex_only():
     codex_agent = tomllib.loads(
-        (REPO_ROOT / "dist/codex/agents/architect.toml").read_text(encoding="utf-8")
+        (REPO_ROOT / "dist/codex/.codex/agents/architect.toml").read_text(encoding="utf-8")
     )
     assert codex_agent["name"] == "architect"
     assert codex_agent["sandbox_mode"] == "read-only"
