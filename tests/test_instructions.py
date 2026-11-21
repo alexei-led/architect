@@ -147,19 +147,22 @@ def test_archfit_calibration_instructions_exist():
     assert "calibration matrix" in agent
 
 
-def test_archfit_guidance_uses_v1_6_cli():
+def test_archfit_guidance_uses_v0_9_cli():
     tool = (SKILLS_DIR / "tools-archfit" / "SKILL.md").read_text()
     plan = (SKILLS_DIR / "architecture-plan" / "SKILL.md").read_text()
     review = (SKILLS_DIR / "architecture-review" / "SKILL.md").read_text()
     template = (REPO_ROOT / "src/resources/templates/plan.md").read_text()
 
-    assert "$ARCHFIT analyze --config .archfit.yaml --json" in tool
-    assert "$ARCHFIT check --config .archfit.yaml --json" in tool
-    assert "$ARCHFIT check --config .archfit.yaml --base <base-ref> --json" in tool
-    assert "--ai-summary" in tool
+    assert "$ARCHFIT check --format json" in tool
+    assert "$ARCHFIT check --base <base-ref> --format json" in tool
+    assert "$ARCHFIT report --format json" in tool
+    assert "brew install coupling-dev/tap/archfit" in tool
+    assert "github.com/coupling-dev/archfit" in tool
+    for retired in ("analyze", "--ai-summary", "--config", "alexei-led"):
+        assert retired not in tool
+        assert retired not in review
     assert "archfit check --base <ref>" in plan
-    assert "archfit check --config .archfit.yaml --base <ref>" in template
-    assert "analyze --ai-summary" in review
+    assert "archfit check --base <ref>" in template
 
 
 def test_coverage_gap_calibration_documented():

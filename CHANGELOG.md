@@ -9,6 +9,11 @@ patch = fixes and documentation updates.
 
 ## [Unreleased]
 
+### Archfit 0.9 new home
+
+- Moved archfit to its new home `github.com/coupling-dev/archfit` (v0.9.0; `brew install coupling-dev/tap/archfit`) in `tools-archfit` and `architect-doctor`.
+- Rewrote `tools-archfit` for the 0.9 command set (`doctor`, `rules`, `can`, `check`, `report`) and the `version: 1` policy; the retired `analyze`, scorecard, `agent_tasks`, labels, and `--ai-summary` guidance is gone.
+
 ## [0.9.2] - 2026-07-15
 
 ### npm extension distribution

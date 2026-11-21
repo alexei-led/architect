@@ -1,35 +1,36 @@
 ---
-{"description":"Gather deterministic architecture-fitness evidence with archfit: full checks, scorecards, deltas, SARIF/JSON findings, tool coverage, and agent_tasks. Use when a repo has .archfit.yaml or the user wants architect to combine its review with archfit. Produces hard facts for architecture-review to calibrate, not a replacement for independent design judgment. NOT for running archfit LLM review as source-of-truth, changing archfit config, baselining findings, or applying fixes.","name":"tools-archfit"}
+{"description":"Gather deterministic architecture-policy evidence with archfit 0.9: the check status for a change, rule and module facts, dependency answers, and the repository report. Use when a repo has .archfit.yaml or the user wants architect to combine its review with archfit. Produces hard facts for architecture-review to calibrate, not a replacement for independent design judgment. NOT for changing the policy, writing exceptions, running doctor --fix, or applying fixes.","name":"tools-archfit"}
 ---
 
 # archfit deterministic evidence
 
-Use archfit as a deterministic measurement and gate engine. It supplies whole-repo
-facts; the architect still judges intent, domain volatility, runtime/deploy
-context, false positives, and missing risks.
+Use archfit as a deterministic policy check. It judges a change against the
+repository's `.archfit.yaml` (`version: 1`) and reports the facts; the architect
+still judges intent, domain volatility, runtime/deploy context, false positives,
+and missing risks.
+
+Install: `brew install coupling-dev/tap/archfit`, `go install
+github.com/coupling-dev/archfit/cmd/archfit@v0.9.0`, or the image
+`ghcr.io/coupling-dev/archfit`. Source: <https://github.com/coupling-dev/archfit>.
 
 ## When to use
 
-Use when a target repo contains `.archfit.yaml` or `archfit.yaml`, when `archfit`
-is available on `PATH`, or when the user asks to combine architect review with
-archfit output. Use it during `architecture-review` before final triage/scoring
-so hard facts can reduce sampling bias.
+Use when a target repo contains `.archfit.yaml`, when `archfit` is available on
+`PATH`, or when the user asks to combine architect review with archfit output.
+Use it during `architecture-review` before final triage/scoring so hard facts
+can reduce sampling bias.
 
 Do not use this skill for:
 
-- `archfit analyze --ai-summary` or `archfit explain <fingerprint>
---ai-summary` AI narration as primary evidence;
-- `archfit config init`, `config update --apply`, `baseline`, `config enrich`
-  (labels/owner/volatility/subdomain), `config init --ai-classify`,
-  `config enrich ... --apply`, or config writes unless the user explicitly asks
-  for config work;
-- applying fixes from `agent_tasks`;
+- `archfit init`, `archfit doctor --fix`, `archfit request`, or any write to
+  `.archfit.yaml`, hooks, or exceptions unless the user explicitly asks;
+- applying fixes for check errors;
 - replacing the architect's independent evidence gathering and Balanced Coupling
   judgment.
 
 ## Skill navigation
 
-- Missing or absent config: return to `architecture-review`; record archfit as
+- Missing or absent policy: return to `architecture-review`; record archfit as
   missing or skipped. Optional archfit absence is a coverage gap, not a blocker.
 - Current skill: run deterministic archfit commands, summarize facts, and build
   a calibration matrix.
@@ -39,14 +40,10 @@ Do not use this skill for:
 
 ## Read-only discipline
 
-Prefer existing config only. Write command outputs to a temp directory outside the
-target repo. Do not create baselines, labels, generated reports, or config patches
-inside the repo without explicit user approval.
-
-If archfit or a child tool writes caches or indexes under the target repo, record
-that path as generated tool state. If the output path is inside the scanned root,
-warn that reports can contaminate measurements and move future outputs outside
-the repo or exclude them.
+Use the existing policy only. Archfit keeps its cache in `.archfit-cache/` of the
+target repo (generated tool state; record it, never commit it). Write command
+outputs to a temp directory outside the target repo. Do not create or change a
+policy, exception, hook, or request without explicit user approval.
 
 ## Deterministic command set
 
@@ -58,85 +55,66 @@ if [ -x ./archfit ]; then ARCHFIT=./archfit; fi
 if [ -x ./.bin/archfit ]; then ARCHFIT=./.bin/archfit; fi
 ```
 
-Run only commands that fit the repo and time budget. `analyze` is report-only:
-it exits `0` when analysis completes even when findings exist; read `verdict` and
-`findings` from its output. `check` enforces configured gates: `0` pass, `1`
-violation, `2` warning or strict-tool failure, and `3` config/runtime error.
-Treat `check` exits `1` and `2` as evidence, not command failures. Invalid JSON or
-exit `3` from either command is a tool failure.
+`check` exits `0` pass, `1` fail, `2` unknown (no verdict), wrong usage, or a tool
+error. Treat `1` and `unknown` as evidence, not command failures; `unknown` is not
+a pass. `can` exits `0` yes, `1` no, `2` unknown. `rules` and `report` exit `0`
+whatever they show.
 
 ```sh
-# Tool/config health.
+# Tool and hook health (read-only without --fix).
 $ARCHFIT doctor
 
-# Full deterministic facts as JSON: findings, metrics, classified_edges,
-# agent_tasks, and the coupling_balance score.
-$ARCHFIT analyze --config .archfit.yaml --json
+# The rules for the files the change touches, one module, or one rule.
+$ARCHFIT rules
+$ARCHFIT rules <path-or-rule> ...
 
-# Same report rendered as the coupling_balance scorecard.
-$ARCHFIT analyze --config .archfit.yaml --format scorecard
+# The modules by layer and their allowed dependencies.
+$ARCHFIT rules --graph
 
-# Human-readable deterministic audit (text is the default format).
-$ARCHFIT analyze --config .archfit.yaml
+# May <from> depend on <to>? (module, file, directory, import path, or library)
+$ARCHFIT can <from> <to>
 
-# Report-only delta facts, only when a meaningful base ref is known.
-$ARCHFIT analyze --config .archfit.yaml --base <base-ref> --json
-
-# Enforce current configured gates.
-$ARCHFIT check --config .archfit.yaml --json
-
-# Enforce only the delta against a meaningful base ref.
-$ARCHFIT check --config .archfit.yaml --base <base-ref> --json
+# Status of the change against its merge base with the target branch.
+$ARCHFIT check --format json
+$ARCHFIT check --base <base-ref> --format json
 
 # Optional CI annotation artifact (SARIF to stdout).
-$ARCHFIT check --config .archfit.yaml --sarif
+$ARCHFIT check --format sarif
+
+# Repository-wide state: clean, drift, or expired; unread places; expiring
+# exceptions; unchecked rules; balance of each allowed dependency.
+$ARCHFIT report --format json
 ```
 
-Plain `archfit explain <fingerprint>` is deterministic finding detail and may be
-used as evidence. Do not run `archfit analyze --ai-summary` or `archfit explain
-<fingerprint> --ai-summary` unless the user specifically wants Archfit's AI
-narrative. If you do, label it `advisory_ai`, capture parse/runtime failures, and
-never cite it as deterministic evidence.
+`check` compares the change with the target branch's policy; a local policy that
+differs from it gives `unknown`. `--policy <file>` previews a candidate policy
+without that comparison. Never run `archfit request` for evidence gathering: it
+posts a comment or opens an issue.
 
 ## Extract these facts
 
-From the JSON, scorecard, or text output, extract and summarize:
+From the JSON (`archfit.result.v1`, `archfit.architecture-state.v2`) or text,
+extract and summarize:
 
-- `tool_coverage` and `coverage_gaps`: missing, failed, skipped, and stale tools;
-  confidence impact.
-- `summary`, the single `coupling_balance` dimension (`score.overall`/
-  `overall_band`, confidence, evidence refs), and per-metric results in
-  `metrics[]`. archfit synthesizes only `coupling_balance`; derive the other six
-  architect dimensions from findings, metrics, and your own evidence.
-- `findings`: IDs, severity, status (`new`, `baseline`, `fixed`, `waived`,
-  `expired_waiver`), `rule_id`, files, modules, and `kind` (`gate` or
-  `advisory`).
-- `agent_tasks`: machine-readable repair tasks (`finding_id`, `rule_id`, `goal`,
-  `constraints`, `files`, `validation`); emitted for active gate findings only.
-- dependency metrics: `cycle` and `blast_radius` where present in `metrics[]`.
-  archfit emits no hub or instability metric — get those from codegraph.
-- coupling facts: archfit scores each classified cross-boundary edge with the
-  book equation (`balance = max(|strength - distance|, 10 - volatility) + 1`,
-  1–10, scorer `bc_score.v3`). Each `bc/imbalanced_coupling` finding carries its
-  BC fields in `matched_by`: `score_value`, `score_band`, `cheapest_move`,
-  `distance_basis`, `strength`, `distance`, `volatility`. The `classified_edges`
-  summary holds `mean_balance`, `scored`, `abstained`,
-  `by_strength`/`by_distance`/`by_volatility`, and `llm_approved`. Strength includes
-  `symmetric` (clone-derived, ordinal 9); volatility may be `undeclared`/`unknown`
-  (scored worst-case); abstained edges (unknown strength or distance) are excluded
-  from `mean_balance`.
-- config quality signals from `config_warnings` and module declarations:
-  generated or under-specified modules, missing owner, deploy unit, subdomain,
-  volatility, public/private boundary, or weak warn-only rules.
-- delta facts: new, existing/baseline, resolved, severity-changed, and
-  touched-by-delta findings where available.
-- artifact/cache noise: `.archfit-cache`, `.codegraph`, `.gitnexus`, generated
-  reports, package caches, vendored external caches, or output under the target
-  root.
+- `status` (`pass`, `fail`, `waiting`, `unknown`), `summary`, `base`, `head`,
+  `engine`, `date`, and the `policy` block (`protected`, `differs`, `target`).
+  `protected: false` means the result is a local guide, not change control.
+- `errors[]`: `rule`, `path`, `line`, `what`, `why`, `instead`, `from`/`to`
+  modules, `next.kind` (`fix`, `command`, `wait`, `restore`), and `from_change`.
+- `unknown[]`: cause (`policy`, `base`, `tool`, `import`) and the restore step.
+  Each is a coverage gap; the status is not a pass.
+- `balance` on coupling errors: `value`, `min`, `strength` (`contract`, `model`,
+  `intrusive`), and the target's declared `volatility`; `surface` and `package`
+  for a use past the target's public or model part.
+- the `repository` object (push runs, and `report`): `state`, `drift[]`,
+  `expiring[]`, `unread[]`.
+- exceptions: covered rules, `expires` dates, and expired ones.
+- doctor tool rows: missing or invalid tools (`ast-grep`, `cargo`, `dotnet`)
+  mean unread code and lower confidence.
 
-Absence of findings is evidence only when the relevant tool coverage is present
-and current. A green score on missing/thin evidence is a calibration concern, not
-proof of architectural health.
+Absence of errors is evidence only when the relevant code was read (`unknown[]`
+and `unread[]` empty). A `pass` on missing or thin evidence is a calibration
+concern, not proof of architectural health.
 
 ## Architect calibration matrix
 
@@ -169,73 +147,57 @@ Classify with independent evidence:
   functional coupling without import edges, duplicated business rules, prompt/tool
   contract drift, deploy selector drift, slow/flaky architecture-adjacent tests,
   or supply-chain/runtime topology risk.
-- `config_changes`: `.archfit.yaml` improvements that would make deterministic
-  facts more honest, especially module ownership, deploy units, public/private
-  boundaries, subdomain, volatility, and stronger gates.
+- `config_changes`: `.archfit.yaml` policy changes that would make deterministic
+  facts more honest, especially module boundaries, public/model surfaces,
+  volatility, allowed dependencies, and missing rules. Propose them for an owner
+  (`archfit request`); never edit the policy yourself.
 - `new_fitness_checks`: executable checks to add after design/repair.
-- `labels_to_confirm`: architect-inferred subdomain/volatility/strength labels a
-  human should approve before deterministic gating uses them. Strength labels
-  live in `.archfit-labels.yaml` (`from`/`to`/`strength`/`status`/`provenance`/
-  `confidence`, plus `rationale`/`evidence_hash`); only `status: approved`
-  entries override the SCIP hint, and the labelable strengths are
-  contract/model/functional/symmetric/intrusive. Flag heavy `provenance: llm`
-  labeling — archfit drops `coupling_balance` confidence a band when ≥20% of
-  scored edges rest on non-high-confidence LLM labels.
+- `labels_to_confirm`: architect-inferred volatility or surface declarations
+  (`volatility`, `public`, `model`) that an owner should approve before the
+  policy uses them. Archfit reads volatility only from the policy.
 
 ## Balanced Coupling handling
 
-archfit now scores edges with the book's own equation (scorer `bc_score.v3`,
-ordinals matching the book: contract 1, model 3, functional 8, symmetric 9,
-intrusive 10), so its `coupling_balance` is book-aligned in math. It still cannot
-own the business truth behind the inputs. For every important coupling claim,
-apply `methodology-balanced-coupling` and confirm what archfit could only declare
-or infer:
+Archfit declares no coupling score. It enforces the policy's rules and, for
+coupling rules, a balance of strength against the target's declared volatility.
+It cannot own the business truth behind those inputs. For every important
+coupling claim, apply `methodology-balanced-coupling` and confirm:
 
-- strength: archfit's SCIP-based strength tops out at `functional` (contract and
-  intrusive are deterministic; model-vs-functional is heuristic; `symmetric`
-  comes only from clone detection). Confirm the model/functional/contract
-  distinction by reading the crossing types; promote it with an approved
-  `.archfit-labels.yaml` entry, not a prose guess.
-- distance: archfit reports a `distance_basis` (code_structure / ownership /
-  deploy_unit). `runtime_async` is report-only and never moves distance — fold
-  runtime/deploy distance in yourself.
-- volatility: archfit derives it from config `volatility:`/`subdomain:` and an
-  inferred-volatility cascade — never from churn or path/name guessing, and it
-  cannot see provider-switch (implementation) volatility in generic/supporting
-  code. Confirm declarations against the business domain; `undeclared`/`unknown`
-  volatility scores worst-case and is a config gap to flag, not a finding.
-- balancing move: archfit suggests a `cheapest_move` (reduce_strength /
-  reduce_distance / lower_volatility / declare_volatility); treat it as a
-  hypothesis and confirm it against the relationship record.
+- strength: archfit reports `contract`, `model`, or `intrusive` from the target's
+  declared surface. Confirm functional or symmetric coupling by reading the
+  crossing code; archfit does not see it.
+- distance and runtime/deploy topology: fold these in yourself; archfit's module
+  graph is code structure.
+- volatility: the policy declares it. Confirm each declaration against the
+  business domain; an undeclared or wrong value is a config gap to flag, not a
+  finding.
+- balancing move: use `instead` and `next` as hypotheses and confirm them
+  against the relationship record.
 
-Do not pass through archfit's `coupling_balance` score as the architect score.
-Use the per-edge `score_value`/`score_band` and the `classified_edges`
-distribution as evidence, then score from relationship records and coverage.
+Do not pass through archfit's `balance` values or status as the architect score.
+Use the errors, the balance inputs, and the coverage fields as evidence, then
+score from relationship records and coverage.
 
-Apply coverage-gap calibration consistently so the magnitude is reproducible,
-not just the direction:
+Apply coverage-gap calibration consistently:
 
-- When edge classification is absent (`scip absent` / "no classified
-  cross-boundary edges"), set `coupling_balance` confidence `low` and cap the
-  band at `mixed` (≤ 60, default ~50) unless you classify the edges yourself with
-  codegraph, `go list`, or dependency-cruiser.
-- When `classified_edges.scored` is a low fraction of `total` (many `abstained`
-  unknown-strength/distance edges), `mean_balance` rests on thin coverage — treat
-  it like absent classification: low confidence, cap at `mixed`.
+- `unknown` status, non-empty `unknown[]` or `unread[]`, or missing tools: set
+  confidence `low` for the affected dimension and cap the band at `mixed` unless
+  you classify the edges yourself with codegraph, `go list`, or
+  dependency-cruiser.
+- `policy.protected: false` or `policy.differs: true`: the result does not show
+  change control; say so.
 - When GitNexus covered only part of the changed files, apply the same cap to
   `change_locality`.
-- A clean `coupling_balance` dimension with `confidence: medium` and an `n/a`
-  metric is a coverage gap, not a strong result.
 
 ## Output
 
 Return a concise evidence summary:
 
 - commands run and artifacts produced;
-- exit statuses interpreted as findings/warnings/failures;
-- tool coverage and confidence impact;
-- top deterministic findings and agent tasks by severity/risk;
-- scorecard/delta highlights;
+- exit statuses interpreted as findings/unknowns/failures;
+- coverage (`unknown[]`, `unread[]`, doctor tools) and confidence impact;
+- top errors and repository drift by severity/risk;
+- check and report highlights;
 - calibration matrix;
 - smallest follow-up checks needed to verify hypotheses.
 
@@ -243,11 +205,8 @@ Return a concise evidence summary:
 
 - Deterministic archfit facts can seed review; they do not replace independent
   verification or user/domain context.
-- No high-quality architecture claim from missing or unclassified evidence.
-- No source or config writes without explicit approval.
-- No treating `archfit analyze --ai-summary` / `archfit explain <fingerprint>
---ai-summary` narration as source-of-truth; plain `explain` remains
-  deterministic finding detail.
+- No high-quality architecture claim from missing or unread evidence.
+- No source, policy, or exception writes without explicit approval.
 - No counting an archfit pass as proof of correctness, security, performance, or
-  all architecture quality; it only says configured checks and measured metrics
-  passed under the observed coverage.
+  all architecture quality; it only says the policy's rules passed under the
+  observed coverage.
