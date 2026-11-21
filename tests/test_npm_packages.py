@@ -28,10 +28,10 @@ EXPECTED = {
     "codex": {
         "name": "@alexeiled/architect-codex",
         "top_level": {
+            ".codex",
             ".codex-plugin",
             "LICENSE",
             "README.md",
-            "agents",
             "package.json",
             "resources",
             "skills",

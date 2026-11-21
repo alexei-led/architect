@@ -70,7 +70,7 @@ codex plugin marketplace add alexei-led/architect
 codex plugin add architecture@alexei-led-architect
 ```
 
-The generated Codex package includes `agents/architect.toml`. Copy it into
+The generated Codex package includes `.codex/agents/architect.toml`. Copy it into
 `~/.codex/agents/` or `.codex/agents/` if you want subagent spawning.
 
 ### Pi

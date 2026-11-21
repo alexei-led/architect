@@ -65,7 +65,7 @@ PACKAGE_SPECS = (
         name="@alexeiled/architect-codex",
         title="Architect for Codex",
         description="Evidence-based architecture design and review plugin for OpenAI Codex.",
-        files=(".codex-plugin", "agents", "resources", "skills"),
+        files=(".codex-plugin", ".codex", "resources", "skills"),
         install=(
             "codex plugin marketplace add alexei-led/architect\n"
             "codex plugin add architecture@alexei-led-architect"

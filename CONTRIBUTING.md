@@ -87,8 +87,8 @@ Source of truth is `agentbundle.json` plus the declared files under `src/`.
 Generated artifacts in `dist/` are committed. **Agent Bundler** is a local
 system prerequisite: `make build`, `make generated-check`, `make package-smoke`,
 and the release script invoke it from `PATH`. GitHub workflows run only the
-CI-safe `make check` target and do not require `agbun`. Check the installed version
-with `agbun --version`; its value is recorded in `dist/.agentbundler/build.json`
+CI-safe `make check` target and do not require `agbun`. Generated output is built with `agbun` v0.7.3; other versions
+produce drift. Check the installed version with `agbun --version`; its value is recorded in `dist/.agentbundler/build.json`
 after each build.
 
 Main outputs:
@@ -97,7 +97,7 @@ Main outputs:
 agentbundle.json
 src/packages/architecture.json
 dist/claude/{.claude-plugin,skills,agents,resources}/
-dist/codex/{.codex-plugin,skills,agents,resources}/
+dist/codex/{.codex-plugin,.codex,skills,resources}/
 dist/pi/{package.json,skills,agents,resources}/
 dist/copilot/{plugin.json,skills,agents,resources}/
 dist/grok/.grok/{skills,resources}/

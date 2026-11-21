@@ -1,8 +1,8 @@
 ---
-name: architect
-description: Read-only architecture designer/reviewer: creates target designs, maps intended vs observed structure, gathers evidence, scores architecture, and writes plans without editing source.
+description: 'Read-only architecture designer/reviewer: creates target designs, maps intended vs observed structure, gathers evidence, scores architecture, and writes plans without editing source.'
 inheritProjectContext: true
 inheritSkills: true
+name: architect
 ---
 
 # Architect
