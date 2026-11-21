@@ -104,8 +104,8 @@ instructions or report.
 5. **Gather evidence across applicable dimensions.** Use `tools-code-search` for
    local search/read/grep first. If the repo has `.archfit.yaml`/`archfit.yaml`
    or `archfit` is available, run `tools-archfit` as a deterministic preflight:
-   full JSON/scorecard, delta when a base ref is known, tool coverage, findings,
-   and `agent_tasks`. Then climb the narrowest evidence ladder that can prove
+   `check` (with a base ref when known), `rules --graph`, `report`, doctor tool
+   coverage, errors, and unknown or unread places. Then climb the narrowest evidence ladder that can prove
    each claim: ast-grep/tree-sitter for syntactic presence, LSP for resolved
    symbol truth, codegraph, codebase-memory-mcp, or language dependency tools
    for graph shape and cycles, GitNexus or git history for co-change/churn, and
@@ -126,10 +126,8 @@ instructions or report.
      classify findings and metrics as `confirmed`, `severity_adjusted`,
      `false_positive_or_noise`, or `missed_by_archfit`. Include config changes,
      new fitness checks, and labels to confirm. Do not pass through archfit's
-     scores as architect scores; use them as evidence and coverage signals.
-     archfit's optional AI narrative (`analyze --ai-summary` or `explain
-<fingerprint> --ai-summary`) is advisory only, never source-of-truth.
-     Plain `explain <fingerprint>` output is deterministic finding detail.
+     status or balance values as architect scores; use them as evidence and
+     coverage signals.
    - **For every important coupling relationship, write a small evidence
      matrix before scoring it.** Capture: relationship and abstraction level;
      strength classification plus evidence; distance split into code,

@@ -70,8 +70,8 @@ analysis cannot support a green score.
 - **Coverage gaps cap quality** — when a dimension's primary evidence is missing,
   partial, or stale and not independently re-established, set confidence low and
   cap the band at `mixed` (≤60), defaulting to the band midpoint. This makes
-  down-calibration of tool false-greens (e.g. archfit `coupling_balance` with no
-  classified edges when scip is absent) reproducible in magnitude, not only
+  down-calibration of tool false-greens (e.g. an archfit `pass` while `unknown[]`
+  or `unread[]` lists code it could not read) reproducible in magnitude, not only
   direction. The `architecture-scorecard` skill lists primary evidence per
   dimension.
 - **Never score from directory shape alone** — only observed, enforced behavior

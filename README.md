@@ -41,7 +41,7 @@ It does not edit production code during review.
 - skills for review, design, planning, scoring, methodology, and evidence gathering
 - report, design, and plan templates
 - helper CLIs: `architect-doctor`, `architect-validate-report`, `architect-compare-reports`
-- optional `tools-archfit` workflow for calibrated archfit scorecards, JSON findings, deltas, and agent tasks
+- optional `tools-archfit` workflow for calibrated archfit check results, rule errors, and repository reports
 
 ## Install
 
@@ -179,7 +179,7 @@ architect-compare-reports base-report.md head-report.md
 
 `architect-doctor` reports which local analysis tools are available and where coverage is missing.
 If `archfit` and `.archfit.yaml` are present, architecture reviews can start from
-archfit's deterministic scorecard, JSON findings, delta output, and `agent_tasks`,
+archfit's deterministic check status, rule errors, and repository report,
 then verify and calibrate them against code, intent, and runtime/deploy context.
 
 ## Read next

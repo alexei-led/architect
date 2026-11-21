@@ -45,7 +45,7 @@ TOOLS: tuple[Tool, ...] = (
         "archfit",
         ("dependency", "change", "report"),
         ("archfit", "--version"),
-        "see archfit install docs",
+        "brew install coupling-dev/tap/archfit",
     ),
     Tool("ast-grep", ("structural",), ("ast-grep", "--version"), "brew install ast-grep"),
     Tool(

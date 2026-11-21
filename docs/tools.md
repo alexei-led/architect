@@ -25,7 +25,7 @@ when the matching ecosystem marker is present in the repo.
 | `rg`                               | discovery                | all                   | `brew install ripgrep`                                 |
 | `git`                              | change                   | all                   | install git                                            |
 | `gitnexus`                         | change                   | all                   | see GitNexus install docs                              |
-| `archfit`                          | dependency/change/report | all                   | see archfit install docs                               |
+| `archfit`                          | dependency/change/report | all                   | `brew install coupling-dev/tap/archfit`                |
 | `ast-grep`                         | structural               | all                   | `brew install ast-grep`                                |
 | `tree-sitter`                      | structural               | all                   | `brew install tree-sitter-cli`                         |
 | `ruff`                             | structural               | python                | `uv pip install ruff`                                  |
@@ -80,8 +80,8 @@ Use the narrowest tool that can prove the claim, in this order:
 1. `tools-code-search` / `fd` / `rg` / targeted reads — locate the path,
    symbol, or config.
 2. `tools-archfit` when `.archfit.yaml` exists or archfit is available — gather
-   deterministic scorecard, JSON findings, tool coverage, deltas, and
-   `agent_tasks` for calibration.
+   deterministic check status, rule errors, unread places, and repository
+   report for calibration.
 3. `ast-grep` or `tree-sitter` — prove syntactic presence or absence of a pattern.
 4. LSP — prove resolved definitions, references, implementations, and diagnostics.
 5. `codegraph` (or `codebase-memory-mcp` when installed) or language dependency
@@ -100,8 +100,8 @@ The current split uses tool-family skills by language or operational surface,
 plus one deterministic aggregate for archfit because it has a distinct
 review-calibration workflow and machine-readable output contract.
 
-- `tools-archfit` — archfit deterministic `analyze` output (JSON/scorecard/SARIF),
-  delta (`--base`), tool coverage, and `agent_tasks`.
+- `tools-archfit` — archfit deterministic `check` output (JSON/SARIF), `rules`,
+  `can`, `report`, and tool coverage.
 - `tools-lsp-tree-sitter` — LSP, tree-sitter.
 - `tools-typescript` — dependency-cruiser, madge, knip, tsc, ESLint.
 - `tools-python` — import-linter, pydeps, pyright/basedpyright, ruff,
